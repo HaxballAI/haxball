@@ -9,26 +9,35 @@ class Action:
         return self.kick
 
     def isMovingDir(self,direction):
-        if (self.dir == 0 and direction == "still")
-            or (self.dir == 1 and direction == "r")
-            or (self.dir == 2 and direction in ["ur","ru"])
-            or (self.dir == 3 and direction == "u")
-            or (self.dir == 4 and direction in ["ul","lu"])
-            or (self.dir == 5 and direction == "l")
-            or (self.dir == 6 and direction in ["dl","ld"])
-            or (self.dir == 7 and direction == "d")
-            or (self.dir == 8 and direction in ["dr","rd"]):
-            return True
-        else:
-            return False
+        # Return true if directions is the current one
+        # Directions should be a string like "ul" for up-left for
+        # ease of use
+        stringToNumber = {
+            "still": 0,
+            "u": 1,
+            "ur": 2,
+            "ru": 2,
+            "r": 3,
+            "dl": 4,
+            "ld": 4,
+            "d": 5,
+            "dl": 6,
+            "ld": 6,
+            "l": 7,
+            "ul": 8,
+            "lu": 8
+        }
 
+        if (type(direction) == "str"):
+            direction = stringToNumber[direction]
 
+        return self.dir == direction
 
-        #Return true if directions is current one
-        #Directions should be a string like "ul" for up-left for
-        #ease of use
-        continue
+    def getDirection(self):
+        # Returns the movement direction (from 0 to 8)
+        return self.dir
 
     def rawAction(self):
-        #Returns raw action for use in networks.
-        continue
+        # Returns raw action for use in networks. A tuple of the kicking state (0 or 1)
+        # and movement direction (from 0 to 8)
+        return (self.isKicking(), self.getDirection())
