@@ -1,12 +1,13 @@
 
 
 class Action:
-    def __init__(self, directionNumber, isKicking):
-        self.kick = isKicking
+    def __init__(self, directionNumber = 0, isKicking = 0):
+        self.kicking = isKicking
         self.dir = directionNumber
 
+
     def isKicking(self):
-        return self.kick
+        return self.kicking
 
     def isMovingDir(self,direction):
         # Return true if directions is the current one

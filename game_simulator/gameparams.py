@@ -1,3 +1,20 @@
+# Pygame stuff hasn't beed added properly yet!!!
+windowwidth = 840
+windowheight = 400
+pitchwidth = 640
+pitchheight = 260
+goalsize = 110
+
+# defines player numbers
+# the first players are controlled manually
+# this was added because it will end up being added anyways
+# it also allows us to test the robustness of player-player collisions when there are large numbers of players
+redteamsize = 1
+blueteamsize = 1
+
+# defines terminal game parameters
+maxscore = 1
+
 # game parameters for the player
 playerradius = 15
 playerbouncing = 0.5
@@ -39,3 +56,34 @@ centrecircleradius = 70
 centrecirclecolour = (199, 230, 189)
 centrecirclethickness = 3
 centrelinethickness = 3
+
+# defines text properties
+textcolour = (0, 0, 0)
+textposition = (215, 25)
+
+# defines relevant pitch coordinates for calculation
+pitchcornerx = int(np.floor((windowwidth - pitchwidth) / 2))
+pitchcornery = int(np.floor((windowheight - pitchheight) / 2))
+
+goalcornery = int(np.floor((windowheight - goalsize) / 2))
+y1 = pitchcornerx - 30
+
+z1 = pitchcornerx + pitchwidth
+z2 = goalcornery
+
+a1 = y1 + 2 * ballradius
+a2 = int(np.floor(goalcornery - goallinethickness / 2))
+
+b1 = z1
+b2 = int(np.floor(goalcornery - goallinethickness / 2))
+
+# defines the movespace of a player
+movespacex = [playerradius, windowwidth - playerradius]
+movespacey = [playerradius, windowheight - playerradius]
+
+# defines the movespace of a ball
+ballspacex = [pitchcornerx + ballradius, pitchcornerx + pitchwidth - ballradius]
+ballspacey = [pitchcornery + ballradius, pitchcornery + pitchheight - ballradius]
+
+# defines goal width
+goaly = [goalcornery, goalcornery + goalsize]
