@@ -1,23 +1,23 @@
 
 
 class Action:
-    def __init__(self, direction, isKicking):
+    def __init__(self, directionNumber, isKicking):
         self.kick = isKicking
-        self.dir = direction
+        self.dir = directionNumber
 
-        def isKicking(self):
+    def isKicking(self):
         return self.kick
 
     def isMovingDir(self,direction):
-        if (self.dir[0, 0] == 0 and direction == "still")
-            or (self.dir[0, 0] == 1 and direction == "r")
-            or (self.dir[0, 0] == 2 and direction in ["ur","ru"])
-            or (self.dir[0, 0] == 3 and direction == "u")
-            or (self.dir[0, 0] == 4 and direction in ["ul","lu"])
-            or (self.dir[0, 0] == 5 and direction == "l")
-            or (self.dir[0, 0] == 6 and direction in ["dl","ld"])
-            or (self.dir[0, 0] == 7 and direction == "d")
-            or (self.dir[0, 0] == 8 and direction in ["dr","rd"]):
+        if (self.dir == 0 and direction == "still")
+            or (self.dir == 1 and direction == "r")
+            or (self.dir == 2 and direction in ["ur","ru"])
+            or (self.dir == 3 and direction == "u")
+            or (self.dir == 4 and direction in ["ul","lu"])
+            or (self.dir == 5 and direction == "l")
+            or (self.dir == 6 and direction in ["dl","ld"])
+            or (self.dir == 7 and direction == "d")
+            or (self.dir == 8 and direction in ["dr","rd"]):
             return True
         else:
             return False
