@@ -286,6 +286,12 @@ class GameSim:
             ballsPos = [ ball.pos for ball in self.balls ]
 
             return (redsPos, bluesPos, ballsPos )
+        elif format == "full info"
+            redsInfo = [ [rPlayer.pos, rPlayer.vel, rPlayer.isKicking] for rPlayer in self.reds ]
+            bluesInfo = [ [bPlayer.pos, bPlayer.vel, bPlayer.isKicking] for bPlayer in self.blues ]
+            ballsInfo = [ [ball.pos, ball.vel ] for ball in self.balls ]
+
+            return (redsInfo, bluesInfo, ballsInfo )
 
 
     def giveCommands(self, actions , actionFormat = "raw"):
