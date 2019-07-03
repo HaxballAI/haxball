@@ -6,7 +6,7 @@ import numpy as np
 
 
 class GameSim:
-    def __init__(self, red_player_count, blue_player_count, ball_count):
+    def __init__(self, red_player_count, blue_player_count, ball_count, extraParams = {}):
         # Intialise the entities
         self.reds = [entities.Player("red", self.getRandomPositionInThePlayingField()) for i in range(red_player_count)]
         self.blues = [entities.Player("blue", self.getRandomPositionInThePlayingField()) for i in range(blue_player_count)]
@@ -33,6 +33,18 @@ class GameSim:
 
         # Number of elapsed frames
         self.frames = 0
+
+        # Sets extra information to do with. Probably a convention that I am
+        # not following here.
+        if "printDebug" in extraParams:
+            self.printDebug = extraParams["printDebug"]
+        else:
+            self.printDebug = False
+
+        if "printDebugFreq" in extraParams:
+            self.printDebugFreq = extraParams["printDebugFreq"]
+        else:
+            self.printDebugFreq = 600
 
     def getRandomPositionInThePlayingField(self):
         return np.array([gameparams.pitchcornerx + (np.random.random_sample())*580, gameparams.pitchcornery + (np.random.random_sample())*200]).astype(float)
@@ -94,7 +106,8 @@ class GameSim:
                     obj.pos[1] = movement_space_y[1] + (movement_space_y[1] - obj.pos[1]) / 2
 
     def makeEntityHitBall(self, obj, ball):
-        print("HIT!!")
+        if self.printDebug:
+            print("HIT!!")
         # Updates the ball's velocity since a kick call was called from obj to ball
         ball.vel = ball.vel + gameparams.kickstrength * ball.inv_mass * obj.getDirectionTo(ball)
         return
@@ -115,7 +128,8 @@ class GameSim:
 
         bouncingq = obj1.bouncingquotient * obj2.bouncingquotient
         if is_obj1_static == False:
-            print("Kinetic collision!")
+            if self.printDebug:
+                print("Kinetic collision!")
             centerofmass = (obj1.pos * obj1.mass + obj2.pos * obj2.mass) / (obj1.mass + obj2.mass)
 
             # updates object components
@@ -242,7 +256,7 @@ class GameSim:
     def getFeedback(self):
         # TODO: Idk in what form you want this to be, can be easily modified.
 
-        if self.frames % 10000 == 0:
+        if self.printDebug:
             # Print some stuff
             print("Frame {}, score R-B: {}-{}".format(self.frames, self.red_score, self.blue_score))
             if self.was_point_scored:
@@ -257,13 +271,34 @@ class GameSim:
 
         return
 
-    def giveCommands(self, actions):
+    def getState(self, format = "positions"):
+        # Returns data based off of format specified
+        # TODO: come up with better name than format
+
+        # Positions give list of player positions, then ball positions
+        # All positions are just tuples (x,y)
+        # First element is list of red player positions
+        # Second element is list of blue player positions
+        # Thirst is list of ball positions
+        if format == "positions":
+            redsPos = [ rPlayer.pos for rPlayer in self.reds ]
+            bluesPos = [ bPlayer.pos for bPlayer in self.blues ]
+            ballsPos = [ ball.pos for ball in self.balls ]
+
+            return (redsPos, bluesPos, ballsPos )
+
+
+    def giveCommands(self, actions , actionFormat = "raw"):
         # Gives commands to all the controllable entities in the game in the form of a list pf commands.
         # Each command is a tuple of size 2 specifying direction (18 possible states) and then the kick state.
         # The position of the command in the list determines which entity the command is sent to.
         # TODO: Pls complete this function
-        for i in range(len(self.players)):
-            self.players[i].current_action = playeraction.Action(actions[i][0], actions[i][1])
+        if actionFormat == "raw":
+            for i in range(len(self.players)):
+                self.players[i].current_action = playeraction.Action(actions[i][0], actions[i][1])
+        elif actionFormat == "object":
+            for i in range(len(self.players)):
+                self.players[i].current_action = actions[i]
         return
 
     def step(self):

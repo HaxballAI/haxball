@@ -9,13 +9,15 @@ def main():
     blue_player_count = 4
     ball_count = 1 # Doesn't work with >1 yet as balls reset in the exact center
 
-    game = gamesim.GameSim(red_player_count, blue_player_count, ball_count)
+    game = gamesim.GameSim(red_player_count, blue_player_count, ball_count ,
+                        {"printDebug" : True})
     game.getFeedback()
 
     while(True):
-        game.giveCommands([[randrange(9), 1] for i in range(red_player_count + blue_player_count)])
+        game.giveCommands([[randrange(9), 1] for i in range(red_player_count + blue_player_count)] , "raw")
         game.step()
-        game.getFeedback()
+        if game.frames % 10000 == 0:
+            game.getFeedback()
 
 
 if __name__ == "__main__":
