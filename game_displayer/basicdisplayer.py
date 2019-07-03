@@ -1,8 +1,10 @@
 
 import pygame
+from pygame import gfxdraw
+from game_simulator import gameparams as gp
 
-playerRad = 15
-ballRad = 10
+
+
 
 
 class GameWindow:
@@ -26,17 +28,30 @@ class GameWindow:
 
         self.win.fill( (0, 0, 0 ) )
 
+        # draws ball area
+        pygame.draw.rect(self.win, gp.pitchcolour, (gp.pitchcornerx, gp.pitchcornery, gp.pitchwidth, gp.pitchheight))
+        #draws area behind goal
+        pygame.draw.rect(self.win, gp.pitchcolour, (gp.pitchcornerx - 30, gp.goalcornery, 30, gp.goalsize))
+        pygame.draw.rect(self.win, gp.pitchcolour, (gp.windowwidth - gp.pitchcornerx, gp.goalcornery, 30, gp.goalsize))
+
+
         for redP in things[0]:
             intP = tuple( map( int, redP ) )
-            pygame.draw.circle(self.win, (255,0,0), intP, playerRad)
+            pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1], gp.playerradius-gp.kickingcirclethickness, gp.redcolour)
+            pygame.gfxdraw.aacircle(self.win, intP[0], intP[1], gp.playerradius-gp.kickingcirclethickness, gp.redcolour)
 
         for blueP in things[1]:
             intP = tuple( map( int, blueP ) )
-            pygame.draw.circle(self.win, (0,0,255), intP, playerRad)
+            pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1], gp.playerradius-gp.kickingcirclethickness, gp.bluecolour)
+            pygame.gfxdraw.aacircle(self.win, intP[0], intP[1], gp.playerradius-gp.kickingcirclethickness, gp.bluecolour)
 
         for ballP in things[2]:
             intP = tuple( map( int, ballP ) )
-            pygame.draw.circle(self.win, (255,255,255), intP, ballRad)
+            pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1], gp.ballradius+2, (0, 0, 0))
+            pygame.gfxdraw.aacircle(self.win, intP[0], intP[1], gp.ballradius+2, (0, 0, 0))
+            pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1], gp.ballradius, (255, 255, 255))
+            pygame.gfxdraw.aacircle(self.win, intP[0], intP[1], gp.ballradius, (255, 255, 255))
+
 
 
         self.clock.tick(self.fps)
