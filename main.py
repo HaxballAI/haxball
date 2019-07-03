@@ -1,7 +1,11 @@
 from game_simulator import gamesim
 from game_displayer import basicdisplayer
+<<<<<<< HEAD
 from human_agent import humanagent
 from retarded_agent import retardedagent
+=======
+import random
+>>>>>>> c0b75a08b92335137f5e17c74df30e62accc58d0
 
 import numpy as np
 from random import randrange
@@ -34,6 +38,7 @@ def main():
     running = True
 
     while(running):
+<<<<<<< HEAD
         # Updates the key states for the human agent
         disp.updateKeys()
         commands = [agents[i].getRawAction(disp) for i in range(player_count)]
@@ -41,6 +46,12 @@ def main():
 
         game.step()
         disp.drawThings(game.getState( "positions" ) )
+=======
+        if random.random() < 0.01:
+            game.giveCommands([[randrange(9), 1] for i in range(red_player_count + blue_player_count)] , "raw")
+        game.step()
+        disp.drawThings( game.getState( "full info" ) )
+>>>>>>> c0b75a08b92335137f5e17c74df30e62accc58d0
 
         if game.frames % 10000 == 0:
             game.getFeedback()

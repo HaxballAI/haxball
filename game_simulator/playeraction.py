@@ -5,13 +5,24 @@ dirx = [0, 0, 1, 1, 1, 0, -1, -1, -1]
 diry = [0, 1, 1, 0, -1, -1 ,-1, 0, 1]
 
 
+
+
 class Action:
-    def __init__(self, directionNumber = 0, isKicking = 0):
+    def __init__(self, directionNumber = 0, isKicking = 0, canKick = 1):
         self.kicking = isKicking
+        self.can_kick = canKick
         self.dir_idx = directionNumber
 
+        self.direction = np.array((dirx[self.dir_idx], diry[self.dir_idx])).astype("float")
+        if directionNumber != 0:
+            self.direction /= np.linalg.norm(self.direction)
+            
+
     def isKicking(self):
-        return self.kicking
+        return self.kicking == 1
+
+    def canKick(self):
+        return self.can_kick
 
     def isMovingDir(self, direction):
         # Return true if directions is the current one
@@ -40,10 +51,7 @@ class Action:
 
     def getDirection(self):
         # Returns the movement direction as a normalised vector
-        direction = np.array((dirx[self.dir_idx], diry[self.dir_idx])).astype("float")
-        if self.dir_idx != 0:
-            direction /= np.linalg.norm(direction)
-        return direction
+        return self.direction
 
     def rawAction(self):
         # Returns raw action for use in networks. A tuple of the kicking state (0 or 1)
@@ -51,4 +59,4 @@ class Action:
         return (self.kicking, self.dir_idx)
 
 def getRandomAction():
-    return Action(random.randint(0,9), random.randint(0,2))
+    return Action(random.randint(0,8), random.randint(0,1))

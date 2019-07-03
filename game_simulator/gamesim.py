@@ -85,7 +85,7 @@ class GameSim:
             movement_space_x = [gameparams.pitchcornerx + obj.radius,
                                 gameparams.pitchcornerx + gameparams.pitchwidth - obj.radius]
             movement_space_y = [gameparams.pitchcornery + obj.radius,
-                                gameparams.pitchcornerx + gameparams.pitchheight - obj.radius]
+                                gameparams.pitchcornery + gameparams.pitchheight - obj.radius]
 
             if obj.pos[0] <= movement_space_x[0] or obj.pos[0] >= movement_space_x[1]:
                 if obj.pos[1] >= gameparams.goaly[0] and obj.pos[1] <= gameparams.goaly[1]:
@@ -206,7 +206,7 @@ class GameSim:
                 if player.getDistanceTo(ball) <= player.radius + ball.radius + 4:
                     self.has_the_game_been_kicked_off = True
 
-                    if player.current_action.isKicking() == True and player.can_kick == True:
+                    if player.current_action.isKicking() == True and player.current_action.canKick() == True:
                         self.makeEntityHitBall(player, ball)
                         player.can_kick = False
                     elif player.current_action.isKicking() == False:
@@ -284,6 +284,12 @@ class GameSim:
             ballsPos = [ ball.pos for ball in self.balls ]
 
             return (redsPos, bluesPos, ballsPos )
+        elif format == "full info":
+            redsInfo = [ [rPlayer.pos, rPlayer.vel, rPlayer.current_action.isKicking() and rPlayer.current_action.canKick()] for rPlayer in self.reds ]
+            bluesInfo = [ [bPlayer.pos, bPlayer.vel, bPlayer.current_action.isKicking() and bPlayer.current_action.canKick()] for bPlayer in self.blues ]
+            ballsInfo = [ [ball.pos, ball.vel ] for ball in self.balls ]
+
+            return (redsInfo, bluesInfo, ballsInfo )
 
 
     def giveCommands(self, actions, actionFormat = "raw"):

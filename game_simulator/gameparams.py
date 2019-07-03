@@ -68,6 +68,14 @@ pitchcornerx = int(np.floor((windowwidth - pitchwidth) / 2))
 pitchcornery = int(np.floor((windowheight - pitchheight) / 2))
 
 goalcornery = int(np.floor((windowheight - goalsize) / 2))
+
+redgoalpostup = (pitchcornerx, goalcornery)
+redgoalpostdown = (pitchcornerx, goalcornery + goalsize)
+bluegoalpostup = (windowwidth - pitchcornerx, goalcornery)
+bluegoalpostdown = (windowwidth - pitchcornerx, goalcornery + goalsize)
+
+goalposts = [redgoalpostup, redgoalpostdown, bluegoalpostup, bluegoalpostdown]
+
 y1 = pitchcornerx - 30
 
 z1 = pitchcornerx + pitchwidth
