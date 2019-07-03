@@ -8,8 +8,9 @@ diry = [0, 1, 1, 0, -1, -1 ,-1, 0, 1]
 
 
 class Action:
-    def __init__(self, directionNumber = 0, isKicking = 0):
+    def __init__(self, directionNumber = 0, isKicking = 0, canKick = 1):
         self.kicking = isKicking
+        self.can_kick = canKick
         self.dir_idx = directionNumber
 
         self.direction = np.array((dirx[self.dir_idx], diry[self.dir_idx])).astype("float")
@@ -19,6 +20,9 @@ class Action:
 
     def isKicking(self):
         return self.kicking
+
+    def canKick(self):
+        return self.can_kick
 
     def isMovingDir(self, direction):
         # Return true if directions is the current one
