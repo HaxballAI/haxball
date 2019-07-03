@@ -14,6 +14,8 @@ class GameWindow:
         self.clock = pygame.time.Clock()
         self.fps = fps
 
+        self.rip = False
+
         pygame.init()
 
         self.win = pygame.display.set_mode( (self.width, self.height ) )
@@ -39,6 +41,11 @@ class GameWindow:
 
         self.clock.tick(self.fps)
         pygame.display.update()
+
+    def getInput(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.rip = True
 
     def shutdown(self):
         pygame.quit()

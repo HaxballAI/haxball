@@ -16,12 +16,20 @@ def main():
                         {"printDebug" : True})
     game.getFeedback()
 
-    while(True):
+    running = True
+
+    while(running):
         game.giveCommands([[randrange(9), 1] for i in range(red_player_count + blue_player_count)] , "raw")
         game.step()
         disp.drawThings( game.getState( "positions" ) )
+
         if game.frames % 10000 == 0:
             game.getFeedback()
+
+        disp.getInput()
+        if disp.rip:
+            disp.shutdown()
+            running = False
 
 
 if __name__ == "__main__":
