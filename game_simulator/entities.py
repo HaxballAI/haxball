@@ -55,10 +55,6 @@ class Player(Entity):
 
         # player properties
         self.team = team
-        if self.team == "red":
-            self.colour = gameparams.redcolour
-        else:
-            self.colour = gameparams.bluecolour
         self.mass = 1 / gameparams.playerinvmass
 
     def updatePosition(self):
