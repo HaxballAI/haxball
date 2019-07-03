@@ -19,7 +19,7 @@ class Action:
 
 
     def isKicking(self):
-        return self.kicking
+        return self.kicking == 1
 
     def canKick(self):
         return self.can_kick
