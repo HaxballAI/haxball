@@ -85,7 +85,7 @@ class GameSim:
             movement_space_x = [gameparams.pitchcornerx + obj.radius,
                                 gameparams.pitchcornerx + gameparams.pitchwidth - obj.radius]
             movement_space_y = [gameparams.pitchcornery + obj.radius,
-                                gameparams.pitchcornerx + gameparams.pitchheight - obj.radius]
+                                gameparams.pitchcornery + gameparams.pitchheight - obj.radius]
 
             if obj.pos[0] <= movement_space_x[0] or obj.pos[0] >= movement_space_x[1]:
                 if obj.pos[1] >= gameparams.goaly[0] and obj.pos[1] <= gameparams.goaly[1]:
