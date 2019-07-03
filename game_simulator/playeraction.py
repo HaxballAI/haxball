@@ -15,7 +15,7 @@ class Action:
         self.direction = np.array((dirx[self.dir_idx], diry[self.dir_idx])).astype("float")
         if directionNumber != 0:
             self.direction /= np.linalg.norm(self.direction)
-
+            
 
     def isKicking(self):
         return self.kicking == 1

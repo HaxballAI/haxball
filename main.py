@@ -1,5 +1,6 @@
 from game_simulator import gamesim
 from game_displayer import basicdisplayer
+import random
 
 import numpy as np
 from random import randrange
@@ -19,7 +20,8 @@ def main():
     running = True
 
     while(running):
-        game.giveCommands([[randrange(9), 1] for i in range(red_player_count + blue_player_count)] , "raw")
+        if random.random() < 0.01:
+            game.giveCommands([[randrange(9), 1] for i in range(red_player_count + blue_player_count)] , "raw")
         game.step()
         disp.drawThings( game.getState( "positions" ) )
 
