@@ -36,7 +36,7 @@ class GameWindow:
         pygame.draw.rect(self.win, gp.pitchcolour, (gp.pitchcornerx - 30, gp.goalcornery, 30, gp.goalsize))
         pygame.draw.rect(self.win, gp.pitchcolour, (gp.windowwidth - gp.pitchcornerx, gp.goalcornery, 30, gp.goalsize))
 
-        # draws goal lines
+        # draws pitch borders
         pygame.draw.rect(self.win, gp.goallinecolour, (
         gp.pitchcornerx - gp.goallinethickness // 2, gp.pitchcornery - gp.goallinethickness // 2, gp.goallinethickness,
         gp.pitchheight + gp.goallinethickness))
@@ -49,6 +49,13 @@ class GameWindow:
         pygame.draw.rect(self.win, gp.goallinecolour, (
         gp.pitchcornerx - gp.goallinethickness // 2, gp.windowheight - gp.pitchcornery - gp.goallinethickness // 2,
         gp.pitchwidth + gp.goallinethickness, gp.goallinethickness))
+
+        # draws goalposts
+        for goalpost in gp.goalposts:
+            pygame.gfxdraw.filled_circle(self.win, goalpost[0], goalpost[1], gp.goalpostradius, (0, 0, 0))
+            pygame.gfxdraw.aacircle(self.win, goalpost[0], goalpost[1], gp.goalpostradius, (0, 0, 0))
+            pygame.gfxdraw.filled_circle(self.win, goalpost[0], goalpost[1], gp.goalpostradius-gp.goalpostborderthickness, gp.goalpostcolour)
+            pygame.gfxdraw.aacircle(self.win, goalpost[0], goalpost[1], gp.goalpostradius-gp.goalpostborderthickness, gp.goalpostcolour)
 
 
         for redInfo in things[0]:
