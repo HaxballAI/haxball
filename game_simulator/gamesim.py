@@ -206,7 +206,7 @@ class GameSim:
                 if player.getDistanceTo(ball) <= player.radius + ball.radius + 4:
                     self.has_the_game_been_kicked_off = True
 
-                    if player.current_action.isKicking() == True and player.can_kick == True:
+                    if player.current_action.isKicking() == True and player.current_action.canKick() == True:
                         self.makeEntityHitBall(player, ball)
                         player.can_kick = False
                     elif player.current_action.isKicking() == False:
@@ -286,9 +286,9 @@ class GameSim:
             ballsPos = [ ball.pos for ball in self.balls ]
 
             return (redsPos, bluesPos, ballsPos )
-        elif format == "full info"
-            redsInfo = [ [rPlayer.pos, rPlayer.vel, rPlayer.isKicking] for rPlayer in self.reds ]
-            bluesInfo = [ [bPlayer.pos, bPlayer.vel, bPlayer.isKicking] for bPlayer in self.blues ]
+        elif format == "full info":
+            redsInfo = [ [rPlayer.pos, rPlayer.vel, rPlayer.current_action.isKicking() and rPlayer.current_action.canKick()] for rPlayer in self.reds ]
+            bluesInfo = [ [bPlayer.pos, bPlayer.vel, bPlayer.current_action.isKicking() and bPlayer.current_action.canKick()] for bPlayer in self.blues ]
             ballsInfo = [ [ball.pos, ball.vel ] for ball in self.balls ]
 
             return (redsInfo, bluesInfo, ballsInfo )

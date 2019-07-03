@@ -23,7 +23,7 @@ def main():
         if random.random() < 0.01:
             game.giveCommands([[randrange(9), 1] for i in range(red_player_count + blue_player_count)] , "raw")
         game.step()
-        disp.drawThings( game.getState( "positions" ) )
+        disp.drawThings( game.getState( "full info" ) )
 
         if game.frames % 10000 == 0:
             game.getFeedback()

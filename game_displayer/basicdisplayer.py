@@ -2,6 +2,7 @@
 import pygame
 from pygame import gfxdraw
 from game_simulator import gameparams as gp
+from game_simulator import playeraction as pa
 
 
 
@@ -35,18 +36,51 @@ class GameWindow:
         pygame.draw.rect(self.win, gp.pitchcolour, (gp.windowwidth - gp.pitchcornerx, gp.goalcornery, 30, gp.goalsize))
 
 
-        for redP in things[0]:
-            intP = tuple( map( int, redP ) )
-            pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1], gp.playerradius-gp.kickingcirclethickness, gp.redcolour)
-            pygame.gfxdraw.aacircle(self.win, intP[0], intP[1], gp.playerradius-gp.kickingcirclethickness, gp.redcolour)
+        for redInfo in things[0]:
+            intP = tuple( map( int, redInfo[0] ) )
 
-        for blueP in things[1]:
-            intP = tuple( map( int, blueP ) )
-            pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1], gp.playerradius-gp.kickingcirclethickness, gp.bluecolour)
-            pygame.gfxdraw.aacircle(self.win, intP[0], intP[1], gp.playerradius-gp.kickingcirclethickness, gp.bluecolour)
+            if redInfo[2]:
+                pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1],
+                    gp.kickingcircleradius, gp.kickingcirclecolour)
+                pygame.gfxdraw.aacircle(self.win, intP[0], intP[1],
+                    gp.kickingcircleradius, gp.kickingcirclecolour)
 
-        for ballP in things[2]:
-            intP = tuple( map( int, ballP ) )
+            else:
+                pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1],
+                    gp.kickingcircleradius, (0,0,0))
+                pygame.gfxdraw.aacircle(self.win, intP[0], intP[1],
+                    gp.kickingcircleradius, (0,0,0))
+
+
+            pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1],
+                gp.playerradius-gp.kickingcirclethickness, gp.redcolour)
+            pygame.gfxdraw.aacircle(self.win, intP[0], intP[1],
+                gp.playerradius-gp.kickingcirclethickness, gp.redcolour)
+
+
+
+        for blueInfo in things[1]:
+            intP = tuple( map( int, blueInfo[0] ) )
+            if blueInfo[2]:
+                pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1],
+                    gp.kickingcircleradius, gp.kickingcirclecolour)
+                pygame.gfxdraw.aacircle(self.win, intP[0], intP[1],
+                    gp.kickingcircleradius, gp.kickingcirclecolour)
+
+            else:
+                pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1],
+                    gp.kickingcircleradius, (0,0,0))
+                pygame.gfxdraw.aacircle(self.win, intP[0], intP[1],
+                    gp.kickingcircleradius, (0,0,0))
+
+
+            pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1],
+                gp.playerradius-gp.kickingcirclethickness, gp.bluecolour)
+            pygame.gfxdraw.aacircle(self.win, intP[0], intP[1],
+                gp.playerradius-gp.kickingcirclethickness, gp.bluecolour)
+
+        for ballInfo in things[2]:
+            intP = tuple( map( int, ballInfo[0] ) )
             pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1], gp.ballradius+2, (0, 0, 0))
             pygame.gfxdraw.aacircle(self.win, intP[0], intP[1], gp.ballradius+2, (0, 0, 0))
             pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1], gp.ballradius, (255, 255, 255))

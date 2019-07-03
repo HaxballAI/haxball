@@ -51,7 +51,6 @@ class Player(Entity):
 
         # Initialise current action + can_kick which presents kick-spamming
         self.current_action = playeraction.Action()
-        self.can_kick = True
 
         # player properties
         self.team = team
@@ -60,7 +59,7 @@ class Player(Entity):
     def updatePosition(self):
         # Updates the position of the player while taking the player input into account
         # Damping effect when trying to kick the ball
-        if self.current_action.isKicking() == True and self.can_kick == True:
+        if self.current_action.isKicking() == True and self.current_action.canKick() == True:
             self.vel += self.current_action.getDirection() * gameparams.kickaccel
         else:
             self.vel += self.current_action.getDirection() * gameparams.accel
