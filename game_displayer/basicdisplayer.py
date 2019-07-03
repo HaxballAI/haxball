@@ -28,12 +28,27 @@ class GameWindow:
         # Things is of a very specific format that should not be violated
 
         self.win.fill( (0, 0, 0 ) )
-
+        # draws background
+        pygame.draw.rect(self.win, gp.bordercolour, (0, 0, gp.windowwidth, gp.windowheight))
         # draws ball area
         pygame.draw.rect(self.win, gp.pitchcolour, (gp.pitchcornerx, gp.pitchcornery, gp.pitchwidth, gp.pitchheight))
         #draws area behind goal
         pygame.draw.rect(self.win, gp.pitchcolour, (gp.pitchcornerx - 30, gp.goalcornery, 30, gp.goalsize))
         pygame.draw.rect(self.win, gp.pitchcolour, (gp.windowwidth - gp.pitchcornerx, gp.goalcornery, 30, gp.goalsize))
+
+        # draws goal lines
+        pygame.draw.rect(self.win, gp.goallinecolour, (
+        gp.pitchcornerx - gp.goallinethickness // 2, gp.pitchcornery - gp.goallinethickness // 2, gp.goallinethickness,
+        gp.pitchheight + gp.goallinethickness))
+        pygame.draw.rect(self.win, gp.goallinecolour, (
+        gp.windowwidth - gp.pitchcornerx - gp.goallinethickness // 2, gp.pitchcornery - gp.goallinethickness // 2, gp.goallinethickness,
+        gp.pitchheight + gp.goallinethickness))
+        pygame.draw.rect(self.win, gp.goallinecolour, (
+        gp.pitchcornerx - gp.goallinethickness // 2, gp.pitchcornery - gp.goallinethickness // 2, gp.pitchwidth + gp.goallinethickness,
+        gp.goallinethickness))
+        pygame.draw.rect(self.win, gp.goallinecolour, (
+        gp.pitchcornerx - gp.goallinethickness // 2, gp.windowheight - gp.pitchcornery - gp.goallinethickness // 2,
+        gp.pitchwidth + gp.goallinethickness, gp.goallinethickness))
 
 
         for redInfo in things[0]:
