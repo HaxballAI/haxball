@@ -31,6 +31,19 @@ class HumanAgent():
         else:
             dir = max(a, b)
 
+        # Temporary for direction flipping in z
+        if a == 1:
+            a = 5
+        elif a == 5:
+            a = 1
+            
+        if a == 1 and b == 7:
+            dir = 8
+        elif a != 0 and b != 0:
+            dir = (a + b) // 2
+        else:
+            dir = max(a, b)
+
         return (dir, gui.isKeyPressed(self.kick))
 
     def getAction(self, gui):
