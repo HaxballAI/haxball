@@ -211,13 +211,11 @@ class GameSim:
                         player.can_kick = False
                     elif player.current_action.isKicking() == False:
                         player.can_kick = True
-        return
 
     def updatePositions(self):
         # Update all the positions of the entities, no collision detection
         for entity in self.moving_objects:
             entity.updatePosition()
-        return
 
     def resetMap(self):
         # Reset the positions of the entities in the sim
@@ -288,7 +286,7 @@ class GameSim:
             return (redsPos, bluesPos, ballsPos )
 
 
-    def giveCommands(self, actions , actionFormat = "raw"):
+    def giveCommands(self, actions, actionFormat = "raw"):
         # Gives commands to all the controllable entities in the game in the form of a list pf commands.
         # Each command is a tuple of size 2 specifying direction (18 possible states) and then the kick state.
         # The position of the command in the list determines which entity the command is sent to.

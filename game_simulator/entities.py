@@ -15,18 +15,12 @@ def get_idx():
 # Base class for any entity, stores position, velocity, acceleration.
 class Entity:
     def __init__(self, initial_position, initial_velocity, initial_acceleration, radius, bouncingquotient):
-        self.pos = initial_position
-        self.vel = initial_velocity
-        self.acc = initial_acceleration
+        self.pos = np.array(initial_position)
+        self.vel = np.array(initial_velocity)
+        self.acc = np.array(initial_acceleration)
 
         self.radius = radius
         self.bouncingquotient = bouncingquotient
-
-    def updatePosition(self):
-        # Updates the position of the entity. Doesn't include any step duration for
-        # whatever reason. God help us all
-        self.vel *= gameparams.balldamping
-        self.pos += self.vel
 
     # Get the Euclidian distance from self to obj
     def getDistanceTo(self, obj):
@@ -39,8 +33,6 @@ class Entity:
 
 class Player(Entity):
     def __init__(self, team, initial_position, initial_velocity = np.zeros(2), initial_acceleration = np.zeros(2)):
-        # TODO: NO NEWKICK
-
         # Initialise positional parameters, basic properties of the object
         Entity.__init__(self, initial_position, initial_velocity, initial_acceleration,
                         gameparams.playerradius, gameparams.playerbouncing)
@@ -84,13 +76,15 @@ class Ball(Entity):
         # Initialise positional parameters, basic properties of the object
         Entity.__init__(self, initial_position, initial_velocity, initial_acceleration, gameparams.ballradius, gameparams.ballbouncing)
 
-        # TODO: This isn't even called at any point lol, remove?
-        # sets default positions
-        self.default_position = initial_position
-
         # ball properties
         self.mass = 1 / gameparams.ballinvmass
         self.inv_mass = gameparams.ballinvmass
+
+    def updatePosition(self):
+        # Updates the position of the entity. Doesn't include any step duration for
+        # whatever reason. God help us all
+        self.vel *= gameparams.balldamping
+        self.pos += self.vel
 
     def reset(self):
         # positional parameters
