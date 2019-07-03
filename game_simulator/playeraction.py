@@ -1,15 +1,22 @@
+import numpy as np
 
+dirx = [0, 0, 1, 1, 1, 0, -1, -1, -1]
+diry = [0, 1, 1, 0, -1, -1 ,-1, 0, 1]
 
 class Action:
     def __init__(self, directionNumber = 0, isKicking = 0):
         self.kicking = isKicking
-        self.dir = directionNumber
+        self.dir_idx = directionNumber
+
+        self.direction = np.array((dirx[self.dir_idx], diry[self.dir_idx])).astype("float")
+        if directionNumber != 0:
+            self.direction /= np.linalg.norm(self.direction)
 
 
     def isKicking(self):
         return self.kicking
 
-    def isMovingDir(self,direction):
+    def isMovingDir(self, direction):
         # Return true if directions is the current one
         # Directions should be a string like "ul" for up-left for
         # ease of use
@@ -32,13 +39,13 @@ class Action:
         if (type(direction) == "str"):
             direction = stringToNumber[direction]
 
-        return self.dir == direction
+        return self.dir_idx == direction
 
     def getDirection(self):
-        # Returns the movement direction (from 0 to 8)
-        return self.dir
+        # Returns the movement direction as a normalised vector
+        return self.direction
 
     def rawAction(self):
         # Returns raw action for use in networks. A tuple of the kicking state (0 or 1)
         # and movement direction (from 0 to 8)
-        return (self.isKicking(), self.getDirection())
+        return (self.kicking, self.dir_idx)

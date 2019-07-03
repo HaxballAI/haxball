@@ -1,74 +1,41 @@
-import playeraction
-import entities
-import playeraction
+from game_simulator import entities
+from game_simulator import gameparams
+from game_simulator import playeraction
+
+import numpy as np
 
 
 class GameSim:
-    def __init__(self, red_players, blue_players, balls):
+    def __init__(self, red_player_count, blue_player_count, ball_count):
         # Intialise the entities
-        self.reds = red_players
-        self.blues = blue_players
-        self.balls = balls
-        self.goalposts = [entities.GoalPost(np.array(pitchcornerx, goalcornery)),
-                          entities.GoalPost(np.array(pitchcornerx, goalcornery + goalsize)),
-                          entities.GoalPost(np.array(windowwidth - pitchcornerx, goalcornery)),
-                          entities.GoalPost(np.array(windowwidth - pitchcornerx, goalcornery + goalsize))]
+        self.reds = [entities.Player("red", self.getRandomPositionInThePlayingField()) for i in range(red_player_count)]
+        self.blues = [entities.Player("blue", self.getRandomPositionInThePlayingField()) for i in range(blue_player_count)]
+        self.goalposts = [entities.GoalPost(np.array((gameparams.pitchcornerx, gameparams.goalcornery))),
+                          entities.GoalPost(np.array((gameparams.pitchcornerx, gameparams.goalcornery + gameparams.goalsize))),
+                          entities.GoalPost(np.array((gameparams.windowwidth - gameparams.pitchcornerx, gameparams.goalcornery))),
+                          entities.GoalPost(np.array((gameparams.windowwidth - gameparams.pitchcornerx, gameparams.goalcornery + gameparams.goalsize)))]
         self.centre_block = entities.CentreCircleBlock(np.array(gameparams.ballstart))
+        self.balls = [entities.Ball(self.getRandomPositionInThePlayingField()) for i in range(ball_count)]
 
         # Create useful groupings
         self.players = self.reds + self.blues
         self.moving_objects = self.players + self.balls
 
-        # Game state flags
+        # Game state info
         self.has_the_game_been_kicked_off = True
 
         self.red_last_goal = False
+        # Flag showing whether a point was scored in the current step
+        self.was_point_scored = False
 
-    def resolveCollision(self, obj1, obj2, is_obj1_static = 0):
-        # if there is a collision between the two objects, resolve it. Assumes two circles
-        # Has flag for the case where obj2 is static and doesn't get any momentum
-        direction = (obj1.pos - obj2.pos)
-        distance = (np.linalg.norm(direction))
-        bouncingq = obj1.bouncingquotient * obj2.bouncingquotient
-        centerofmass = (obj1.pos * obj1.mass + obj2.pos * obj2.mass) / (obj1.mass + obj2.mass)
+        self.red_score = 0
+        self.blue_score = 0
 
-        # if the objects aren't overlapping, don't even bother resolving
-        if distance > obj1.radius + obj2.radius:
-            return
+        # Number of elapsed frames
+        self.frames = 0
 
-        # calculates normal and tangent vectors
-        collisionnormal = direction / distance
-        collisiontangent = np.array([direction[1], - direction[0]]) / (np.linalg.norm(direction))
-
-        if !is_obj1_static:
-            # updates object components
-            obj1normalvelocity = np.dot(np.array(obj1.velocity), collisionnormal)
-            obj2normalvelocity = np.dot(np.array(obj2.velocity), collisionnormal)
-
-            # inelastic collision formula
-            obj1newnormalvelocity = (bouncingq * obj2.mass * (obj2normalvelocity - obj1normalvelocity) + obj1.mass * obj1normalvelocity + obj2.mass * obj2normalvelocity) / (obj1.mass + obj2.mass)
-            obj2newnormalvelocity = (bouncingq * obj1.mass * (obj1normalvelocity - obj2normalvelocity) + obj2.mass * obj2normalvelocity + obj1.mass * obj1normalvelocity) / (obj2.mass + obj1.mass)
-            obj1tangentvelocity = np.dot(np.array(obj1.velocity), collisiontangent)
-            obj2tangentvelocity = np.dot(np.array(obj2.velocity), collisiontangent)
-
-            obj1.velocity = obj1newnormalvelocity * np.array(collisionnormal) + obj1tangentvelocity * np.array(collisiontangent)
-            obj2.velocity = obj2newnormalvelocity * np.array(collisionnormal) + obj2tangentvelocity * np.array(collisiontangent)
-
-            obj1.pos = centerofmass + ((obj1.radius + obj2.radius) + bouncingq * (obj1.radius + obj2.radius - distance)) * collisionnormal * obj2.mass / (obj1.mass + obj2.mass)
-            obj2.pos = centerofmass - ((obj1.radius + obj2.radius) + bouncingq * (obj1.radius + obj2.radius - distance)) * collisionnormal * obj1.mass / (obj1.mass + obj2.mass)
-        else:
-            # updates obj2 components since that's the only moving part
-            obj1normalvelocity = np.dot(np.array(obj1.velocity), collisionnormal)
-            obj2normalvelocity = np.dot(np.array(obj2.velocity), collisionnormal)
-            velocityafter = (obj1normalvelocity + obj2normalvelocity) * bouncingq * 2
-
-            obj1tangentvelocity = np.dot(np.array(obj1.velocity), collisiontangent)
-            obj2tangentvelocity = np.dot(np.array(obj2.velocity), collisiontangent)
-
-            obj1.velocity = - velocityafter * np.array(collisionnormal) + obj1tangentvelocity * np.array(collisiontangent)
-            obj2.velocity = velocityafter * np.array(collisionnormal) + obj2tangentvelocity * np.array(collisiontangent)
-
-            obj2.pos = obj1.pos - collisionnormal * (obj1.radius + obj2.radius)
+    def getRandomPositionInThePlayingField(self):
+        return np.array([gameparams.pitchcornerx + (np.random.random_sample())*580, gameparams.pitchcornery + (np.random.random_sample())*200]).astype(float)
 
     def keepOutOfCentre(self, obj):
         # Moves an object out of the centre area. Called during kickoff
@@ -83,31 +50,21 @@ class GameSim:
             self.centre_block.pos[0] = int(self.centre_block.pos[0]) # Idk why this even exists
             self.centre_block.pos[1] = int(self.centre_block.pos[1])
 
-    def giveCommands(self, actions):
-        # Gives commands to all the controllable entities in the game in the form of a list pf commands.
-        # Each command is a tuple of size 2 specifying kick state and direction (18 possible states).
-        # The position of the command in the list determines which entity the command is sent to.
-        continue
-
-    def getFeedback(self):
-        # Idk in what form you want this to be, can be easily modified.
-        continue
-
     def keepEntityInMovementSpace(self, obj, is_ball = 0):
         # should keep things on the board where the movement happens
 
-        if !is_ball:
+        if is_ball == False:
             movement_space_x = [obj.radius, gameparams.windowwidth - obj.radius]
             movement_space_y = [obj.radius, gameparams.windowheight - obj.radius]
 
             if obj.pos[0] <= movement_space_x[0] or obj.pos[0] >= movement_space_x[1]:
-                obj.velocity[0] = 0
+                obj.vel[0] = 0
                 if obj.pos[0] <= movement_space_x[0]:
                     obj.pos[0] = movement_space_x[0]
                 if obj.pos[0] >= movement_space_x[1]:
                     obj.pos[0] = movement_space_x[1]
             if obj.pos[1] <= movement_space_y[0] or obj.pos[1] >= movement_space_y[1]:
-                obj.velocity[1] = 0
+                obj.vel[1] = 0
                 if obj.pos[1] <= movement_space_y[0]:
                     obj.pos[1] = movement_space_y[0]
                 if obj.pos[1] >= movement_space_y[1]:
@@ -122,43 +79,101 @@ class GameSim:
                 if obj.pos[1] >= gameparams.goaly[0] and obj.pos[1] <= gameparams.goaly[1]:
                     pass
                 else:
-                    obj.velocity[0] = - 0.5 * ball.velocity[0]
+                    obj.vel[0] = - 0.5 * obj.vel[0]
                     if obj.pos[0] <= movement_space_x[0]:
                         obj.pos[0] = movement_space_x[0] + (movement_space_x[0] - obj.pos[0]) / 2
 
-                    if ball.pos[0] >= movement_space_x[1]:
+                    if obj.pos[0] >= movement_space_x[1]:
                         obj.pos[0] = movement_space_x[1] + (movement_space_x[1] - obj.pos[0]) / 2
 
             if obj.pos[1] <= movement_space_y[0] or obj.pos[1] >= movement_space_y[1]:
-                obj.velocity[1] = - 0.5 * obj.velocity[1]
+                obj.vel[1] = - 0.5 * obj.vel[1]
                 if obj.pos[1] <= movement_space_y[0]:
                     obj.pos[1] = movement_space_y[0] + (movement_space_y[0] - obj.pos[1]) / 2
                 if obj.pos[1] >= movement_space_y[1]:
                     obj.pos[1] = movement_space_y[1] + (movement_space_y[1] - obj.pos[1]) / 2
 
+    def makeEntityHitBall(self, obj, ball):
+        print("HIT!!")
+        # Updates the ball's velocity since a kick call was called from obj to ball
+        ball.vel = ball.vel + gameparams.kickstrength * ball.inv_mass * obj.getDirectionTo(ball)
+        return
+
+    def resolveCollision(self, obj1, obj2, is_obj1_static = 0):
+        # if there is a collision between the two objects, resolve it. Assumes two circles
+        # Has flag for the case where obj2 is static and doesn't get any momentum
+        direction = (obj1.pos - obj2.pos)
+        distance = (np.linalg.norm(direction))
+
+        # if the objects aren't overlapping, don't even bother resolving
+        if distance > obj1.radius + obj2.radius:
+            return
+
+        # calculates normal and tangent vectors
+        collisionnormal = direction / distance
+        collisiontangent = np.array([direction[1], - direction[0]]) / (np.linalg.norm(direction))
+
+        bouncingq = obj1.bouncingquotient * obj2.bouncingquotient
+        if is_obj1_static == False:
+            print("Kinetic collision!")
+            centerofmass = (obj1.pos * obj1.mass + obj2.pos * obj2.mass) / (obj1.mass + obj2.mass)
+
+            # updates object components
+            obj1normalvelocity = np.dot(np.array(obj1.vel), collisionnormal)
+            obj2normalvelocity = np.dot(np.array(obj2.vel), collisionnormal)
+
+            # inelastic collision formula
+            obj1newnormalvelocity = (bouncingq * obj2.mass * (obj2normalvelocity - obj1normalvelocity) + obj1.mass * obj1normalvelocity + obj2.mass * obj2normalvelocity) / (obj1.mass + obj2.mass)
+            obj2newnormalvelocity = (bouncingq * obj1.mass * (obj1normalvelocity - obj2normalvelocity) + obj2.mass * obj2normalvelocity + obj1.mass * obj1normalvelocity) / (obj2.mass + obj1.mass)
+            obj1tangentvelocity = np.dot(np.array(obj1.vel), collisiontangent)
+            obj2tangentvelocity = np.dot(np.array(obj2.vel), collisiontangent)
+
+            obj1.vel = obj1newnormalvelocity * np.array(collisionnormal) + obj1tangentvelocity * np.array(collisiontangent)
+            obj2.vel = obj2newnormalvelocity * np.array(collisionnormal) + obj2tangentvelocity * np.array(collisiontangent)
+
+            obj1.pos = centerofmass + ((obj1.radius + obj2.radius) + bouncingq * (obj1.radius + obj2.radius - distance)) * collisionnormal * obj2.mass / (obj1.mass + obj2.mass)
+            obj2.pos = centerofmass - ((obj1.radius + obj2.radius) + bouncingq * (obj1.radius + obj2.radius - distance)) * collisionnormal * obj1.mass / (obj1.mass + obj2.mass)
+        else:
+            # updates obj2 components since that's the only moving part
+            obj1normalvelocity = np.dot(np.array(obj1.vel), collisionnormal)
+            obj2normalvelocity = np.dot(np.array(obj2.vel), collisionnormal)
+            velocityafter = (obj1normalvelocity + obj2normalvelocity) * bouncingq * 2
+
+            obj1tangentvelocity = np.dot(np.array(obj1.vel), collisiontangent)
+            obj2tangentvelocity = np.dot(np.array(obj2.vel), collisiontangent)
+
+            obj1.vel = - velocityafter * np.array(collisionnormal) + obj1tangentvelocity * np.array(collisiontangent)
+            obj2.vel = velocityafter * np.array(collisionnormal) + obj2tangentvelocity * np.array(collisiontangent)
+
+            obj2.pos = obj1.pos - collisionnormal * (obj1.radius + obj2.radius)
+
     def detectAndResolveCollisions(self):
+        # Handle ALL the collision in the sim, including borders, entities etc.
+
         # blocks the players that aren't kicking off from entering the centre/other half
         if self.has_the_game_been_kicked_off == False:
             if self.red_last_goal == True:
-                for i in range(len(reds)):
-                    if reds[i].pos[0] >= windowwidth // 2 - playerradius:
-                        reds[i].velocity[0] = 0
-                        reds[i].pos[0] = windowwidth // 2 - playerradius
+                for i in range(len(self.reds)):
+                    player = self.reds[i]
+                    if player.pos[0] >= gameparams.windowwidth // 2 - player.radius:
+                        player.vel[0] = 0
+                        player.pos[0] = gameparams.windowwidth // 2 - player.radius
 
-                    self.keepoutofcentre(reds[i])
+                    self.keepOutOfCentre(self.reds[i])
             else:
-                for i in range(len(blues)):
-                    if blues[i].pos[0] <= windowwidth // 2 + playerradius:
-                        blues[i].velocity[0] = 0
-                        blues[i].pos[0] = windowwidth // 2 + playerradius
+                for i in range(len(self.blues)):
+                    player = self.blues[i]
+                    if player.pos[0] <= gameparams.windowwidth // 2 + player.radius:
+                        player.vel[0] = 0
+                        player.pos[0] = gameparams.windowwidth // 2 + player.radius
 
-                    self.keepoutofcentre(blues[i])
+                    self.keepOutOfCentre(self.blues[i])
 
         # Keep all the players within the playing field
-        for player in players:
+        for player in self.players:
             self.keepEntityInMovementSpace(player, 0)
         # And same for the balls. Keep in mind they have a different field size
-        for ball in balls:
+        for ball in self.balls:
             self.keepEntityInMovementSpace(ball, 1)
 
         # Handle moving object - moving object collisions
@@ -174,23 +189,97 @@ class GameSim:
         # Handle ball kicks
         for player in self.players:
             for ball in self.balls:
-                if 
+                if player.getDistanceTo(ball) <= player.radius + ball.radius + 4:
+                    self.has_the_game_been_kicked_off = True
+
+                    if player.current_action.isKicking() == True and player.can_kick == True:
+                        self.makeEntityHitBall(player, ball)
+                        player.can_kick = False
+                    elif player.current_action.isKicking() == False:
+                        player.can_kick = True
         return
 
-    def moveEntities(self):
+    def updatePositions(self):
+        # Update all the positions of the entities, no collision detection
         for entity in self.moving_objects:
             entity.updatePosition()
         return
 
+    def resetMap(self):
+        # Reset the positions of the entities in the sim
+        for obj in self.moving_objects:
+            obj.reset()
+        self.has_the_game_been_kicked_off = False
+        # TODO: Reset the game data?
+        return
+
+    def updateScore(self):
+        for ball in self.balls:
+            if ball.pos[0] <= gameparams.pitchcornerx:
+                self.blue_score += 1
+                self.red_last_goal = False
+
+                # TODO: Game data stuff?
+
+                frames = 0
+                if self.blue_score + self.red_score > 2:
+                    # TODO: New match? Update the agents?
+                    pass
+                self.resetMap()
+            elif ball.pos[0] >= gameparams.windowwidth - gameparams.pitchcornerx:
+                self.red_score += 1
+                self.red_last_goal = True
+
+                # TODO: Game data stuff?
+
+                frames = 0
+                if self.blue_score + self.red_score > 2:
+                    # TODO: New match? Update the agents?
+                    pass
+                self.resetMap()
+        return
+
+    def getFeedback(self):
+        # TODO: Idk in what form you want this to be, can be easily modified.
+
+        if self.frames % 10000 == 0:
+            # Print some stuff
+            print("Frame {}, score R-B: {}-{}".format(self.frames, self.red_score, self.blue_score))
+            if self.was_point_scored:
+                print("    A point was scored, nice!")
+            for obj in self.reds:
+                print("    red player at: {:.3f}; {:.3f} with velocity {:.3f}; {:.3f}".format(obj.pos[0], obj.pos[1], obj.vel[0], obj.vel[1]))
+            for obj in self.blues:
+                print("    blue player at: {:.3f}; {:.3f} with velocity {:.3f}; {:.3f}".format(obj.pos[0], obj.pos[1], obj.vel[0], obj.vel[1]))
+            for obj in self.balls:
+                print("    ball at: {:.3f}; {:.3f} with velocity {:.3f}; {:.3f}\n".format(obj.pos[0], obj.pos[1], obj.vel[0], obj.vel[1]))
+
+
+        return
+
+    def giveCommands(self, actions):
+        # Gives commands to all the controllable entities in the game in the form of a list pf commands.
+        # Each command is a tuple of size 2 specifying direction (18 possible states) and then the kick state.
+        # The position of the command in the list determines which entity the command is sent to.
+        # TODO: Pls complete this function
+        for i in range(len(self.players)):
+            self.players[i].current_action = playeraction.Action(actions[i][0], actions[i][1])
+        return
 
     def step(self):
+        self.frames += 1
+        self.was_point_scored = 0
         # TODO: pygame clock
 
         # Update positions
-        self.moveEntities()
+        self.updatePositions()
 
         # Hande collisions
         self.detectAndResolveCollisions()
 
-        ### handles the key events
+        # Update the score of the game
+        self.updateScore()
+
+        ### TODO: Handle key events
         ### keys = pygame.key.get_pressed()
+        return

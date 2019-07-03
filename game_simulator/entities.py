@@ -1,5 +1,8 @@
-import gameparams
-import playeraction
+from game_simulator import gameparams
+from game_simulator import playeraction
+
+import numpy as np
+
 
 # handles player indexing
 curr_idx = -1
@@ -22,12 +25,20 @@ class Entity:
     def updatePosition(self):
         # Updates the position of the entity. Doesn't include any step duration for
         # whatever reason. God help us all
-        self.velocity *= gameparams.balldamping
-        self.pos += self.velocity
+        self.vel *= gameparams.balldamping
+        self.pos += self.vel
+
+    # Get the Euclidian distance from self to obj
+    def getDistanceTo(self, obj):
+        return np.linalg.norm(obj.pos - self.pos)
+
+    # Get the normalised vector pointing from self to obj
+    def getDirectionTo(self, obj):
+        return (obj.pos - self.pos) / self.getDistanceTo(obj)
 
 
 class Player(Entity):
-    def __init__(self, initial_position, initial_velocity, initial_acceleration = np.zeros((2, 1))):
+    def __init__(self, team, initial_position, initial_velocity = np.zeros(2), initial_acceleration = np.zeros(2)):
         # TODO: NO NEWKICK
 
         # Initialise positional parameters, basic properties of the object
@@ -38,51 +49,67 @@ class Player(Entity):
         self.default_position = initial_position
         self.idx = get_idx()
 
-        #Action is weird, not nice. Maybe make into a class?
+        # Initialise current action + can_kick which presents kick-spamming
         self.current_action = playeraction.Action()
+        self.can_kick = True
 
         # player properties
-        self.colour = colour
+        self.team = team
+        if self.team == "red":
+            self.colour = gameparams.redcolour
+        else:
+            self.colour = gameparams.bluecolour
         self.mass = 1 / gameparams.playerinvmass
 
     def updatePosition(self):
-        self.velocity *= gameparams.balldamping
-        self.pos += self.velocity
+        # Updates the position of the player while taking the player input into account
+        # Damping effect when trying to kick the ball
+        if self.current_action.isKicking() == True and self.can_kick == True:
+            self.vel += self.current_action.getDirection() * gameparams.kickaccel
+        else:
+            self.vel += self.current_action.getDirection() * gameparams.accel
+
+        self.vel *= gameparams.playerdamping
+        self.pos += self.vel
 
     def reset(self):
-        # position vectors
-        self.pos = np.array([pitchcornerx + (np.random.random_sample())*580, pitchcornery + (np.random.random_sample())*200]).astype(float)
+        # TODO: Make the positional initialisation better...
+        # positional parameters
+        self.pos = np.array([gameparams.pitchcornerx + (np.random.random_sample())*580, gameparams.pitchcornery + (np.random.random_sample())*200]).astype(float)
+        self.vel = np.zeros(2)
+        self.acc = np.zeros(2)
 
-        # velocity and speed
-        self.velocity = np.array([0, 0])
-        self.speed = 0
-
-        # acceleration
-        self.acc = np.array([0, 0])
-
-        # player properties
+        # Set the action to default action state
         self.current_action = playeraction.Action()
 
 
 class Ball(Entity):
-    def __init__(self, initial_position, initial_velocity, initial_acceleration = np.zeros((2, 1))):
+    def __init__(self, initial_position, initial_velocity = np.zeros(2), initial_acceleration = np.zeros(2)):
         # Initialise positional parameters, basic properties of the object
         Entity.__init__(self, initial_position, initial_velocity, initial_acceleration, gameparams.ballradius, gameparams.ballbouncing)
 
+        # TODO: This isn't even called at any point lol, remove?
         # sets default positions
         self.default_position = initial_position
 
         # ball properties
         self.mass = 1 / gameparams.ballinvmass
+        self.inv_mass = gameparams.ballinvmass
+
+    def reset(self):
+        # positional parameters
+        self.pos = np.array([gameparams.pitchcornerx + (np.random.random_sample())*580, gameparams.pitchcornery + (np.random.random_sample())*200]).astype(float)
+        self.vel = np.zeros(2)
+        self.acc = np.zeros(2)
 
 
 class GoalPost(Entity):
-    def __init__(self, initial_position, initial_velocity = 0, initial_acceleration = np.zeros((2, 1))):
+    def __init__(self, initial_position, initial_velocity = np.zeros(2), initial_acceleration = np.zeros(2)):
         # Initialise positional parameters, basic properties of the object
         Entity.__init__(self, initial_position, initial_velocity, initial_acceleration, gameparams.goalpostradius, gameparams.goalpostbouncingquotient)
 
 
 class CentreCircleBlock(Entity):
-    def __init__(self, initial_position, initial_velocity = 0, initial_acceleration = np.zeros((2, 1))):
+    def __init__(self, initial_position, initial_velocity = np.zeros(2), initial_acceleration = np.zeros(2)):
         # Initialise positional parameters, basic properties of the object
         Entity.__init__(self, initial_position, initial_velocity, initial_acceleration, gameparams.centrecircleradius, 0)

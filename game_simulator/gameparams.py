@@ -1,3 +1,5 @@
+import numpy as np
+
 # Pygame stuff hasn't beed added properly yet!!!
 windowwidth = 840
 windowheight = 400
