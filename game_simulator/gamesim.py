@@ -203,7 +203,6 @@ class GameSim:
         # Handle ball kicks
         for player in self.players:
             for ball in self.balls:
-                print(player.can_kick)
                 if player.getDistanceTo(ball) <= player.radius + ball.radius + 4:
                     self.has_the_game_been_kicked_off = True
 
@@ -291,6 +290,10 @@ class GameSim:
             ballsInfo = [ [ball.pos, ball.vel ] for ball in self.balls ]
 
             return (redsInfo, bluesInfo, ballsInfo )
+        elif format == "state-action pairs"
+            state = [ [object.pos, object.vel ] for object in self.moving_objects]
+            action = [ [player.current_action] for player in self.players]
+            return (state, action)
 
 
     def giveCommands(self, actions, actionFormat = "raw"):
