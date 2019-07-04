@@ -207,11 +207,11 @@ class GameSim:
                 if player.getDistanceTo(ball) <= player.radius + ball.radius + 4:
                     self.has_the_game_been_kicked_off = True
 
-                    if player.can_kick == True and player.can_kick == True:
+                    if player.current_action.isKicking() and player.can_kick:
                         self.makeEntityHitBall(player, ball)
                         player.can_kick = False
-                    elif player.current_action.isKicking() == False:
-                        player.can_kick = True
+            if not player.current_action.isKicking():
+                player.can_kick = True
 
     def updatePositions(self):
         # Update all the positions of the entities, no collision detection
