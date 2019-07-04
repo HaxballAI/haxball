@@ -46,6 +46,11 @@ class GameSim:
         else:
             self.printDebugFreq = 600
 
+        if "auto score" in extraParams:
+            self.auto_score = extraParams["auto score"]
+        else:
+            self.auto_score = False
+
     def getRandomPositionInThePlayingField(self):
         return np.array([gameparams.pitchcornerx + (np.random.random_sample())*580, gameparams.pitchcornery + (np.random.random_sample())*200]).astype(float)
 
@@ -226,6 +231,7 @@ class GameSim:
         return
 
     def updateScore(self):
+        # TODO: Fuck this.
         for ball in self.balls:
             if ball.pos[0] <= gameparams.pitchcornerx:
                 self.blue_score += 1
@@ -250,6 +256,16 @@ class GameSim:
                     pass
                 self.resetMap()
         return
+
+    def checkGoals(self):
+        #Checks all the balls, returns tuple of (red scores, blue scores)
+        countedGoals = [0,0]
+        for ball in self.balls:
+            if ball.pos[0] <= gameparams.pitchcornerx:
+                countedGoals[1] += 1
+            elif ball.pos[0] >= gameparams.windowwidth - gameparams.pitchcornerx:
+                countedGoals[0] += 1
+        return countedGoals
 
     def getFeedback(self):
         # TODO: Idk in what form you want this to be, can be easily modified.
@@ -290,7 +306,7 @@ class GameSim:
             ballsInfo = [ [ball.pos, ball.vel ] for ball in self.balls ]
 
             return (redsInfo, bluesInfo, ballsInfo )
-        elif format == "state-action pairs"
+        elif format == "state-action pairs":
             state = [ [object.pos, object.vel ] for object in self.moving_objects]
             action = [ [player.current_action] for player in self.players]
             return (state, action)
@@ -321,7 +337,8 @@ class GameSim:
         self.detectAndResolveCollisions()
 
         # Update the score of the game
-        self.updateScore()
+        if self.auto_score:
+            self.updateScore()
 
         ### TODO: Handle key events
         ### keys = pygame.key.get_pressed()
