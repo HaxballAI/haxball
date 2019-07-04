@@ -2,6 +2,8 @@ from game_simulator import gamesim
 from game_displayer import basicdisplayer
 from human_agent import humanagent
 from retarded_agent import retardedagent
+import os
+import pickle
 
 import random
 
@@ -33,6 +35,8 @@ def main():
                         {"printDebug" : True})
     game.getFeedback()
 
+    gamedata = []
+
     running = True
 
     while(running):
@@ -45,7 +49,21 @@ def main():
 
         disp.drawThings( game.getState( "full info" ) )
 
-        #gamedata.append([game.getState( "state-action pairs" )])
+        gamedata.append([game.getState( "state-action pairs" )])
+
+        if game.was_point_scored:
+            print("goal!")
+            saved_games_filename = 'saved_games.dat'
+            games = []
+            if os.path.exists(saved_games_filename) and os.path.getsize(saved_games_filename) > 0:
+                with open(saved_games_filename,'rb') as rfp:
+                    games = pickle.load(rfp)
+            games.append(gamedata)
+            gamedata = []
+            with open(saved_games_filename,'wb') as wfp:
+                pickle.dump(games, wfp)
+                print("dumped!")
+            game.was_point_scored = False
 
         game.step()
 

@@ -230,6 +230,7 @@ class GameSim:
             if ball.pos[0] <= gameparams.pitchcornerx:
                 self.blue_score += 1
                 self.red_last_goal = False
+                self.was_point_scored = True
 
                 # TODO: Game data stuff?
 
@@ -241,6 +242,7 @@ class GameSim:
             elif ball.pos[0] >= gameparams.windowwidth - gameparams.pitchcornerx:
                 self.red_score += 1
                 self.red_last_goal = True
+                self.was_point_scored = True
 
                 # TODO: Game data stuff?
 
@@ -290,7 +292,7 @@ class GameSim:
             ballsInfo = [ [ball.pos, ball.vel ] for ball in self.balls ]
 
             return (redsInfo, bluesInfo, ballsInfo )
-        elif format == "state-action pairs"
+        elif format == "state-action pairs":
             state = [ [object.pos, object.vel ] for object in self.moving_objects]
             action = [ [player.current_action] for player in self.players]
             return (state, action)
