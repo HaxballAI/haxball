@@ -203,7 +203,6 @@ class GameSim:
         # Handle ball kicks
         for player in self.players:
             for ball in self.balls:
-                print(player.can_kick)
                 if player.getDistanceTo(ball) <= player.radius + ball.radius + 4:
                     self.has_the_game_been_kicked_off = True
 
