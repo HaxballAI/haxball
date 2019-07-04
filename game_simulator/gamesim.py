@@ -51,6 +51,11 @@ class GameSim:
         else:
             self.auto_score = False
 
+        if "enforce kickoff" in extraParams:
+            self.enforce_kickoff = extraParams["enforce kickoff"]
+        else:
+            self.enforce_kickoff = False
+
     def getRandomPositionInThePlayingField(self):
         return np.array([gameparams.pitchcornerx + (np.random.random_sample())*580, gameparams.pitchcornery + (np.random.random_sample())*200]).astype(float)
 
@@ -226,7 +231,8 @@ class GameSim:
         # Reset the positions of the entities in the sim
         for obj in self.moving_objects:
             obj.reset()
-        self.has_the_game_been_kicked_off = False
+        if self.enforce_kickoff:
+            self.has_the_game_been_kicked_off = False
         # TODO: Reset the game data?
         return
 
@@ -308,10 +314,17 @@ class GameSim:
             ballsInfo = [ [ball.pos, ball.vel ] for ball in self.balls ]
 
             return (redsInfo, bluesInfo, ballsInfo )
+
         elif format == "state-action pairs":
             state = [ [object.pos, object.vel ] for object in self.moving_objects]
             action = [ [player.current_action] for player in self.players]
             return (state, action)
+
+        elif format == "raw sa pairs":
+            state = [ [object.pos, object.vel ] for object in self.moving_objects]
+            action = [ [player.current_action.rawAction()] for player in self.players]
+            return (state, action)
+
 
 
     def giveCommands(self, actions, actionFormat = "raw"):
@@ -319,6 +332,8 @@ class GameSim:
         # Each command is a tuple of size 2 specifying direction (18 possible states) and then the kick state.
         # The position of the command in the list determines which entity the command is sent to.
         # TODO: Pls complete this function
+
+        # NOTE: reds come before blues.
         if actionFormat == "raw":
             for i in range(len(self.players)):
                 self.players[i].current_action = playeraction.Action(actions[i][0], actions[i][1])
