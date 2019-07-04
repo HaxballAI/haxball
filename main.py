@@ -42,8 +42,13 @@ def main():
         game.giveCommands(commands, "raw")
         # if random.random() < 0.01:
         #     game.giveCommands([[randrange(9), 1] for i in range(red_player_count + blue_player_count)] , "raw")
-        game.step()
+
         disp.drawThings( game.getState( "full info" ) )
+
+        #gamedata.append([game.getState( "state-action pairs" )])
+
+        game.step()
+
 
         if game.frames % 10000 == 0:
             game.getFeedback()

@@ -290,6 +290,9 @@ class GameSim:
             ballsInfo = [ [ball.pos, ball.vel ] for ball in self.balls ]
 
             return (redsInfo, bluesInfo, ballsInfo )
+        elif format == "state-action pairs"
+            state = [ [object.pos, object.vel ] for object in self.moving_objects]
+            action = [ [player.current_action] for player in self.players]
 
 
     def giveCommands(self, actions, actionFormat = "raw"):
