@@ -6,7 +6,7 @@ import numpy as np
 
 
 class GameSim:
-    def __init__(self, red_player_count, blue_player_count, ball_count, extraParams = {}):
+    def __init__(self, red_player_count, blue_player_count, ball_count, extraParams = {}, seed = -1):
         # Intialise the entities
         self.reds = [entities.Player("red", self.getRandomPositionInThePlayingField()) for i in range(red_player_count)]
         self.blues = [entities.Player("blue", self.getRandomPositionInThePlayingField()) for i in range(blue_player_count)]
@@ -33,6 +33,10 @@ class GameSim:
 
         # Number of elapsed frames
         self.frames = 0
+
+        # Initialise the random seed iff seed != 1
+        if seed != 1:
+            np.random(seed)
 
         # Sets extra information to do with. Probably a convention that I am
         # not following here.
@@ -267,7 +271,7 @@ class GameSim:
 
     def checkGoals(self):
         #Checks all the balls, returns tuple of (red scores, blue scores)
-        countedGoals = [0,0]
+        countedGoals = (0,0)
         for ball in self.balls:
             if ball.pos[0] <= gameparams.pitchcornerx:
                 countedGoals[1] += 1
@@ -277,7 +281,6 @@ class GameSim:
 
     def getFeedback(self):
         # TODO: Idk in what form you want this to be, can be easily modified.
-
         if self.printDebug:
             # Print some stuff
             print("Frame {}, score R-B: {}-{}".format(self.frames, self.red_score, self.blue_score))
