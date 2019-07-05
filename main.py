@@ -2,8 +2,7 @@ from game_simulator import gamesim
 from game_displayer import basicdisplayer
 from human_agent import humanagent
 from retarded_agent import retardedagent
-import os
-import pickle
+from data_handler import datahandler
 
 import random
 
@@ -29,45 +28,42 @@ def main():
         agents.append(retardedagent.RetardedAgent())
 
 
+    # Intialise the graphical interface of the game
     disp = basicdisplayer.GameWindow(840 , 400)
 
+    # Initialise the game simulator
     game = gamesim.GameSim(red_player_count, blue_player_count, ball_count ,
-                        {"printDebug" : True})
-    game.getFeedback()
+                        {"printDebug" : True, "auto score" : True})
 
-    gamedata = []
+    # Initialise the data handler (saving data, loading it, etc)
+    data_handler = datahandler.DataHandler("saved_games.dat")
+
 
     running = True
 
     while(running):
         # Need to update what keys are being pressed down for the human agents
         disp.updateKeys()
+        # Query each agent on what commands should be sent to the game simulator
         commands = [agents[i].getRawAction(disp) for i in range(player_count)]
         game.giveCommands(commands, "raw")
-        # if random.random() < 0.01:
-        #     game.giveCommands([[randrange(9), 1] for i in range(red_player_count + blue_player_count)] , "raw")
 
+        # Update the graphical interface canvas
         disp.drawThings( game.getState( "full info" ) )
 
-        gamedata.append([game.getState( "state-action pairs" )])
+        # Load the last game state to the data handler
+        data_handler.loadIntoBuffer([game.getState( "state-action pairs" )])
 
+        # At some arbitrary point, store the buffered game states into the
+        # destination file. In this case it's after a goal has been scored
         if game.was_point_scored:
-            print("goal!")
-            saved_games_filename = 'saved_games.dat'
-            games = []
-            if os.path.exists(saved_games_filename) and os.path.getsize(saved_games_filename) > 0:
-                with open(saved_games_filename,'rb') as rfp:
-                    games = pickle.load(rfp)
-            games.append(gamedata)
-            gamedata = []
-            with open(saved_games_filename,'wb') as wfp:
-                pickle.dump(games, wfp)
-                print("dumped!")
+            data_handler.dumpBufferToFile()
             game.was_point_scored = False
 
         game.step()
 
 
+        # Get Debugging data from the game
         if game.frames % 10000 == 0:
             game.getFeedback()
 
