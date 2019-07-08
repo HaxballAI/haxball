@@ -138,8 +138,6 @@ class GameSim:
 
         bouncingq = obj1.bouncingquotient * obj2.bouncingquotient
         if is_obj1_static == False:
-            if self.printDebug:
-                print("Kinetic collision!")
             centerofmass = (obj1.pos * obj1.mass + obj2.pos * obj2.mass) / (obj1.mass + obj2.mass)
 
             # updates object components
@@ -290,7 +288,7 @@ class GameSim:
             for obj in self.balls:
                 print("    ball at: {:.3f}; {:.3f} with velocity {:.3f}; {:.3f}\n".format(obj.pos[0], obj.pos[1], obj.vel[0], obj.vel[1]))
 
-
+d
         return
 
     def getState(self, format = "positions"):
