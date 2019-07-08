@@ -3,6 +3,15 @@ from gym import core, spaces
 from game_simulator import gameparams
 import numpy as np
 
+def flatten(S):
+    if S == []:
+        return S
+    if isinstance(S[0], list):
+        return flatten(S[0]) + flatten(S[1:])
+    if isinstance(S[0], type(np.array([])) ):
+        return flatten(S[0].tolist()) + flatten(S[1:])
+    return S[:1] + flatten(S[1:])
+
 class DuelFixedGym(core.Env):
 
     def __init__(self, config):
@@ -25,14 +34,12 @@ class DuelFixedGym(core.Env):
         # self.reward_range = (-1,1)
 
     def getState(self):
-        raw_state = self.envo.getState("raw sa pairs")[0]
-        raw_state.flatten()
-        raw_state.flatten()
+        raw_state = self.envo.getState()[0]
 
-        return raw_state
+        return flatten(raw_state)
 
     def getRotatedState(self):
-        raw_state = self.envo.getState("raw sa pairs")[0]
+        raw_state = self.envo.getState()[0]
         # Flips the states
         raw_state[0], raw_state[1] = raw_state[1], raw_state[0]
 
@@ -40,17 +47,14 @@ class DuelFixedGym(core.Env):
             elem[0] = gameparams.rotatePos(elem[0])
             elem[1] = gameparams.rotateVel(elem[1])
 
-        raw_state.flatten()
-        raw_state.flatten()
-
-        return raw_state
+        return flatten(raw_state)
 
     def getOpAction(self):
         return self.opponent( self.getRotatedState() )
 
     def step(self, action):
         opAction = self.getOpAction()
-        step_data = self.envo(action, opAction)
+        step_data = self.envo.step(action, opAction)
 
         return [self.getState(), step_data[2], step_data[1], {}]
 
