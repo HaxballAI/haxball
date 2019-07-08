@@ -1,5 +1,11 @@
 import numpy as np
 
+def rotateVel(vel):
+    return np.array( [ -vel[1], -vel[0] ] )
+
+def rotatePos(pos):
+    return np.array( [windowwidth - pos[1] , windowheight - pos[0] ] )
+
 # Pygame stuff hasn't beed added properly yet!!!
 windowwidth = 840
 windowheight = 400

@@ -11,6 +11,9 @@ class DuelEnviroment:
 
         self.steps_since_reset = 0
 
+    def getState(self):
+        return self.game_sim.getState("raw sa pairs")
+
     def step(self, red_action, blue_action):
         self.steps_since_reset += 1
 
