@@ -1,5 +1,5 @@
 import torch
-import itertools
+import torch.nn.functional as F
 import numpy as np
 from data_handler import datahandler
 from game_simulator import gameparams as gp
@@ -23,24 +23,25 @@ redactions = []
 blueactions = []
 for game in loaded_data:
     for frame in game:
-        redpositions.append(flatten(frame[0]))
+        redpositions.append(torch.FloatTensor(flatten(frame[0])))
         redonehotaction = [0]*10
         redonehotaction[frame[1][0][1]] = 1
         redonehotaction[9]=frame[1][0][0]
-        redactions.append(redonehotaction)
+        redactions.append(torch.FloatTensor(redonehotaction))
         blueframe = []
         for object in frame:
             blueframe.append([gp.rotatePos(object[0]),gp.rotateVel(object[1])])
-        bluepositions.append(flatten(blueframe))
+        bluepositions.append(torch.FloatTensor(flatten(blueframe)))
         blueonehotaction = [0]*10
         blueonehotaction[frame[1][1][1]] = 1
         blueonehotaction[9]=frame[1][1][0]
-        blueactions.append(blueonehotaction)
+        blueactions.append(torch.FloatTensor(blueonehotaction))
 
 
 positions = redpositions + bluepositions
 actions = redactions + blueactions
-data = [positions,actions]
+data = [positions, actions]
+print(data)
 
 class TwoLayerNet(torch.nn.Module):
     def __init__(self, D_in, H, D_out):
@@ -59,7 +60,7 @@ class TwoLayerNet(torch.nn.Module):
         well as arbitrary operators on Tensors.
         """
         h_relu = self.linear1(x).clamp(min=0)
-        y_pred = torch.nn.Softmax(self.linear2(h_relu))
+        y_pred = F.softmax(self.linear2(h_relu),dim=0)
         return y_pred
 
 
@@ -84,7 +85,7 @@ for t in range(1):
         y_pred = model(data[0][i])
 
         # Compute and print loss
-        loss = criterion(y_pred, data[1],[i])
+        loss = criterion(y_pred, data[1][i])
         print(t, loss.item())
 
         # Zero gradients, perform a backward pass, and update the weights.
