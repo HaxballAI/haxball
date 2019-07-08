@@ -3,6 +3,7 @@ from game_displayer import basicdisplayer
 from human_agent import humanagent
 from retarded_agent import retardedagent
 from data_handler import datahandler
+from model_tuner import tuner
 
 import random
 
@@ -53,6 +54,8 @@ def main():
 
     running = True
 
+    tuner.tuner()
+
     while(running):
         # Need to update what keys are being pressed down for the human agents
         disp.updateKeys()
@@ -69,7 +72,6 @@ def main():
         # At some arbitrary point, store the buffered game states into the
         # destination file. In this case it's after a goal has been scored
         if game.was_point_scored:
-
             data_handler.dumpBufferToFile()
             game.was_point_scored = False
 

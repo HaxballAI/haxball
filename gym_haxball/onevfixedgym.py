@@ -1,25 +1,28 @@
-from 1v1enviroment import DuelEnviroment
-from gym import core , spaces
-from gamesim import gameparams
+from gym_haxball.onevoneenviroment import DuelEnviroment
+from gym import core, spaces
+from game_simulator import gameparams
+import numpy as np
 
 class DuelFixedGym(core.Env):
 
     def __init__(self, config):
         self.envo = DuelEnviroment()
         self.opponent = config["opponent"]
-        self.action_space = spaces.MultiDiscrete([9, 2])
+        self.action_space = spaces.Tuple((spaces.Discrete(9), spaces.Discrete(2)))
         win_w = gameparams.windowwidth
         win_h = gameparams.windowheight
 
         self.observation_space = spaces.Box(
-           low = np.array[0.0, 0.0, -15.0, -15.0, 0.0, 0.0,
-                          -15.0, -15.0, 0.0, 0.0, -15.0, -15.0],
-           high = np.array[win_w, win_h, 15.0, 15.0, win_w, win_h,
-                            15.0, 15.0, win_w, win_h, 15.0, 15.0,],
+           low = np.array([0.0, 0.0, -15.0, -15.0, 0.0, 0.0,
+                          -15.0, -15.0, 0.0, 0.0, -15.0, -15.0]),
+           high = np.array([win_w, win_h, 15.0, 15.0, win_w, win_h,
+                            15.0, 15.0, win_w, win_h, 15.0, 15.0]),
             dtype = np.float32
            )
 
-        self.reward_range = (-1,1)
+
+
+        # self.reward_range = (-1,1)
 
     def getState(self):
         raw_state = self.envo.getState("raw sa pairs")[0]
