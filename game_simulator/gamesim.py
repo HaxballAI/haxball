@@ -35,8 +35,8 @@ class GameSim:
         self.frames = 0
 
         # Initialise the random seed iff seed != 1
-        if seed != 1:
-            np.random(seed)
+        if seed != -1:
+            np.random.seed(seed)
 
         # Sets extra information to do with. Probably a convention that I am
         # not following here.
@@ -291,7 +291,6 @@ class GameSim:
             for obj in self.balls:
                 print("    ball at: {:.3f}; {:.3f} with velocity {:.3f}; {:.3f}\n".format(obj.pos[0], obj.pos[1], obj.vel[0], obj.vel[1]))
 
-d
         return
 
     def getState(self, format = "positions"):
@@ -323,8 +322,8 @@ d
 
         elif format == "raw sa pairs":
             state = [ [object.pos, object.vel ] for object in self.moving_objects]
-            action = [ [player.current_action.rawAction()] for player in self.players]
-            return (state, action)
+            action = [ player.current_action.rawAction() for player in self.players]
+            return [state, action]
 
 
 

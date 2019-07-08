@@ -31,7 +31,7 @@ def main():
     agents = []
     # Red agents
     agents.append(humanagent.HumanAgent(('w', 'd', 's', 'a', 'x')))
-        for i in range(red_player_count - 1):
+    for i in range(red_player_count - 1):
         agents.append(retardedagent.RetardedAgent())
     # Blue agents
     agents.append(humanagent.HumanAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'RCTRL')))
@@ -44,15 +44,11 @@ def main():
 
     # Initialise the game simulator
     game = gamesim.GameSim(red_player_count, blue_player_count, ball_count ,
-<<<<<<< HEAD
-                        {"printDebug" : True , "auto score" : True})
-    game.getFeedback()
-=======
                         {"printDebug" : True, "auto score" : True})
 
     # Initialise the data handler (saving data, loading it, etc)
-    data_handler = datahandler.DataHandler("saved_games.dat")
->>>>>>> 7549bf5ed99cb339e4396c506180b623bc209611
+    data_handler = datahandler.DataHandler("rawsaved_games.dat")
+
 
 
     running = True
@@ -68,34 +64,13 @@ def main():
         disp.drawThings( game.getState( "full info" ) )
 
         # Load the last game state to the data handler
-        data_handler.loadIntoBuffer([game.getState( "state-action pairs" )])
+        data_handler.loadIntoBuffer(game.getState( "raw sa pairs" ))
 
         # At some arbitrary point, store the buffered game states into the
         # destination file. In this case it's after a goal has been scored
         if game.was_point_scored:
-<<<<<<< HEAD
-            print("goal!")
-            saved_games_filename = 'save_game_1v1.dat'
-            games = []
-            if os.path.exists(saved_games_filename) and os.path.getsize(saved_games_filename) > 0:
-                with open(saved_games_filename,'rb') as rfp:
-                    games = pickle.load(rfp)
-            games.append(gamedata)
-            with open(saved_games_filename,'wb') as wfp:
-                pickle.dump(games, wfp)
-                print("dumped!")
 
-
-            for frame in gamedata:
-                if game.red_last_goal:
-                    classify(critic, frame, 1, loss_f, learning_rate = 1e-4, steps = 500)
-                else:
-                    classify(critic, frame, 0, loss_f, learning_rate = 1e-4, steps = 500)'''
-
-            gamedata = []
-=======
             data_handler.dumpBufferToFile()
->>>>>>> 7549bf5ed99cb339e4396c506180b623bc209611
             game.was_point_scored = False
 
 
