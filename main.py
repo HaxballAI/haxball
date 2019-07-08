@@ -48,7 +48,12 @@ def main():
                         {"printDebug" : True, "auto score" : True})
 
     # Initialise the data handler (saving data, loading it, etc)
+<<<<<<< HEAD
     data_handler = datahandler.DataHandler("saved_games.dat")
+=======
+    data_handler = datahandler.DataHandler("rawsaved_games.dat")
+
+>>>>>>> db5dca5c06241018f549d78f81d512d447b8dd2c
 
 
     running = True
@@ -66,11 +71,15 @@ def main():
         disp.drawThings( game.getState( "full info" ) )
 
         # Load the last game state to the data handler
-        data_handler.loadIntoBuffer([game.getState( "state-action pairs" )])
+        data_handler.loadIntoBuffer(game.getState( "raw sa pairs" ))
 
         # At some arbitrary point, store the buffered game states into the
         # destination file. In this case it's after a goal has been scored
         if game.was_point_scored:
+<<<<<<< HEAD
+=======
+
+>>>>>>> db5dca5c06241018f549d78f81d512d447b8dd2c
             data_handler.dumpBufferToFile()
             game.was_point_scored = False
 
