@@ -35,8 +35,8 @@ class GameSim:
         self.frames = 0
 
         # Initialise the random seed iff seed != 1
-        if seed != 1:
-            np.random(seed)
+        if seed != -1:
+            np.random.seed(seed)
 
         # Sets extra information to do with. Probably a convention that I am
         # not following here.
