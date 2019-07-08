@@ -4,9 +4,9 @@ from gamesim import gameparams
 
 class DuelFixedGym(core.Env):
 
-    def __init__(self, opponent):
+    def __init__(self, config):
         self.envo = DuelEnviroment()
-        self.opponent = opponent
+        self.opponent = config["opponent"]
         self.action_space = spaces.MultiDiscrete([9, 2])
         win_w = gameparams.windowwidth
         win_h = gameparams.windowheight
