@@ -290,10 +290,6 @@ class GameSim:
                 print("    blue player at: {:.3f}; {:.3f} with velocity {:.3f}; {:.3f}".format(obj.pos[0], obj.pos[1], obj.vel[0], obj.vel[1]))
             for obj in self.balls:
                 print("    ball at: {:.3f}; {:.3f} with velocity {:.3f}; {:.3f}\n".format(obj.pos[0], obj.pos[1], obj.vel[0], obj.vel[1]))
-<<<<<<< HEAD
-=======
-
->>>>>>> db5dca5c06241018f549d78f81d512d447b8dd2c
         return
 
     def getState(self, format = "positions"):
