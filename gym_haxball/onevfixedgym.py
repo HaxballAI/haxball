@@ -1,6 +1,7 @@
 from gym_haxball.onevoneenviroment import DuelEnviroment
 from gym import core, spaces
 from game_simulator import gameparams
+import numpy as np
 
 class DuelFixedGym(core.Env):
 
@@ -12,10 +13,10 @@ class DuelFixedGym(core.Env):
         win_h = gameparams.windowheight
 
         self.observation_space = spaces.Box(
-           low = np.array[0.0, 0.0, -15.0, -15.0, 0.0, 0.0,
-                          -15.0, -15.0, 0.0, 0.0, -15.0, -15.0],
-           high = np.array[win_w, win_h, 15.0, 15.0, win_w, win_h,
-                            15.0, 15.0, win_w, win_h, 15.0, 15.0,],
+           low = np.array([0.0, 0.0, -15.0, -15.0, 0.0, 0.0,
+                          -15.0, -15.0, 0.0, 0.0, -15.0, -15.0]),
+           high = np.array([win_w, win_h, 15.0, 15.0, win_w, win_h,
+                            15.0, 15.0, win_w, win_h, 15.0, 15.0]),
             dtype = np.float32
            )
 
