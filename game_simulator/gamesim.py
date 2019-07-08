@@ -269,7 +269,7 @@ class GameSim:
 
     def checkGoals(self):
         #Checks all the balls, returns tuple of (red scores, blue scores)
-        countedGoals = (0,0)
+        countedGoals = [0,0]
         for ball in self.balls:
             if ball.pos[0] <= gameparams.pitchcornerx:
                 countedGoals[1] += 1
