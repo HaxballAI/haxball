@@ -1,6 +1,6 @@
-from 1v1enviroment import DuelEnviroment
-from gym import core , spaces
-from gamesim import gameparams
+from gym_haxball.onevoneenviroment import DuelEnviroment
+from gym import core, spaces
+from game_simulator import gameparams
 
 class DuelFixedGym(core.Env):
 

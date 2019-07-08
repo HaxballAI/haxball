@@ -1,4 +1,4 @@
-from  game_simulator import gamsesim
+from game_simulator import gamesim
 
 class DuelEnviroment:
 
@@ -23,7 +23,7 @@ class DuelEnviroment:
 
         for i in range(self.step_len):
             self.game_sim.step()
-            goal = self.goalScorded()
+            goal = self.goalScored()
             # If a goal is scored return instantly
             if goal == 1:
                 return [state_action_pairs , True, 1 , -1]
@@ -48,4 +48,5 @@ class DuelEnviroment:
             return 1
         elif goals[1] > 0:
             return -1
-        else return 0
+        else:
+            return 0
