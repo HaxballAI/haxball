@@ -37,7 +37,7 @@ def tuner():
             "num_workers": 1,  # parallelism
             "env_config": {
                 "corridor_length": 5,
-                "opponent": tune.function(lambda : (randrange(9), randrange(2)))
+                "opponent": tune.function(lambda : (randrange(9), randrange(2))),
             },
         },
     )

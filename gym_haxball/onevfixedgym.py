@@ -8,7 +8,7 @@ class DuelFixedGym(core.Env):
     def __init__(self, config):
         self.envo = DuelEnviroment()
         self.opponent = config["opponent"]
-        self.action_space = spaces.MultiDiscrete([9, 2])
+        self.action_space = spaces.Tuple((spaces.Discrete(9), spaces.Discrete(2)))
         win_w = gameparams.windowwidth
         win_h = gameparams.windowheight
 
@@ -20,7 +20,9 @@ class DuelFixedGym(core.Env):
             dtype = np.float32
            )
 
-        self.reward_range = (-1,1)
+
+
+        # self.reward_range = (-1,1)
 
     def getState(self):
         raw_state = self.envo.getState("raw sa pairs")[0]
