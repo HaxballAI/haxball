@@ -3,24 +3,12 @@ from game_displayer import basicdisplayer
 from human_agent import humanagent
 from retarded_agent import retardedagent
 from data_handler import datahandler
-from model_tuner import tuner
+#from model_tuner import tuner
 
 import random
 
 import numpy as np
 from random import randrange
-
-'''critic = torch.nn.Sequential(
-    torch.nn.Linear(4, 100),
-    torch.nn.ReLU(),
-    torch.nn.Linear(H, D_out),
-    torch.nn.functional.sigmoid()
-    )
-actor = torch.nn.Sequential(
-    torch.nn.Linear(, H),
-    torch.nn.ReLU(),
-    torch.nn.Linear(H, D_out),
-    torch.nn.functional.sigmoid()'''
 
 def main():
     red_player_count = 1
@@ -54,7 +42,7 @@ def main():
 
     running = True
 
-    tuner.tuner()
+    #tuner.tuner()
 
     while(running):
         # Need to update what keys are being pressed down for the human agents
