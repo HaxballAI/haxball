@@ -1,10 +1,10 @@
 import numpy as np
 
 def rotateVel(vel):
-    return np.array( [ -vel[1], -vel[0] ] )
+    return np.array( [ -vel[0], -vel[1] ] )
 
 def rotatePos(pos):
-    return np.array( [windowwidth - pos[1] , windowheight - pos[0] ] )
+    return np.array( [windowwidth - pos[0] , windowheight - pos[1] ] )
 
 # Pygame stuff hasn't beed added properly yet!!!
 windowwidth = 840
@@ -103,3 +103,7 @@ ballspacey = [pitchcornery + ballradius, pitchcornery + pitchheight - ballradius
 
 # defines goal width
 goaly = [goalcornery, goalcornery + goalsize]
+
+#empirical stdev:
+#
+normalizers = [193.70029977, 68.09326598, 1.01127008, 0.68247464, 193.70029977, 68.09326598, 1.01127008, 0.68247464, 229.63846106, 90.32273922, 0.76002225, 0.58843952]

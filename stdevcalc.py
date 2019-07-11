@@ -24,23 +24,31 @@ redactions = []
 blueactions = []
 for game in loaded_data:
     for frame in game:
-        redpositions.append(torch.FloatTensor(flatten(frame[0])))
+        redpositions.append(flatten(frame[0]))
         redaction = frame[1][0]
         redactions.append(redaction)
         blueframe = []
-        for object in frame:
-            blueframe.append([gp.rotatePos(object[0]),gp.rotateVel(object[1])])
-        bluepositions.append(torch.FloatTensor(flatten(blueframe)))
+        for object in frame[0]:
+            blueframe.append( [ gp.rotatePos( object[0] ), gp.rotateVel(object[1]) ] )
+        blueframe = flatten(blueframe)
+        blueframe = blueframe[4:8] + blueframe[0:4] + blueframe[8:]
+        bluepositions.append(blueframe)
         blueaction = frame[1][1]
         blueactions.append(blueaction)
 
-
 positions = redpositions + bluepositions
 normalizedpositions = [[x[0]/x[1] for x in zip(position,gp.normalizers)] for position in positions]
+print(normalizedpositions[0])
 actions = redactions + blueactions
-data = [normalizedpositions, actions]
+data = [positions, actions]
+positions = np.array(positions)
+print("Red Positions:")
+print(redpositions[0])
+print("Blue Positions:")
+print(bluepositions[0])
+print(np.std(positions,axis=0))
 
-class TwoLayerNet(torch.nn.Module):
+'''class TwoLayerNet(torch.nn.Module):
     def __init__(self, D_in, H, D_out):
 
         super(TwoLayerNet, self).__init__()
@@ -50,7 +58,7 @@ class TwoLayerNet(torch.nn.Module):
     def forward(self, x):
         h_relu = self.linear1(x).clamp(min=0)
         movepred = self.linear2(h_relu)[0][:9]
-        kickpred = torch.nn.Sigmoid()(self.linear2(h_relu)[0][-1:])
+        kickpred = torch.sigmoid(self.linear2(h_relu)[0][-1:])
         return movepred, kickpred
 
 
@@ -74,13 +82,13 @@ for t in range(1):
 
         movepred, kickpred = model(torch.tensor(data[0][i]).unsqueeze(0))
 
-        # Compute and print loss        
-        loss = movecriterion(movepred.unsqueeze(0),torch.tensor([data[1][i][1]]))
-        loss += kickcriterion( kickpred.unsqueeze(0), torch.FloatTensor( [ data[1][i][0] ] ) )
+        # Compute and print loss
 
-        if i % 100 == 0:
-            print(loss)
+        loss = movecriterion(movepred.unsqueeze(0),torch.tensor([data[1][i][0]]))
+        loss += kickcriterion( kickpred.unsqueeze(0), torch.FloatTensor( [ data[1][i][1] ] ) )
+
         # Zero gradients, perform a backward pass, and update the weights.
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+'''
