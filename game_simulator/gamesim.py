@@ -324,6 +324,9 @@ class GameSim:
             action = [ player.current_action.rawAction() for player in self.players]
             return [state, action]
 
+        elif format == "raw state":
+            return [ [object.pos, object.vel ] for object in self.moving_objects]
+
 
 
     def giveCommands(self, actions, actionFormat = "raw"):
