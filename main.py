@@ -5,6 +5,9 @@ from retarded_agent import retardedagent
 from data_handler import datahandler
 #from model_tuner import tuner
 
+import game_simulator.gameparams as gp
+
+
 import random
 
 import numpy as np
@@ -44,11 +47,16 @@ def main():
 
     #tuner.tuner()
 
+    # FUNCTION THAT DEFINES OPPONENT REPLACE RHS WITH THIS
+
+    opponent = lambda x : [0,0]
+
     while(running):
         # Need to update what keys are being pressed down for the human agents
         disp.updateKeys()
         # Query each agent on what commands should be sent to the game simulator
         commands = [agents[i].getRawAction(disp) for i in range(player_count)]
+        commands[0] = opponent( gp.flatten( game.getState("raw state") ) )
         game.giveCommands(commands, "raw")
 
         # Update the graphical interface canvas
