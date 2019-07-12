@@ -7,6 +7,8 @@ from ray import tune
 from ray.tune import grid_search
 from ray.rllib.models import FullyConnectedNetwork, Model, ModelCatalog
 
+import ray.rllib.agents.ppo as ppo
+
 class CustomModel(Model):
     """Example of a custom model.
     This model just delegates to the built-in fcnet.
@@ -23,8 +25,9 @@ class CustomModel(Model):
 def tuner():
     ray.init()
     ModelCatalog.register_custom_model("my_model", CustomModel)
-    tune.run(
+    return tune.run(
         "PPO",
+        checkpoint_at_end = True,
         stop={
             "timesteps_total": 10000,
         },
@@ -41,3 +44,16 @@ def tuner():
             },
         },
     )
+
+
+def getagent():
+
+    ModelCatalog.register_custom_model("my_model", CustomModel)
+    config = ppo.DEFAULT_CONFIG.copy()
+    config["num_gpus"] = 0
+    config["num_workers"] = 1
+    config["env_config"]["opponent"] =  tune.function(lambda x : (randrange(9), randrange(2)))
+
+    trainer = ppo.PPOTrainer(config=config, env =  onevfixedgym.DuelFixedGym )
+
+    return trainer
