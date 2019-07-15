@@ -12,6 +12,10 @@ import random
 
 import numpy as np
 from random import randrange
+from moveclassifier import TwoLayerNet
+model = TwoLayerNet(D_in, H, D_out)
+model.load_state_dict(torch.load("initialmodelweights.dat"))
+model.eval()
 
 def main():
     red_player_count = 1
@@ -49,7 +53,7 @@ def main():
 
     # FUNCTION THAT DEFINES OPPONENT REPLACE RHS WITH THIS
 
-    opponent = lambda x : [0,0]
+    opponent = np.random.choice(model(x).numpy())
 
     while(running):
         # Need to update what keys are being pressed down for the human agents
