@@ -111,10 +111,6 @@ class GameWindow:
             pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1], gp.ballradius, (255, 255, 255))
             pygame.gfxdraw.aacircle(self.win, intP[0], intP[1], gp.ballradius, (255, 255, 255))
 
-
-        self.clock.tick(self.fps)
-        pygame.display.update()
-
     def getInput(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
