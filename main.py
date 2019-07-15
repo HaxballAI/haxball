@@ -77,8 +77,6 @@ def main():
         ran_kick = np.random.choice( [False, True] , p = [ 1 - p_kick , p_kick] )
         return [ran_move , ran_kick]
 
-    print(opponent)
-
     while(running):
         # Need to update what keys are being pressed down for the human agents
         disp.updateKeys()
