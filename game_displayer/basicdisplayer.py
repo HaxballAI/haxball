@@ -1,15 +1,9 @@
-
 import pygame
 from pygame import gfxdraw
 from game_simulator import gameparams as gp
 from game_simulator import playeraction as pa
 
-
-
-
-
 class GameWindow:
-
     def __init__(self, winWidth, winHeight, fps = 60):
         self.height = winHeight
         self.width = winWidth
@@ -29,7 +23,6 @@ class GameWindow:
 
     def drawThings(self, things):
         # Things is of a very specific format that should not be violated
-
         self.win.fill( (0, 0, 0 ) )
         # draws background
         pygame.draw.rect(self.win, gp.bordercolour, (0, 0, gp.windowwidth, gp.windowheight))
@@ -60,7 +53,6 @@ class GameWindow:
             pygame.gfxdraw.filled_circle(self.win, goalpost[0], goalpost[1], gp.goalpostradius-gp.goalpostborderthickness, gp.goalpostcolour)
             pygame.gfxdraw.aacircle(self.win, goalpost[0], goalpost[1], gp.goalpostradius-gp.goalpostborderthickness, gp.goalpostcolour)
 
-
         for redInfo in things[0]:
             intP = tuple( map( int, redInfo[0] ) )
 
@@ -81,8 +73,6 @@ class GameWindow:
                 gp.playerradius-gp.kickingcirclethickness, gp.redcolour)
             pygame.gfxdraw.aacircle(self.win, intP[0], intP[1],
                 gp.playerradius-gp.kickingcirclethickness, gp.redcolour)
-
-
 
         for blueInfo in things[1]:
             intP = tuple( map( int, blueInfo[0] ) )
@@ -140,3 +130,4 @@ class GameWindow:
 
     def shutdown(self):
         pygame.quit()
+

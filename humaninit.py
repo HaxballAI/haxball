@@ -23,13 +23,13 @@ def probmove(arr):
         j += 1
     return j
 
-(x_init, y_init) = (pickle.load(open('gamedatagood.txt', 'rb')),pickle.load(open('movedatagood.txt', 'rb')))
+x_init, y_init = pickle.load(open('gamedatagood.txt', 'rb')), pickle.load(open('movedatagood.txt', 'rb'))
 
 length = len(x_init)
-counting = [i for i in range(length)]
+counting = list(range(length))
 np.random.shuffle(counting)
 cutoff = 0.9
-x_train, y_train, x_test, y_test = ([] for n in range(4))
+x_train, y_train, x_test, y_test = [[]] * 4
 for k in range(length):
     j = counting[k]
     if (j < cutoff*length):
@@ -83,10 +83,10 @@ epsilon = 1
 learningrate = .0004
 importanceoftime = .1
 
-
-network = [np.random.randn(100,7) / np.sqrt(6) ,
-np.random.randn(100,101) / np.sqrt(101),
-np.random.randn(18,101) / np.sqrt(101)]
+network = [
+    np.random.randn(100,7) / np.sqrt(6),
+    np.random.randn(100,101) / np.sqrt(101),
+    np.random.randn(18,101) / np.sqrt(101)]
 games = []
 points = 0
 
@@ -179,15 +179,12 @@ goaly = [goalcornery, goalcornery + goalsize]
 # handles player indexing
 curr_idx = -1
 
-
 def get_idx():
     global curr_idx
     curr_idx += 1
     return curr_idx
 
-
 class player(object):
-
     def __init__(self, x, y, colour):
 
         # sets default positions
@@ -233,9 +230,7 @@ class player(object):
         pygame.gfxdraw.filled_circle(win, x, y, playerradius-kickingcirclethickness, self.colour)
         pygame.gfxdraw.aacircle(win, x, y, playerradius-kickingcirclethickness, self.colour)
 
-
     def reset(self):
-
         # position vectors
         self.pos = np.array([pitchcornerx + (np.random.random_sample())*580, pitchcornery + (np.random.random_sample())*200]).astype(float)
 
@@ -259,7 +254,6 @@ class player(object):
 
 
 class ball(object):
-
     def __init__(self, x, y):
         # sets default positions
         self.defaultx = x
@@ -290,7 +284,6 @@ class ball(object):
         pygame.gfxdraw.filled_circle(win, x, y, ballradius, (255, 255, 255))
         pygame.gfxdraw.aacircle(win, x, y, ballradius, (255, 255, 255))
 
-
     def reset(self):
         # position vectors
         self.pos = np.array([pitchcornerx + (np.random.random_sample())*580, pitchcornery + (np.random.random_sample())*200]).astype(float)
@@ -307,7 +300,6 @@ class ball(object):
 
 
 class goalpost(object):
-
     def __init__(self, x, y):
         self.pos = np.array([x, y])
         self.bouncingquotient = goalpostbouncingquotient
@@ -323,11 +315,8 @@ class goalpost(object):
         pygame.gfxdraw.filled_circle(win, x, y, goalpostradius-goalpostborderthickness, goalpostcolour)
         pygame.gfxdraw.aacircle(win, x, y, goalpostradius-goalpostborderthickness, goalpostcolour)
 
-
-
 # the object for blocking the player not kicking off from entering the centre
 class centrecircleblock(object):
-
     def __init__(self):
         self.pos = np.array([ballstart[0], ballstart[1]])
         self.radius = centrecircleradius
@@ -341,7 +330,6 @@ def timeformat(millis):
     mm = (millis // 60000) % 60
     hh = (millis // 3600000) % 60
     return hh, mm, ss
-
 
 def redrawgamewindow():
     win.fill((0, 0, 0))
@@ -417,7 +405,6 @@ def redrawgamewindow():
 
     pygame.display.update()
 
-
 # defines object-object collision
 def collision(obj1, obj2):
     direction = (obj1.pos - obj2.pos)
@@ -468,8 +455,6 @@ def collisiongoalpost(obj1, obj2):
 
     obj2.pos = obj1.pos - collisionnormal * (obj1.radius + obj2.radius)
 
-
-
 # handles kick interaction
 def kick(obj1, ball):
     ball.velocity = np.array(ball.velocity) + kickstrength * ballinvmass * obj1.kickdirection(ball)
@@ -480,7 +465,6 @@ def resetmap():
         obj.reset()
     kickedoff = False
     gamedata = np.array([])
-
 
 # handles players and movespace
 def keep_player_in_movespace(player):
@@ -585,7 +569,6 @@ wingamedata = []
 winmovedata = []
 
 def policy(signal):
-
     intermediate = logistic.cdf(2*signal)
     #intermediate = np.repeat(epsilon/18, 18)
     #intermediate[np.argmax(signal)] += 1 - epsilon
@@ -667,15 +650,10 @@ while run:
         redchoice[0] = oldRedPredict
         bluechoice[0] = oldBluePredict
 
-
-
-
-
     # blocks the player that isn't kicking off from entering the circle/ other half
     if kickedoff == False:
         if redlastgoal == True:
             for i in range(len(reds)):
-
                 if reds[i].pos[0] >= windowwidth // 2 - playerradius:
                     reds[i].velocity[0] = 0
                     reds[i].pos[0] = windowwidth // 2 - playerradius
@@ -683,7 +661,6 @@ while run:
                 keepoutofcentre(reds[i])
         else:
             for i in range(len(blues)):
-
                 if blues[i].pos[0] <= windowwidth // 2 + playerradius:
                     blues[i].velocity[0] = 0
                     blues[i].pos[0] = windowwidth // 2 + playerradius
@@ -840,3 +817,4 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+

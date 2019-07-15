@@ -5,6 +5,7 @@ import random
 from data_handler import datahandler
 from game_simulator import gameparams as gp
 from torch.autograd import Variable
+
 data_handler = datahandler.DataHandler("rawsaved_games.dat")
 data_handler.loadFileToBuffer()
 loaded_data=data_handler.buffer
@@ -73,7 +74,6 @@ class TwoLayerNet(torch.nn.Module):
         kickpred = torch.nn.Sigmoid()(self.linear3(h_relu))
         return movepred, kickpred
 
-
 # N is batch size; D_in is input dimension;
 # H is hidden dimension; D_out is output dimension.
 N, D_in, H, D_out = 1, 12, 100, 10
@@ -82,8 +82,6 @@ N, D_in, H, D_out = 1, 12, 100, 10
 
 # Construct our model by instantiating the class defined above
 model = TwoLayerNet(D_in, H, D_out)
-
-
 
 movecriterion = torch.nn.CrossEntropyLoss(reduction='sum')
 kickcriterion = torch.nn.BCELoss(size_average=True)

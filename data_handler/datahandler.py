@@ -57,3 +57,4 @@ class DataHandler:
     def getFileContent(self):
         self.loadFileToBuffer()
         return self.getBuffer()
+

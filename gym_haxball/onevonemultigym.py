@@ -4,7 +4,6 @@ from gym import core , spaces
 from gamesim import gameparams
 
 class DuelFixedGym(multi_agent_env.MultiAgentEnv):
-
     def __init__(self):
         self.envo = DuelEnviroment()
 
@@ -13,12 +12,12 @@ class DuelFixedGym(multi_agent_env.MultiAgentEnv):
         win_h = gameparams.windowheight
 
         self.observation_space = spaces.Box(
-           low = np.array[0.0, 0.0, -15.0, -15.0, 0.0, 0.0,
-                          -15.0, -15.0, 0.0, 0.0, -15.0, -15.0],
-           high = np.array[win_w, win_h, 15.0, 15.0, win_w, win_h,
+            low = np.array[0.0, 0.0, -15.0, -15.0, 0.0, 0.0,
+                           -15.0, -15.0, 0.0, 0.0, -15.0, -15.0],
+            high = np.array[win_w, win_h, 15.0, 15.0, win_w, win_h,
                             15.0, 15.0, win_w, win_h, 15.0, 15.0,],
             dtype = np.float32
-           )
+            )
 
         self.reward_range = (-1,1)
 
@@ -26,7 +25,6 @@ class DuelFixedGym(multi_agent_env.MultiAgentEnv):
         raw_state = self.envo.getState("raw sa pairs")[0]
         raw_state.flatten()
         raw_state.flatten()
-
         return raw_state
 
     def getRotatedState(self):
@@ -47,17 +45,18 @@ class DuelFixedGym(multi_agent_env.MultiAgentEnv):
         rState = self.getState()
         bState = self.getRotatedState()
 
-        return {"red" : rState , "blue" : bState}
+        return {"red" : rState, "blue" : bState}
 
     def step(self, actionDict):
         step_data = self.envo.step(actionDict["red"], actionDict["blue"])
 
-        rewards = {"red" : step_data[2] , "blue" : step_data[3]}
-        dones = {"red" : step_data[1] , "blue" : step_data[1]}
-        infos = {"red" : {} , "blue" : {}}
+        rewards = {"red" : step_data[2], "blue" : step_data[3]}
+        dones = {"red" : step_data[1], "blue" : step_data[1]}
+        infos = {"red" : {}, "blue" : {}}
 
         return [self.getMultiState(), rewards, dones, infos]
 
     def reset(self):
         self.envo.reset()
         return self.getMultiState()
+

@@ -13,7 +13,6 @@ def flatten(S):
     return S[:1] + flatten(S[1:])
 
 class DuelFixedGym(core.Env):
-
     def __init__(self, config):
         self.envo = DuelEnviroment()
         self.opponent = config["opponent"]
@@ -29,14 +28,10 @@ class DuelFixedGym(core.Env):
             dtype = np.float32
            )
 
-
-
         # self.reward_range = (-1,1)
 
     def getState(self):
-        raw_state = self.envo.getState()[0]
-
-        return flatten(raw_state)
+        return flatten(self.envo.getState()[0])
 
     def getRotatedState(self):
         raw_state = self.envo.getState()[0]
@@ -50,14 +45,14 @@ class DuelFixedGym(core.Env):
         return flatten(raw_state)
 
     def getOpAction(self):
-        return self.opponent( self.getRotatedState() )
+        return self.opponent(self.getRotatedState())
 
     def step(self, action):
         opAction = self.getOpAction()
         step_data = self.envo.step(action, opAction)
-
         return [self.getState(), step_data[2], step_data[1], {}]
 
     def reset(self):
         self.envo.reset()
         return self.getState()
+

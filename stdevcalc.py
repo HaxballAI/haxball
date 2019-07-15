@@ -4,6 +4,7 @@ import numpy as np
 from data_handler import datahandler
 from game_simulator import gameparams as gp
 from torch.autograd import Variable
+
 data_handler = datahandler.DataHandler("rawsaved_games.dat")
 data_handler.loadFileToBuffer()
 loaded_data=data_handler.buffer
@@ -17,7 +18,6 @@ def flatten(S):
         return flatten(S[0].tolist()) + flatten(S[1:])
     return S[:1] + flatten(S[1:])
 
-
 redpositions = []
 bluepositions = []
 redactions = []
@@ -29,7 +29,7 @@ for game in loaded_data:
         redactions.append(redaction)
         blueframe = []
         for object in frame[0]:
-            blueframe.append( [ gp.rotatePos( object[0] ), gp.rotateVel(object[1]) ] )
+            blueframe.append([gp.rotatePos(object[0]), gp.rotateVel(object[1])])
         blueframe = flatten(blueframe)
         blueframe = blueframe[4:8] + blueframe[0:4] + blueframe[8:]
         bluepositions.append(blueframe)
@@ -37,7 +37,7 @@ for game in loaded_data:
         blueactions.append(blueaction)
 
 positions = redpositions + bluepositions
-normalizedpositions = [[x[0]/x[1] for x in zip(position,gp.normalizers)] for position in positions]
+normalizedpositions = [[x[0]/x[1] for x in zip(position, gp.normalizers)] for position in positions]
 print(normalizedpositions[0])
 actions = redactions + blueactions
 data = [positions, actions]
@@ -46,9 +46,10 @@ print("Red Positions:")
 print(redpositions[0])
 print("Blue Positions:")
 print(bluepositions[0])
-print(np.std(positions,axis=0))
+print(np.std(positions, axis = 0))
 
-'''class TwoLayerNet(torch.nn.Module):
+'''
+class TwoLayerNet(torch.nn.Module):
     def __init__(self, D_in, H, D_out):
 
         super(TwoLayerNet, self).__init__()
