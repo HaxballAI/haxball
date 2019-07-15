@@ -12,8 +12,25 @@ import random
 
 import numpy as np
 from random import randrange
-from moveclassifier import TwoLayerNet
-model = TwoLayerNet(D_in, H, D_out)
+
+import torch
+
+class TwoLayerNet(torch.nn.Module):
+    def __init__(self, D_in, H, D_out):
+
+        super(TwoLayerNet, self).__init__()
+        self.linear1 = torch.nn.Linear(D_in, H)
+        self.linear2 = torch.nn.Linear(H, D_out-1)
+        self.linear3 = torch.nn.Linear(H, 1)
+
+    def forward(self, x):
+        h_relu = self.linear1(x).clamp(min=0)
+        res = self.linear2(h_relu)
+        movepred = self.linear2(h_relu)
+        kickpred = torch.nn.Sigmoid()(self.linear3(h_relu))
+        return movepred, kickpred
+
+model = TwoLayerNet(12, 100, 10)
 model.load_state_dict(torch.load("initialmodelweights.dat"))
 model.eval()
 
@@ -53,14 +70,21 @@ def main():
 
     # FUNCTION THAT DEFINES OPPONENT REPLACE RHS WITH THIS
 
-    opponent = np.random.choice(model(x).numpy())
+    def opponent(x):
+        movepred, kickpred  = model(x)
+        ran_move = np.random.choice( len( movepred ) , p = torch.nn.Softmax()( movepred ).detach().numpy() )
+        p_kick = float(kickpred[0])
+        ran_kick = np.random.choice( [False, True] , p = [ 1 - p_kick , p_kick] )
+        return [ran_move , ran_kick]
+
+    print(opponent)
 
     while(running):
         # Need to update what keys are being pressed down for the human agents
         disp.updateKeys()
         # Query each agent on what commands should be sent to the game simulator
         commands = [agents[i].getRawAction(disp) for i in range(player_count)]
-        commands[0] = opponent( gp.flatten( game.getState("raw state") ) )
+        commands[0] = opponent( torch.tensor(gp.flatten( game.getState("raw state") )) )
         game.giveCommands(commands, "raw")
 
         # Update the graphical interface canvas
