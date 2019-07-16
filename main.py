@@ -6,6 +6,7 @@ from human_agent import humanagent
 from retarded_agent import retardedagent
 from data_handler import datahandler
 from move_displayer import movedisplayer
+from network import TwoLayerNet, DIMS
 #from model_tuner import tuner
 
 from utils import flatten
@@ -19,22 +20,8 @@ from random import randrange
 
 import torch
 
-class TwoLayerNet(torch.nn.Module):
-    def __init__(self, D_in, H, D_out):
-        super(TwoLayerNet, self).__init__()
-        self.linear1 = torch.nn.Linear(D_in, H)
-        self.linear2 = torch.nn.Linear(H, D_out-1)
-        self.linear3 = torch.nn.Linear(H, 1)
-
-    def forward(self, x):
-        h_relu = self.linear1(x).clamp(min = 0)
-        res = self.linear2(h_relu)
-        movepred = self.linear2(h_relu)
-        kickpred = torch.nn.Sigmoid()(self.linear3(h_relu))
-        return movepred, kickpred
-
 def main():
-    model = TwoLayerNet(12, 100, 10)
+    model = TwoLayerNet(*DIMS)
     model.load_state_dict(torch.load("initialmodelweights.dat"))
     model.eval()
 
