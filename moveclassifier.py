@@ -22,12 +22,12 @@ normalizedpositions, actions = list(zip(*c))
 print("Data normalised")
 
 class TwoLayerNet(torch.nn.Module):
-    def __init__(self, D_in, H, D_out):
+    def __init__(self, D_in, D_hid, D_out):
 
         super(TwoLayerNet, self).__init__()
-        self.linear1 = torch.nn.Linear(D_in, H)
-        self.linear2 = torch.nn.Linear(H, D_out-1)
-        self.linear3 = torch.nn.Linear(H, 1)
+        self.linear1 = torch.nn.Linear(D_in, D_hid)
+        self.linear2 = torch.nn.Linear(D_hid, D_out - 1)
+        self.linear3 = torch.nn.Linear(D_hid, 1)
 
     def forward(self, x):
         h_relu = self.linear1(x).clamp(min=0)
@@ -36,14 +36,15 @@ class TwoLayerNet(torch.nn.Module):
         kickpred = torch.nn.Sigmoid()(self.linear3(h_relu))
         return movepred, kickpred
 
-# N is batch size; D_in is input dimension;
-# H is hidden dimension; D_out is output dimension.
-N, D_in, H, D_out = 1, 12, 100, 10
+# Batch size
+N = 1
+# Dimensions: (in, hidden, out)
+DIMS = (12, 100, 10)
 
 # Create random Tensors to hold inputs and outputs
 
 # Construct our model by instantiating the class defined above
-model = TwoLayerNet(D_in, H, D_out)
+model = TwoLayerNet(*DIMS)
 
 movecriterion = torch.nn.CrossEntropyLoss(reduction='sum')
 kickcriterion = torch.nn.BCELoss(size_average=True)
@@ -72,7 +73,7 @@ for t in range(3):
         optimiser.step()
     torch.save(model.state_dict(), "initialmodelweights.dat")
 
-model = TwoLayerNet(D_in, H, D_out)
+model = TwoLayerNet(*DIMS)
 model.load_state_dict(torch.load("initialmodelweights.dat"))
 model.eval()
 
