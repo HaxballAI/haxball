@@ -73,8 +73,9 @@ class Game:
 
     @staticmethod
     def load(filename):
-        pass
+        f = open(filename, "rb")
+        return pickle.load(f)
 
-    @staticmethod
     def save(filename):
-        pass
+        f = open(filename, "wb")
+        pickle.dump(self, f)
