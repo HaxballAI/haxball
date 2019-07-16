@@ -11,7 +11,7 @@ from torch.autograd import Variable
 import math
 
 positions = np.load('pugamedata.npy')
-normalizedpositions = ((positions-gp.mean)/gp.stdev).tolist()
+normalizedpositions = ((positions - gp.mean)/gp.stdev).tolist()
 actions = np.load('pumovedata.npy').tolist()
 
 # Shuffle normalizedpositions and actions in the same way
@@ -37,7 +37,7 @@ actiondata = list(map(list, zip(*actions)))
 true_move = torch.tensor(actiondata[0]).view(-1,N)
 true_kick = torch.FloatTensor(actiondata[1]).view(-1,N)
 
-for t in range(3):
+for t in range(10):
     runningloss = 0
     for i in range(math.floor(len(normalizedpositions)*9/(10*N))):
         # Forward pass: Compute predicted y by passing x to the model
