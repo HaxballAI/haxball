@@ -13,6 +13,7 @@ class BallState:
     def posToList():
         return [x, y, vx, vy]
 
+@dataclass
 class PlayerState(BallState):
     move: int
     kick: int
