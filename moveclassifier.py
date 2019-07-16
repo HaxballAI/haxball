@@ -10,17 +10,12 @@ from torch.autograd import Variable
 import math
 positions = np.load('pugamedata.npy')
 print(positions)
-print("Divinging...")
 normalizedpositions = ((positions-gp.mean)/gp.stdev).tolist()
-print("divinging done")
 actions = np.load('pumovedata.npy').tolist()
 
-print("Zipping...")
 c = list(zip(normalizedpositions, actions))
 
-print("Pre shuffle")
 random.shuffle(c)
-print("Shuffle done")
 
 normalizedpositions , actions = list(zip(*c))
 
@@ -59,29 +54,27 @@ data_tensor = torch.FloatTensor(data[0]).view(-1,32,12)
 actiondata = list(map(list, zip(*data[1])))
 true_move = torch.tensor(actiondata[0]).view(-1,32)
 true_kick = torch.FloatTensor(actiondata[1]).view(-1,32)
-def optimize():
-    for t in range(3):
-        runningloss = 0
-        for i in range(math.floor(len(data[0])*9/320)):
+
+for t in range(3):
+    runningloss = 0
+    for i in range(math.floor(len(data[0])*9/320)):
         # Forward pass: Compute predicted y by passing x to the model
-
-            movepred, kickpred = model( data_tensor[i] )
-
+        movepred, kickpred = model( data_tensor[i] )
         # Compute and print loss
-            loss = movecriterion(movepred , true_move[i])
-            loss += kickcriterion( kickpred , true_kick[i])
-            runningloss += loss
-            if i % 100 == 0:
-                print("Loss for iteration " + str(t)+","+str(i*32)+"/"+str(math.floor(len(data[0])*9/10)) + ":")
-                print(runningloss/3200)
-                runningloss = 0
-            # Zero gradients, perform a backward pass, and update the weights.
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+        loss = movecriterion(movepred , true_move[i])
+        loss += kickcriterion( kickpred , true_kick[i])
+        runningloss += loss
+        if i % 100 == 0:
+            print("Loss for iteration " + str(t)+","+str(i*32)+"/"+str(math.floor(len(data[0])*9/10)) + ":")
+            print(runningloss/3200)
+            runningloss = 0
+        # Zero gradients, perform a backward pass, and update the weights.
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+    torch.save(model.state_dict(), "initialmodelweights.dat")
 
-        torch.save(model.state_dict(), "initialmodelweights.dat")
-optimize()
 model = TwoLayerNet(D_in, H, D_out)
 model.load_state_dict(torch.load("initialmodelweights.dat"))
 model.eval()
+
