@@ -18,6 +18,7 @@ import random
 
 import numpy as np
 from random import randrange
+from moveclassifier import DIMS
 
 import torch
 
