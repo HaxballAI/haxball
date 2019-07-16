@@ -76,7 +76,7 @@ model = TwoLayerNet(D_in, H, D_out)
 
 movecriterion = torch.nn.CrossEntropyLoss(reduction='sum')
 kickcriterion = torch.nn.BCELoss(size_average=True)
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+optimiser = torch.optim.Adam(model.parameters(), lr=1e-4)
 for t in range(1):
     for i in range(len(data[0])):
         # Forward pass: Compute predicted y by passing x to the model
@@ -89,7 +89,7 @@ for t in range(1):
         loss += kickcriterion( kickpred.unsqueeze(0), torch.FloatTensor( [ data[1][i][1] ] ) )
 
         # Zero gradients, perform a backward pass, and update the weights.
-        optimizer.zero_grad()
+        optimiser.zero_grad()
         loss.backward()
-        optimizer.step()
+        optimiser.step()
 '''
