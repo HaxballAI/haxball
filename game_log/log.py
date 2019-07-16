@@ -1,6 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List
-
+import pickle
 import numpy as np
 
 @dataclass
@@ -66,16 +66,19 @@ class Frame:
 
 @dataclass
 class Game:
-    frames: List[Frame]
+    frames: List[Frame] = field(default_factory = list)
 
-    def toNp(myTeam, me):
-        return np.array([f.posToNp(myTeam, me) for f in frames]), np.array([f.actToNp(myTeam, me) for f in frames])
+    def append(self, frame):
+        self.frames.append(frame)
+
+    def toNp(self, myTeam, me):
+        return np.array([f.posToNp(myTeam, me) for f in frames]), np.array([f.actToNp(myTeam, me) for f in self.frames])
 
     @staticmethod
     def load(filename):
         f = open(filename, "rb")
         return pickle.load(f)
 
-    def save(filename):
+    def save(self, filename):
         f = open(filename, "wb")
         pickle.dump(self, f)

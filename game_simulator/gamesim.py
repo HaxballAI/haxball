@@ -1,6 +1,7 @@
 from game_simulator import entities
 from game_simulator import gameparams
 from game_simulator import playeraction
+from game_log import log
 
 import numpy as np
 
@@ -326,7 +327,12 @@ class GameSim:
         elif format == "raw state":
             return [ [object.pos, object.vel ] for object in self.moving_objects]
 
-
+    def log(self):
+        return log.Frame(
+                blues = [p.log for p in self.blues],
+                reds  = [p.log for p in self.reds ],
+                balls = [b.log for b in self.balls],
+                )
 
     def giveCommands(self, actions, actionFormat = "raw"):
         # Gives commands to all the controllable entities in the game in the form of a list pf commands.

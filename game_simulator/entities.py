@@ -1,5 +1,6 @@
 from game_simulator import gameparams
 from game_simulator import playeraction
+from game_log import log
 
 import numpy as np
 
@@ -68,6 +69,9 @@ class Player(Entity):
         # Set the action to default action state
         self.current_action = playeraction.Action()
 
+    def log(self):
+        return log.PlayerState(self.pos[0], self.pos[1], self.vel[0], self.vel[1], self.current_action.dir_idx, self.current_action.kicking)
+
 class Ball(Entity):
     def __init__(self, initial_position, initial_velocity = np.zeros(2), initial_acceleration = np.zeros(2)):
         # Initialise positional parameters, basic properties of the object
@@ -88,6 +92,9 @@ class Ball(Entity):
         self.pos = np.array([gameparams.pitchcornerx + np.random.random_sample() * 580, gameparams.pitchcornery + np.random.random_sample() * 200]).astype(float)
         self.vel = np.zeros(2)
         self.acc = np.zeros(2)
+
+    def log(self):
+        return log.BallState(self.pos[0], self.pos[1], self.vel[0], self.vel[1])
 
 class GoalPost(Entity):
     def __init__(self, initial_position, initial_velocity = np.zeros(2), initial_acceleration = np.zeros(2)):
