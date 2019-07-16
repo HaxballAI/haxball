@@ -1,3 +1,5 @@
+#! /usr/bin/python
+
 from game_simulator import gamesim
 from game_displayer import basicdisplayer
 from human_agent import humanagent

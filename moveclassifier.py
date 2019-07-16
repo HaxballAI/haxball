@@ -1,3 +1,5 @@
+#! /usr/bin/python
+
 import torch
 import torch.nn.functional as F
 import numpy as np
@@ -5,6 +7,7 @@ import random
 from data_handler import datahandler
 from game_simulator import gameparams as gp
 from torch.autograd import Variable
+
 positions = np.load('pugamedata.npy')
 print(positions)
 print("Divinging...")
