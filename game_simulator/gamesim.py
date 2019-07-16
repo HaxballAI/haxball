@@ -329,9 +329,9 @@ class GameSim:
 
     def log(self):
         return log.Frame(
-                blues = [p.log for p in self.blues],
-                reds  = [p.log for p in self.reds ],
-                balls = [b.log for b in self.balls],
+                blues = [p.log() for p in self.blues],
+                reds  = [p.log() for p in self.reds ],
+                balls = [b.log() for b in self.balls],
                 )
 
     def giveCommands(self, actions, actionFormat = "raw"):
