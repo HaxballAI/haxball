@@ -4,19 +4,11 @@ import numpy as np
 from data_handler import datahandler
 from game_simulator import gameparams as gp
 from torch.autograd import Variable
+from utils import flatten
 
 data_handler = datahandler.DataHandler("rawsaved_games.dat")
 data_handler.loadFileToBuffer()
 loaded_data=data_handler.buffer
-
-def flatten(S):
-    if S == []:
-        return S
-    if isinstance(S[0], list):
-        return flatten(S[0]) + flatten(S[1:])
-    if isinstance(S[0], type(np.array([])) ):
-        return flatten(S[0].tolist()) + flatten(S[1:])
-    return S[:1] + flatten(S[1:])
 
 redpositions = []
 bluepositions = []

@@ -6,7 +6,7 @@ from data_handler import datahandler
 from move_displayer import movedisplayer
 #from model_tuner import tuner
 
-import game_simulator.gameparams as gp
+from utils import flatten
 
 import pygame
 
@@ -82,7 +82,7 @@ def main():
         disp.updateKeys()
         # Query each agent on what commands should be sent to the game simulator
         commands = [agents[i].getRawAction(disp) for i in range(player_count)]
-        commands[0], debug_surf = opponent(torch.tensor(gp.flatten(game.getState("raw state"))))
+        commands[0], debug_surf = opponent(torch.tensor(flatten(game.getState("raw state"))))
         game.giveCommands(commands, "raw")
 
         # Update the graphical interface canvas

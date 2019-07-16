@@ -1,16 +1,8 @@
 from gym_haxball.onevoneenviroment import DuelEnviroment
 from gym import core, spaces
 from game_simulator import gameparams
+from utils import flatten
 import numpy as np
-
-def flatten(S):
-    if S == []:
-        return S
-    if isinstance(S[0], list):
-        return flatten(S[0]) + flatten(S[1:])
-    if isinstance(S[0], type(np.array([])) ):
-        return flatten(S[0].tolist()) + flatten(S[1:])
-    return S[:1] + flatten(S[1:])
 
 class DuelFixedGym(core.Env):
     def __init__(self, config):
