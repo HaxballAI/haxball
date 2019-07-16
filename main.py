@@ -52,7 +52,6 @@ def main():
     for i in range(blue_player_count - 1):
         agents.append(retardedagent.RetardedAgent())
 
-
     # Intialise the graphical interface of the game
     #disp = basicdisplayer.GameWindow(840, 400)
     disp = basicdisplayer.GameWindow(1096, 400)

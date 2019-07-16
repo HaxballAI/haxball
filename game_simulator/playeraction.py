@@ -4,9 +4,6 @@ import random
 dirx = [0, 0, 1, 1, 1, 0, -1, -1, -1]
 diry = [0, 1, 1, 0, -1, -1 ,-1, 0, 1]
 
-
-
-
 class Action:
     def __init__(self, directionNumber = 0, isKicking = 0):
         self.kicking = isKicking
@@ -16,7 +13,6 @@ class Action:
         if directionNumber != 0:
             self.direction /= np.linalg.norm(self.direction)
 
-
     def isKicking(self):
         return self.kicking == 1
 
@@ -25,19 +21,19 @@ class Action:
         # Directions should be a string like "ul" for up-left for
         # ease of use
         stringToNumber = {
-            "still": 0,
-            "u": 1,
-            "ur": 2,
-            "ru": 2,
-            "r": 3,
-            "dl": 4,
-            "ld": 4,
-            "d": 5,
-            "dl": 6,
-            "ld": 6,
-            "l": 7,
-            "ul": 8,
-            "lu": 8
+            "still" : 0,
+            "u"     : 1,
+            "ur"    : 2,
+            "ru"    : 2,
+            "r"     : 3,
+            "dl"    : 4,
+            "ld"    : 4,
+            "d"     : 5,
+            "dl"    : 6,
+            "ld"    : 6,
+            "l"     : 7,
+            "ul"    : 8,
+            "lu"    : 8
         }
 
         if direction in stringToNumber:
@@ -52,7 +48,8 @@ class Action:
     def rawAction(self):
         # Returns raw action for use in networks. A tuple of the kicking state (0 or 1)
         # and movement direction (from 0 to 8)
-        return [self.kicking, self.dir_idx]
+        return self.kicking, self.dir_idx
 
 def getRandomAction():
-    return Action(random.randint(0,8), random.randint(0,1))
+    return Action(random.randint(8), random.randint(1))
+

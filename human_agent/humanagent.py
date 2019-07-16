@@ -44,8 +44,7 @@ class HumanAgent():
         else:
             dir = max(a, b)
 
-        return (dir, gui.isKeyPressed(self.kick))
+        return dir, gui.isKeyPressed(self.kick)
 
     def getAction(self, gui):
-        raw_action = self.getRawAction(gui)
-        return playeraction.Action(raw_action[0], raw_action[1])
+        return playeraction.Action(*self.getRawAction(gui))

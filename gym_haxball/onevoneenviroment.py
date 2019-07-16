@@ -40,7 +40,6 @@ class DuelEnviroment:
         self.steps_since_reset = 0
         self.game_sim.resetMap()
 
-
     def goalScored(self):
         # Checks goals. Returns 1 for red, 0 for none, -1 for blue.
         goals = self.game_sim.checkGoals()
@@ -50,3 +49,4 @@ class DuelEnviroment:
             return -1
         else:
             return 0
+

@@ -3,7 +3,6 @@ from game_simulator import playeraction
 
 import numpy as np
 
-
 # handles player indexing
 curr_idx = -1
 
@@ -29,7 +28,6 @@ class Entity:
     # Get the normalised vector pointing from self to obj
     def getDirectionTo(self, obj):
         return (obj.pos - self.pos) / self.getDistanceTo(obj)
-
 
 class Player(Entity):
     def __init__(self, team, initial_position, initial_velocity = np.zeros(2), initial_acceleration = np.zeros(2), ):
@@ -70,7 +68,6 @@ class Player(Entity):
         # Set the action to default action state
         self.current_action = playeraction.Action()
 
-
 class Ball(Entity):
     def __init__(self, initial_position, initial_velocity = np.zeros(2), initial_acceleration = np.zeros(2)):
         # Initialise positional parameters, basic properties of the object
@@ -88,18 +85,17 @@ class Ball(Entity):
 
     def reset(self):
         # positional parameters
-        self.pos = np.array([gameparams.pitchcornerx + (np.random.random_sample())*580, gameparams.pitchcornery + (np.random.random_sample())*200]).astype(float)
+        self.pos = np.array([gameparams.pitchcornerx + np.random.random_sample() * 580, gameparams.pitchcornery + np.random.random_sample() * 200]).astype(float)
         self.vel = np.zeros(2)
         self.acc = np.zeros(2)
-
 
 class GoalPost(Entity):
     def __init__(self, initial_position, initial_velocity = np.zeros(2), initial_acceleration = np.zeros(2)):
         # Initialise positional parameters, basic properties of the object
         Entity.__init__(self, initial_position, initial_velocity, initial_acceleration, gameparams.goalpostradius, gameparams.goalpostbouncingquotient)
 
-
 class CentreCircleBlock(Entity):
     def __init__(self, initial_position, initial_velocity = np.zeros(2), initial_acceleration = np.zeros(2)):
         # Initialise positional parameters, basic properties of the object
         Entity.__init__(self, initial_position, initial_velocity, initial_acceleration, gameparams.centrecircleradius, 0)
+

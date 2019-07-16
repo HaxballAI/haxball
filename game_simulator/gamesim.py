@@ -4,7 +4,6 @@ from game_simulator import playeraction
 
 import numpy as np
 
-
 class GameSim:
     def __init__(self, red_player_count, blue_player_count, ball_count, extraParams = {}, seed = -1):
         # Intialise the entities
@@ -61,7 +60,7 @@ class GameSim:
             self.enforce_kickoff = False
 
     def getRandomPositionInThePlayingField(self):
-        return np.array([gameparams.pitchcornerx + (np.random.random_sample())*580, gameparams.pitchcornery + (np.random.random_sample())*200]).astype(float)
+        return np.array([gameparams.pitchcornerx + np.random.random_sample() * 580, gameparams.pitchcornery + np.random.random_sample() * 200]).astype(float)
 
     def keepOutOfCentre(self, obj):
         # Moves an object out of the centre area. Called during kickoff
@@ -362,3 +361,4 @@ class GameSim:
         ### TODO: Handle key events
         ### keys = pygame.key.get_pressed()
         return
+
