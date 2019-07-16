@@ -5,6 +5,7 @@ import random
 from data_handler import datahandler
 from game_simulator import gameparams as gp
 from torch.autograd import Variable
+import math
 positions = np.load('pugamedata.npy')
 print(positions)
 print("Divinging...")
@@ -51,32 +52,34 @@ model = TwoLayerNet(D_in, H, D_out)
 
 movecriterion = torch.nn.CrossEntropyLoss(reduction='sum')
 kickcriterion = torch.nn.BCELoss(size_average=True)
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
-runningloss = 0
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-2)
+data_tensor = torch.FloatTensor(data[0]).view(-1,32,12)
+actiondata = list(map(list, zip(*data[1])))
+true_move = torch.tensor(actiondata[0]).view(-1,32)
+true_kick = torch.FloatTensor(actiondata[1]).view(-1,32)
 def optimize():
     for t in range(3):
-    # Forward pass: Compute predicted y by passing x to the model
+        runningloss = 0
+        for i in range(math.floor(len(data[0])*9/320)):
+        # Forward pass: Compute predicted y by passing x to the model
 
-        data_tensor = torch.FloatTensor(data[0]).view(-1,1,12)
-        movepred, kickpred = model( data_tensor )
-        actiondata = list(map(list, zip(*data[1])))
-        true_move = torch.FloatTensor(actiondata[0]).view(-1,1)
-        true_kick = torch.FloatTensor(actiondata[1]).view(-1,1)
-        print(true_move)
-        print(movepred)
-    # Compute and print loss
-        loss = movecriterion(movepred , true_move)
-        loss = kickcriterion( kickpred , true_kick)
-        print("Loss for iteration " + str(t) + ":")
-        print(loss / len(data[0]) )
-        # Zero gradients, perform a backward pass, and update the weights.
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+            movepred, kickpred = model( data_tensor[i] )
+
+        # Compute and print loss
+            loss = movecriterion(movepred , true_move[i])
+            loss += kickcriterion( kickpred , true_kick[i])
+            runningloss += loss
+            if i % 100 == 0:
+                print("Loss for iteration " + str(t)+","+str(i*32)+"/"+str(math.floor(len(data[0])*9/10)) + ":")
+                print(runningloss/3200)
+                runningloss = 0
+            # Zero gradients, perform a backward pass, and update the weights.
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
         torch.save(model.state_dict(), "initialmodelweights.dat")
 optimize()
 model = TwoLayerNet(D_in, H, D_out)
 model.load_state_dict(torch.load("initialmodelweights.dat"))
 model.eval()
-print(model(torch.randn(1,1,12)))
