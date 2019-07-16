@@ -6,7 +6,9 @@ from human_agent import humanagent
 from retarded_agent import retardedagent
 from data_handler import datahandler
 from move_displayer import movedisplayer
+from network import TwoLayerNet, DIMS
 #from model_tuner import tuner
+from game_simulator import gameparams as gp
 
 from utils import flatten
 
@@ -19,20 +21,6 @@ from random import randrange
 from moveclassifier import DIMS
 
 import torch
-
-class TwoLayerNet(torch.nn.Module):
-    def __init__(self, D_in, H, D_out):
-        super(TwoLayerNet, self).__init__()
-        self.linear1 = torch.nn.Linear(D_in, H)
-        self.linear2 = torch.nn.Linear(H, D_out-1)
-        self.linear3 = torch.nn.Linear(H, 1)
-
-    def forward(self, x):
-        h_relu = self.linear1(x).clamp(min = 0)
-        res = self.linear2(h_relu)
-        movepred = self.linear2(h_relu)
-        kickpred = torch.nn.Sigmoid()(self.linear3(h_relu))
-        return movepred, kickpred
 
 def main():
     model = TwoLayerNet(*DIMS)
@@ -85,7 +73,17 @@ def main():
         disp.updateKeys()
         # Query each agent on what commands should be sent to the game simulator
         commands = [agents[i].getRawAction(disp) for i in range(player_count)]
-        commands[0], debug_surf = opponent(torch.tensor(flatten(game.getState("raw state"))))
+
+        c_state = flatten( game.getState(   "raw state" ) )
+        c_state[4] -= c_state[0]
+        c_state[5] -= c_state[1]
+        c_state[8] -= c_state[0]
+        c_state[9] -= c_state[1]
+        c_state = np.array( c_state )
+        #c_state -= gp.mean
+        #c_state /= gp.stdev
+
+        commands[0], debug_surf = opponent( torch.FloatTensor( c_state) )
         game.giveCommands(commands, "raw")
 
         # Update the graphical interface canvas
