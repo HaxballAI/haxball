@@ -1,4 +1,4 @@
-    #! /usr/bin/python
+#! /usr/bin/python
 
 import torch
 import torch.nn.functional as F
@@ -9,7 +9,6 @@ from game_simulator import gameparams as gp
 from network import TwoLayerNet, DIMS
 from torch.autograd import Variable
 import math
-from collections import namedtuple
 
 positions = np.load('pugamedata.npy')
 normalizedpositions = ((positions-gp.mean)/gp.stdev).tolist()

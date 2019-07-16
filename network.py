@@ -1,4 +1,5 @@
 import torch
+from collections import namedtuple
 
 class TwoLayerNet(torch.nn.Module):
     def __init__(self, D_in, D_hid, D_out):
