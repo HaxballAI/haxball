@@ -78,11 +78,15 @@ def main():
         c_state[5] -= c_state[1]
         c_state[8] -= c_state[0]
         c_state[9] -= c_state[1]
-        c_state = np.array( c_state )
-        #c_state -= gp.mean
-        #c_state /= gp.stdev
 
-        commands[0], debug_surf = opponent( torch.FloatTensor( c_state) )
+        c_state = [c_state[0] , c_state[1] ,c_state[4] , c_state[5] ,
+                   c_state[8] , c_state[9] , c_state[2] , c_state[3] ,
+                   c_state[6] , c_state[7] , c_state[10] , c_state[11]]
+
+        c_state = np.array( c_state )
+        c_state_norm = (c_state - gp.mean) / gp.stdev
+
+        commands[0], debug_surf = opponent( torch.FloatTensor( c_state_norm) )
         game.giveCommands(commands, "raw")
 
         # Update the graphical interface canvas
@@ -107,7 +111,13 @@ def main():
         game.step()
 
         # Get Debugging data from the game
-        if game.frames % 10000 == 0:
+
+
+        if game.frames % 1000 == 0:
+            print("c_state:")
+            print(c_state)
+            print("c_state_norm:")
+            print(c_state_norm)
             game.getFeedback()
 
         disp.getInput()
