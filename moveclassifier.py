@@ -5,45 +5,12 @@ import random
 from data_handler import datahandler
 from game_simulator import gameparams as gp
 from torch.autograd import Variable
-data_handler = datahandler.DataHandler("rawsaved_games.dat")
-data_handler.loadFileToBuffer()
-loaded_data=data_handler.buffer
-print("Data loaded.")
-
-def flatten(S):
-    if S == []:
-        return S
-    if isinstance(S[0], list):
-        return flatten(S[0]) + flatten(S[1:])
-    if isinstance(S[0], type(np.array([])) ):
-        return flatten(S[0].tolist()) + flatten(S[1:])
-    return S[:1] + flatten(S[1:])
-
-
-redpositions = []
-bluepositions = []
-redactions = []
-blueactions = []
-for game in loaded_data:
-    for frame in game:
-        redpositions.append(torch.FloatTensor(flatten(frame[0])))
-        redaction = frame[1][0]
-        redactions.append(redaction)
-        blueframe = []
-        for object in frame:
-            blueframe.append([gp.rotatePos(object[0]),gp.rotateVel(object[1])])
-        bluepositions.append(torch.FloatTensor(flatten(blueframe)))
-        blueaction = frame[1][1]
-        blueactions.append(blueaction)
-
-print("Data flipped for blue")
-
-positions = redpositions + bluepositions
-
+positions = np.load('pugamedata.npy')
+print(positions)
 print("Divinging...")
-normalizedpositions = [[x[0]/x[1] for x in zip(position,gp.normalizers)] for position in positions]
+normalizedpositions = ((positions-gp.mean)/gp.stdev).tolist()
 print("divinging done")
-actions = redactions + blueactions
+actions = np.load('pumovedata.npy').tolist()
 
 print("Zipping...")
 c = list(zip(normalizedpositions, actions))
@@ -93,14 +60,16 @@ def optimize():
     for t in range(3):
     # Forward pass: Compute predicted y by passing x to the model
 
-        data_tensor = torch.tensor(data[0])
+        data_tensor = torch.FloatTensor(data[0]).view(-1,1,12)
         movepred, kickpred = model( data_tensor )
-
-        true_move = torch.tensor( [d[1] for d in data[1] ] )
-
+        actiondata = list(map(list, zip(*data[1])))
+        true_move = torch.FloatTensor(actiondata[0]).view(-1,1)
+        true_kick = torch.FloatTensor(actiondata[1]).view(-1,1)
+        print(true_move)
+        print(movepred)
     # Compute and print loss
-        loss = movecriterion(movepred ,true_move)
-        loss += kickcriterion( kickpred , torch.FloatTensor( [d[0] for d in data[1] ] ) )
+        loss = movecriterion(movepred , true_move)
+        loss = kickcriterion( kickpred , true_kick)
         print("Loss for iteration " + str(t) + ":")
         print(loss / len(data[0]) )
         # Zero gradients, perform a backward pass, and update the weights.
@@ -109,7 +78,7 @@ def optimize():
         optimizer.step()
 
         torch.save(model.state_dict(), "initialmodelweights.dat")
-
+optimize()
 model = TwoLayerNet(D_in, H, D_out)
 model.load_state_dict(torch.load("initialmodelweights.dat"))
 model.eval()

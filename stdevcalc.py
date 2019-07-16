@@ -43,10 +43,11 @@ actions = redactions + blueactions
 data = [positions, actions]
 positions = np.array(positions)
 print("Red Positions:")
-print(redpositions[0])
+print(redpositions[10000])
 print("Blue Positions:")
-print(bluepositions[0])
+print(bluepositions[10000])
 print(np.std(positions,axis=0))
+print(np.mean(positions,axis=0))
 
 '''class TwoLayerNet(torch.nn.Module):
     def __init__(self, D_in, H, D_out):
