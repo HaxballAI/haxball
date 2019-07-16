@@ -8,6 +8,7 @@ from data_handler import datahandler
 from move_displayer import movedisplayer
 from network import TwoLayerNet, DIMS
 #from model_tuner import tuner
+from game_simulator import gameparams as gp
 
 from utils import flatten
 
@@ -71,7 +72,17 @@ def main():
         disp.updateKeys()
         # Query each agent on what commands should be sent to the game simulator
         commands = [agents[i].getRawAction(disp) for i in range(player_count)]
-        commands[0], debug_surf = opponent(torch.tensor(flatten(game.getState("raw state"))))
+
+        c_state = flatten( game.getState(   "raw state" ) )
+        c_state[4] -= c_state[0]
+        c_state[5] -= c_state[1]
+        c_state[8] -= c_state[0]
+        c_state[9] -= c_state[1]
+        c_state = np.array( c_state )
+        #c_state -= gp.mean
+        #c_state /= gp.stdev
+
+        commands[0], debug_surf = opponent( torch.FloatTensor( c_state) )
         game.giveCommands(commands, "raw")
 
         # Update the graphical interface canvas
@@ -106,4 +117,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
