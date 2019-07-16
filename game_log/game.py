@@ -29,19 +29,19 @@ class Frame:
     def posToNp(myTeam, me):
         if myTeam == "blue":
             return np.array(
-                    flatMap(PlayerState.posToList, blues[me])
-                    + flatMap(PlayerState.posToList, blues[:me])
-                    + flatMap(PlayerState.posToList, blues[me+1:])
-                    + flatMap(PlayerState.posToList, reds)
-                    + flatMap(BallState.posToList, balls)
+                    blues[me].posToList
+                    + [x for p in blues[:me]   for x in p.posToList]
+                    + [x for p in blues[me+1:] for x in p.posToList]
+                    + [x for p in reds         for x in p.posToList]
+                    + [x for b in balls        for x in b.posToList]
                     )
         elif myTeam == "red":
             return np.array(
-                    flatMap(PlayerState.posToList, reds[me])
-                    + flatMap(PlayerState.posToList, reds[:me])
-                    + flatMap(PlayerState.posToList, reds[me+1:])
-                    + flatMap(PlayerState.posToList, blues)
-                    + flatMap(BallState.posToList, balls)
+                    reds[me].posToList
+                    + [x for p in reds[:me]   for x in p.posToList]
+                    + [x for p in reds[me+1:] for x in p.posToList]
+                    + [x for p in blues       for x in p.posToList]
+                    + [x for b in balls       for x in b.posToList]
                     )
         else:
             raise ValueError
@@ -49,17 +49,17 @@ class Frame:
     def actToNp(myTeam, me):
         if myTeam == "blue":
             return np.array(
-                    flatMap(PlayerState.actToList, blues[me])
-                    + flatMap(PlayerState.actToList, blues[:me])
-                    + flatMap(PlayerState.actToList, blues[me+1:])
-                    + flatMap(PlayerState.actToList, reds)
+                    blues[me].actToList
+                    + [x for p in blues[:me]   for x in p.actToList]
+                    + [x for p in blues[me+1:] for x in p.actToList]
+                    + [x for p in reds         for x in p.actToList]
                     )
         elif myTeam == "red":
             return np.array(
-                    flatMap(PlayerState.actToList, reds[me])
-                    + flatMap(PlayerState.actToList, reds[:me])
-                    + flatMap(PlayerState.actToList, reds[me+1:])
-                    + flatMap(PlayerState.actToList, blues)
+                    reds[me].actToList
+                    + [x for p in reds[:me]   for x in p.actToList]
+                    + [x for p in reds[me+1:] for x in p.actToList]
+                    + [x for p in blues       for x in p.actToList]
                     )
         else:
             raise ValueError
