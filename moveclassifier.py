@@ -39,16 +39,15 @@ true_kick = torch.FloatTensor(actiondata[1]).view(-1,N)
 
 for t in range(10):
     runningloss = 0
-    for i in range(math.floor(len(normalizedpositions)*9/(10*N))):
+    for i in range(len(normalizedpositions) * 9 // (10 * N)):
         # Forward pass: Compute predicted y by passing x to the model
-        movepred, kickpred = model( data_tensor[i] )
+        movepred, kickpred = model(data_tensor[i])
         # Compute and print loss
-        loss = movecriterion(movepred , true_move[i])
-        loss += kickcriterion( kickpred , true_kick[i])
+        loss = movecriterion(movepred, true_move[i])
+        loss += kickcriterion(kickpred, true_kick[i])
         runningloss += loss
         if i % 100 == 0:
-            print("Loss for iteration " + str(t)+","+str(i*N)+"/"+str(math.floor(len(normalizedpositions)*9/10)) + ":")
-            print(runningloss/(100))
+            print(f"Loss for iteration {t:02}, {i * N:06}/{len(normalizedpositions) * 9 // 10:06}: {float(runningloss) / 100:.5f}")
             runningloss = 0
         # Zero gradients, perform a backward pass, and update the weights.
         optimiser.zero_grad()
