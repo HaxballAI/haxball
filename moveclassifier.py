@@ -8,18 +8,16 @@ from data_handler import datahandler
 from game_simulator import gameparams as gp
 from torch.autograd import Variable
 import math
+
 positions = np.load('pugamedata.npy')
 print(positions)
 normalizedpositions = ((positions-gp.mean)/gp.stdev).tolist()
 actions = np.load('pumovedata.npy').tolist()
 
+# Shuffle normalizedpositions and actions in the same way
 c = list(zip(normalizedpositions, actions))
-
 random.shuffle(c)
-
-normalizedpositions , actions = list(zip(*c))
-
-data = [normalizedpositions, actions]
+normalizedpositions, actions = list(zip(*c))
 
 print("Data normalised")
 
@@ -50,14 +48,14 @@ model = TwoLayerNet(D_in, H, D_out)
 movecriterion = torch.nn.CrossEntropyLoss(reduction='sum')
 kickcriterion = torch.nn.BCELoss(size_average=True)
 optimiser = torch.optim.Adam(model.parameters(), lr=1e-2)
-data_tensor = torch.FloatTensor(data[0]).view(-1,32,12)
-actiondata = list(map(list, zip(*data[1])))
+data_tensor = torch.FloatTensor(normalizedpositions).view(-1,32,12)
+actiondata = list(map(list, zip(*actions)))
 true_move = torch.tensor(actiondata[0]).view(-1,32)
 true_kick = torch.FloatTensor(actiondata[1]).view(-1,32)
 
 for t in range(3):
     runningloss = 0
-    for i in range(math.floor(len(data[0])*9/320)):
+    for i in range(math.floor(len(normalizedpositions)*9/320)):
         # Forward pass: Compute predicted y by passing x to the model
         movepred, kickpred = model( data_tensor[i] )
         # Compute and print loss
@@ -65,7 +63,7 @@ for t in range(3):
         loss += kickcriterion( kickpred , true_kick[i])
         runningloss += loss
         if i % 100 == 0:
-            print("Loss for iteration " + str(t)+","+str(i*32)+"/"+str(math.floor(len(data[0])*9/10)) + ":")
+            print("Loss for iteration " + str(t)+","+str(i*32)+"/"+str(math.floor(len(normalizedpositions)*9/10)) + ":")
             print(runningloss/3200)
             runningloss = 0
         # Zero gradients, perform a backward pass, and update the weights.
