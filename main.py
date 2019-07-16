@@ -16,6 +16,7 @@ import random
 
 import numpy as np
 from random import randrange
+from moveclassifier import DIMS
 
 import torch
 
@@ -34,7 +35,7 @@ class TwoLayerNet(torch.nn.Module):
         return movepred, kickpred
 
 def main():
-    model = TwoLayerNet(12, 100, 10)
+    model = TwoLayerNet(*DIMS)
     model.load_state_dict(torch.load("initialmodelweights.dat"))
     model.eval()
 
@@ -119,4 +120,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

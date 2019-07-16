@@ -55,7 +55,7 @@ actiondata = list(map(list, zip(*actions)))
 true_move = torch.tensor(actiondata[0]).view(-1,N)
 true_kick = torch.FloatTensor(actiondata[1]).view(-1,N)
 
-for t in range(3):
+for t in range(1):
     runningloss = 0
     for i in range(math.floor(len(normalizedpositions)*9/(10*N))):
         # Forward pass: Compute predicted y by passing x to the model
