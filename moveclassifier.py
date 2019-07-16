@@ -49,7 +49,7 @@ model = TwoLayerNet(D_in, H, D_out)
 
 movecriterion = torch.nn.CrossEntropyLoss(reduction='sum')
 kickcriterion = torch.nn.BCELoss(size_average=True)
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-2)
+optimiser = torch.optim.Adam(model.parameters(), lr=1e-2)
 data_tensor = torch.FloatTensor(data[0]).view(-1,32,12)
 actiondata = list(map(list, zip(*data[1])))
 true_move = torch.tensor(actiondata[0]).view(-1,32)
@@ -69,9 +69,9 @@ for t in range(3):
             print(runningloss/3200)
             runningloss = 0
         # Zero gradients, perform a backward pass, and update the weights.
-        optimizer.zero_grad()
+        optimiser.zero_grad()
         loss.backward()
-        optimizer.step()
+        optimiser.step()
     torch.save(model.state_dict(), "initialmodelweights.dat")
 
 model = TwoLayerNet(D_in, H, D_out)
