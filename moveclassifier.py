@@ -10,7 +10,7 @@ from torch.autograd import Variable
 import math
 
 positions = np.load('pugamedata.npy')
-print("Divinging...")
+print(positions)
 normalizedpositions = ((positions-gp.mean)/gp.stdev).tolist()
 actions = np.load('pumovedata.npy').tolist()
 
@@ -36,29 +36,23 @@ class TwoLayerNet(torch.nn.Module):
         kickpred = torch.nn.Sigmoid()(self.linear3(h_relu))
         return movepred, kickpred
 
-# N is batch size; D_in is input dimension;
-# H is hidden dimension; D_out is output dimension.
-N, D_in, H, D_out = 32, 12, 50, 10
+# Batch size
+N = 1
+# Dimensions: (in, hidden, out)
+DIMS = (12, 100, 10)
 
 # Create random Tensors to hold inputs and outputs
 
 # Construct our model by instantiating the class defined above
 model = TwoLayerNet(*DIMS)
 
-movecriterion = torch.nn.CrossEntropyLoss(reduction='mean')
+movecriterion = torch.nn.CrossEntropyLoss(reduction='sum')
 kickcriterion = torch.nn.BCELoss(size_average=True)
-optimizer = torch.optim.Adam(model.parameters(), lr=.001)
-data_tensor = torch.FloatTensor(data[0]).view(-1,N,D_in)
-actiondata = list(map(list, zip(*data[1])))
-true_move = torch.tensor(actiondata[0]).view(-1,N)
-true_kick = torch.FloatTensor(actiondata[1]).view(-1,N)
-def optimize():
-    for t in range(3):
-        runningloss = 0
-        for i in range(math.floor(len(data[0])*9/(10*N))):
-        # Forward pass: Compute predicted y by passing x to the model
-
-            movepred, kickpred = model( data_tensor[i] )
+optimiser = torch.optim.Adam(model.parameters(), lr=1e-2)
+data_tensor = torch.FloatTensor(normalizedpositions).view(-1,32,12)
+actiondata = list(map(list, zip(*actions)))
+true_move = torch.tensor(actiondata[0]).view(-1,32)
+true_kick = torch.FloatTensor(actiondata[1]).view(-1,32)
 
 for t in range(3):
     runningloss = 0
@@ -66,31 +60,20 @@ for t in range(3):
         # Forward pass: Compute predicted y by passing x to the model
         movepred, kickpred = model( data_tensor[i] )
         # Compute and print loss
-            loss = movecriterion(movepred , true_move[i])
-            loss += kickcriterion( kickpred , true_kick[i])
-            runningloss += loss
-            if i % 100 == 0:
-                print("Loss for iteration " + str(t)+","+str(i*N)+"/"+str(math.floor(len(data[0])*9/10)) + ":")
-                print(runningloss/(100))
-                runningloss = 0
-            # Zero gradients, perform a backward pass, and update the weights.
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-
-        torch.save(model.state_dict(), "initialmodelweights.dat")
-optimize()
-model = TwoLayerNet(D_in, H, D_out)
-model.load_state_dict(torch.load("initialmodelweights.dat"))
-model.eval()
-with torch.no_grad():
-    runningloss = 0
-    j=0
-    for i in range(math.floor(len(data[0])*9/(10*N)), math.floor(len(data[0])/N)):
-        movepred, kickpred = model( data_tensor[i] )
-        j+=1
-    # Compute and print loss
         loss = movecriterion(movepred , true_move[i])
         loss += kickcriterion( kickpred , true_kick[i])
         runningloss += loss
-    print("validation loss: "+str(runningloss/(j)))
+        if i % 100 == 0:
+            print("Loss for iteration " + str(t)+","+str(i*32)+"/"+str(math.floor(len(normalizedpositions)*9/10)) + ":")
+            print(runningloss/3200)
+            runningloss = 0
+        # Zero gradients, perform a backward pass, and update the weights.
+        optimiser.zero_grad()
+        loss.backward()
+        optimiser.step()
+    torch.save(model.state_dict(), "initialmodelweights.dat")
+
+model = TwoLayerNet(*DIMS)
+model.load_state_dict(torch.load("initialmodelweights.dat"))
+model.eval()
+
