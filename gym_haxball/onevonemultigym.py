@@ -54,7 +54,7 @@ class DuelFixedGym(multi_agent_env.MultiAgentEnv):
         dones = {"red" : step_data[1], "blue" : step_data[1]}
         infos = {"red" : {}, "blue" : {}}
 
-        return [self.getMultiState(), rewards, dones, infos]
+        return self.getMultiState(), rewards, dones, infos
 
     def reset(self):
         self.envo.reset()
