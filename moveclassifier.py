@@ -1,4 +1,4 @@
-#! /usr/bin/python
+    #! /usr/bin/python
 
 import torch
 import torch.nn.functional as F
@@ -66,7 +66,7 @@ for t in range(3):
         runningloss += loss
         if i % 100 == 0:
             print("Loss for iteration " + str(t)+","+str(i*N)+"/"+str(math.floor(len(normalizedpositions)*9/10)) + ":")
-            print(runningloss/(N*100))
+            print(runningloss/(100))
             runningloss = 0
         # Zero gradients, perform a backward pass, and update the weights.
         optimiser.zero_grad()
@@ -81,7 +81,7 @@ model.eval()
 with torch.no_grad():
     runningloss = 0
     j = 0
-    for i in range(math.floor(len(data[0])*9/(10*N)), math.floor(len(data[0])/N)):
+    for i in range(math.floor(len(normalizedpositions)*9/(10*N)), math.floor(len(normalizedpositions)/N)):
         movepred, kickpred = model( data_tensor[i] )
         j += 1
     # Compute and print loss
@@ -89,4 +89,3 @@ with torch.no_grad():
         loss += kickcriterion( kickpred , true_kick[i])
         runningloss += loss
     print("validation loss: " + str(runningloss / j))
-
