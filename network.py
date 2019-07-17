@@ -30,3 +30,21 @@ class Critic(torch.nn.Module):
         h_relu = self.linear1(x).clamp(min=0)
         winprob = torch.nn.Sigmoid()(self.linear2(h_relu))
         return winprob
+
+class Policy(nn.Module):
+    def __init__(self):
+        super(Policy, self).__init__()
+        self.affine1 = torch.nn.Linear(D_in, D_hid)
+        self.move_head = torch.nn.Linear(D_hid, 9)
+        self.kick_head = torch.nn.Linear(D_hid, 1)
+        self.value_head = torch.nn.Linear(D_hid, 1)
+
+        self.saved_actions = []
+        self.rewards = []
+
+    def forward(self, x):
+        x = F.relu(self.affine1(x))
+        moveprobs = F.softmax(self.action_head(x), dim=-1)
+        kickprob = torch.nn.Sigmoid()(self.kick_head(x))
+        winprob = torch.nn.Sigmoid()(self.value_head(x))
+        return moveprobs, kickprob, winprob
