@@ -31,7 +31,7 @@ class Critic(torch.nn.Module):
         winprob = torch.nn.Sigmoid()(self.linear2(h_relu))
         return winprob
 
-class Policy(nn.Module):
+class Policy(torch.nn.Module):
     def __init__(self):
         super(Policy, self).__init__()
         self.affine1 = torch.nn.Linear(D_in, D_hid)
