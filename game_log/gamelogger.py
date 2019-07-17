@@ -6,8 +6,8 @@ import pygame
 
 def recordPlayerGames(dest, games_to_play = 10):
     disp = basicdisplayer.GameWindow(840, 400)
-    blue_agent = humanagent.HumanAgent(('w', 'd', 's', 'a', 'f'))
-    red_agent = humanagent.HumanAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'RCTRL'))
+    blue_agent = humanagent.HumanAgent(('w', 'd', 's', 'a', 'LSHIFT'), disp)
+    red_agent = humanagent.HumanAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'RCTRL'), disp)
     pygame.init()
 
     for game_number in range(games_to_play):
@@ -16,8 +16,8 @@ def recordPlayerGames(dest, games_to_play = 10):
         game_log = log.Game()
         while not game_done:
             disp.updateKeys()
-            red_move = red_agent.getRawAction(disp)
-            blue_move = blue_agent.getRawAction(disp)
+            red_move = red_agent.getRawAction()
+            blue_move = blue_agent.getRawAction()
 
             sim.giveCommands([red_move, blue_move], "raw")
             sim.step()

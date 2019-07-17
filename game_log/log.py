@@ -89,9 +89,9 @@ class Frame:
 
 @dataclass
 class Game:
+    red_goals: int = 0
+    blue_goals: int = 0
     frames: List[Frame] = field(default_factory = list)
-    red_goals: int
-    blue_goals: int
 
     def append(self, frame):
         self.frames.append(frame)

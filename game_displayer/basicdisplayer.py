@@ -122,23 +122,22 @@ class GameWindow:
                 return self.pressed_keys[274]
             elif key == 'LEFT':
                 return self.pressed_keys[276]
-			elif key == 'LALT':
+            elif key == 'LALT':
                 return self.pressed_keys[308]
-			elif key == 'RALT':
+            elif key == 'RALT':
                 return self.pressed_keys[307]
             elif key == 'LCTRL':
                 return self.pressed_keys[306]
             elif key == 'RCTRL':
                 return self.pressed_keys[305]
-			elif key == 'LSHIFT':
+            elif key == 'LSHIFT':
                 return self.pressed_keys[304]
-			elif key == 'RSHIFT':
+            elif key == 'RSHIFT':
                 return self.pressed_keys[303]
-			else:
-				return self.pressed_keys[ord(key)]
+            else:
+                return self.pressed_keys[ord(key)]
         else:
             return self.pressed_keys[key]
 
     def shutdown(self):
         pygame.quit()
-
