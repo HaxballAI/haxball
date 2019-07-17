@@ -32,22 +32,22 @@ class Frame:
     reds: List[PlayerState]
     balls: List[BallState]
 
-    def posToNp(myTeam, me):
+    def posToNp(self, myTeam, me):
         if myTeam == "blue":
             return np.array(
-                    blues[me].posToList(myTeam)
-                    + [x for p in blues[:me]   for x in p.posToList(myTeam)]
-                    + [x for p in blues[me+1:] for x in p.posToList(myTeam)]
-                    + [x for p in reds         for x in p.posToList(myTeam)]
-                    + [x for b in balls        for x in b.posToList(myTeam)]
+                    self.blues[me].posToList(myTeam)
+                    + [x for p in self.blues[:me]   for x in p.posToList(myTeam)]
+                    + [x for p in self.blues[me+1:] for x in p.posToList(myTeam)]
+                    + [x for p in self.reds         for x in p.posToList(myTeam)]
+                    + [x for b in self.balls        for x in b.posToList(myTeam)]
                     )
         elif myTeam == "red":
             return np.array(
                     reds[me].posToList(myTeam)
-                    + [x for p in reds[:me]   for x in p.posToList(myTeam)]
-                    + [x for p in reds[me+1:] for x in p.posToList(myTeam)]
-                    + [x for p in blues       for x in p.posToList(myTeam)]
-                    + [x for b in balls       for x in b.posToList(myTeam)]
+                    + [x for p in self.reds[:me]   for x in p.posToList(myTeam)]
+                    + [x for p in self.reds[me+1:] for x in p.posToList(myTeam)]
+                    + [x for p in self.blues       for x in p.posToList(myTeam)]
+                    + [x for b in self.balls       for x in b.posToList(myTeam)]
                     )
         else:
             raise ValueError
@@ -56,16 +56,16 @@ class Frame:
         if myTeam == "blue":
             return np.array(
                     blues[me].actToList
-                    + [x for p in blues[:me]   for x in p.actToList()]
-                    + [x for p in blues[me+1:] for x in p.actToList()]
-                    + [x for p in reds         for x in p.actToList()]
+                    + [x for p in self.blues[:me]   for x in p.actToList()]
+                    + [x for p in self.blues[me+1:] for x in p.actToList()]
+                    + [x for p in self.reds         for x in p.actToList()]
                     )
         elif myTeam == "red":
             return np.array(
                     reds[me].actToList()
-                    + [x for p in reds[:me]   for x in p.actToList()]
-                    + [x for p in reds[me+1:] for x in p.actToList()]
-                    + [x for p in blues       for x in p.actToList()]
+                    + [x for p in self.reds[:me]   for x in p.actToList()]
+                    + [x for p in self.reds[me+1:] for x in p.actToList()]
+                    + [x for p in self.blues       for x in p.actToList()]
                     )
         else:
             raise ValueError
@@ -87,5 +87,5 @@ class Game:
         return pickle.load(f)
 
     def save(self, filename):
-        f = open(filename, "wb")
+        f = open(filename, "w+b")
         pickle.dump(self, f)
