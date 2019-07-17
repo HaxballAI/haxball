@@ -2,11 +2,11 @@
 
 from game_simulator import gamesim
 from game_displayer import basicdisplayer
-from human_agent import humanagent
-from retarded_agent import retardedagent
+from agents import humanagent
+from agents import retardedagent
 from data_handler import datahandler
 from move_displayer import movedisplayer
-from network import TwoLayerNet, DIMS
+from network import Policy, DIMS
 #from model_tuner import tuner
 from game_simulator import gameparams as gp
 
@@ -22,9 +22,9 @@ from random import randrange
 import torch
 
 def main():
-    model = TwoLayerNet(*DIMS)
-    model.load_state_dict(torch.load("initialmodelweights.dat"))
-    model.eval()
+    #model = Policy(*flatten(DIMS))
+    #model.load_state_dict(torch.load("initialmodelweights.dat"))
+    #model.eval()
 
     # Intialise the graphical interface of the game
     #disp = basicdisplayer.GameWindow(840, 400)
@@ -57,43 +57,20 @@ def main():
 
     #tuner.tuner()
 
-    # FUNCTION THAT DEFINES OPPONENT REPLACE RHS WITH THIS
 
-    def opponent(x):
-        movepred, kickpred = model(x)
-        ran_move = np.random.choice(len(movepred), p = torch.nn.Softmax(dim = 0)(movepred).detach().numpy())
-        p_kick = float(kickpred[0])
-        ran_kick = np.random.choice([False, True], p = [1 - p_kick, p_kick])
-        debug_surf = movedisplayer.drawMove(torch.nn.Softmax(dim = 0)(movepred).detach().numpy(), ran_move)
-        return [ran_move, ran_kick], debug_surf
 
     while(running):
         # Need to update what keys are being pressed down for the human agents
         disp.updateKeys()
         # Query each agent on what commands should be sent to the game simulator
-        commands = [agents[i].getRawAction() for i in range(player_count)]
+        commands = [agents[i].getRawAction(game.getState("raw state")) for i in range(player_count)]
 
-        c_state = flatten( game.getState(   "raw state" ) )
-        c_state[4] -= c_state[0]
-        c_state[5] -= c_state[1]
-        c_state[8] -= c_state[0]
-        c_state[9] -= c_state[1]
 
-        c_state = [c_state[0] , c_state[1] ,c_state[4] , c_state[5] ,
-                   c_state[8] , c_state[9] , c_state[2] , c_state[3] ,
-                   c_state[6] , c_state[7] , c_state[10] , c_state[11]]
-
-        c_state = np.array( c_state )
-        c_state_norm = (c_state - gp.mean) / gp.stdev
-
-        commands[0], debug_surf = opponent( torch.FloatTensor( c_state_norm) )
         game.giveCommands(commands, "raw")
 
         # Update the graphical interface canvas
         disp.drawThings(game.getState("full info"))
 
-        # Add the debug thing
-        disp.win.blit(debug_surf, (840,0))
 
         # Display
         disp.clock.tick(disp.fps)

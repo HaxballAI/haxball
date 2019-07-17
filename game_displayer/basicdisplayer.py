@@ -46,12 +46,19 @@ class GameWindow:
         gp.pitchcornerx - gp.goallinethickness // 2, gp.windowheight - gp.pitchcornery - gp.goallinethickness // 2,
         gp.pitchwidth + gp.goallinethickness, gp.goallinethickness))
 
+        cnt = 0
         # draws goalposts
         for goalpost in gp.goalposts:
+            cnt += 1
             pygame.gfxdraw.filled_circle(self.win, goalpost[0], goalpost[1], gp.goalpostradius, (0, 0, 0))
             pygame.gfxdraw.aacircle(self.win, goalpost[0], goalpost[1], gp.goalpostradius, (0, 0, 0))
-            pygame.gfxdraw.filled_circle(self.win, goalpost[0], goalpost[1], gp.goalpostradius-gp.goalpostborderthickness, gp.goalpostcolour)
-            pygame.gfxdraw.aacircle(self.win, goalpost[0], goalpost[1], gp.goalpostradius-gp.goalpostborderthickness, gp.goalpostcolour)
+            goalpostcol = (0, 0, 0)
+            if cnt <= 2:
+                goalpostcol = (200, 150, 150)
+            else:
+                goalpostcol = (150, 150, 200)
+            pygame.gfxdraw.filled_circle(self.win, goalpost[0], goalpost[1], gp.goalpostradius-gp.goalpostborderthickness, goalpostcol)
+            pygame.gfxdraw.aacircle(self.win, goalpost[0], goalpost[1], gp.goalpostradius-gp.goalpostborderthickness, goalpostcol)
 
         for redInfo in things[0]:
             intP = tuple( map( int, redInfo[0] ) )

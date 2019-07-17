@@ -367,4 +367,3 @@ class GameSim:
         ### TODO: Handle key events
         ### keys = pygame.key.get_pressed()
         return
-
