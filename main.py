@@ -2,14 +2,13 @@
 
 from game_simulator import gamesim
 from game_displayer import basicdisplayer
-from human_agent import humanagent
-from retarded_agent import retardedagent
 from data_handler import datahandler
 from move_displayer import movedisplayer
-from network import TwoLayerNet, DIMS
+from network import Policy, DIMS
 #from model_tuner import tuner
 from game_simulator import gameparams as gp
-
+from agents import ACagent
+from agents import humanagent
 from utils import flatten
 
 import pygame
@@ -22,9 +21,10 @@ from random import randrange
 import torch
 
 def main():
-    model = TwoLayerNet(*DIMS)
-    model.load_state_dict(torch.load("initialmodelweights.dat"))
-    model.eval()
+
+    model = torch.load("sebNet.model")
+
+    playerAg = ACagent.ACAgent(model)
 
     # Intialise the graphical interface of the game
     #disp = basicdisplayer.GameWindow(840, 400)
@@ -38,6 +38,7 @@ def main():
     # Intialise the agents in the order of all reds sequentially, then blues
     agents = []
     # Red agents
+
     agents.append(humanagent.HumanAgent(('w', 'd', 's', 'a', 'x'), disp))
     for i in range(red_player_count - 1):
         agents.append(retardedagent.RetardedAgent())
@@ -46,12 +47,13 @@ def main():
     for i in range(blue_player_count - 1):
         agents.append(retardedagent.RetardedAgent())
 
+
     # Initialise the game simulator
     game = gamesim.GameSim(red_player_count, blue_player_count, ball_count,
                            {"printDebug" : True, "auto score" : True})
 
     # Initialise the data handler (saving data, loading it, etc)
-    data_handler = datahandler.DataHandler("rawsaved_games.dat")
+
 
     running = True
 
@@ -74,19 +76,8 @@ def main():
         commands = [agents[i].getRawAction() for i in range(player_count)]
 
         c_state = flatten( game.getState(   "raw state" ) )
-        c_state[4] -= c_state[0]
-        c_state[5] -= c_state[1]
-        c_state[8] -= c_state[0]
-        c_state[9] -= c_state[1]
 
-        c_state = [c_state[0] , c_state[1] ,c_state[4] , c_state[5] ,
-                   c_state[8] , c_state[9] , c_state[2] , c_state[3] ,
-                   c_state[6] , c_state[7] , c_state[10] , c_state[11]]
-
-        c_state = np.array( c_state )
-        c_state_norm = (c_state - gp.mean) / gp.stdev
-
-        commands[0], debug_surf = opponent( torch.FloatTensor( c_state_norm) )
+        commands[0], debug_surf = playerAg.getRawAction(  c_state, True)
         game.giveCommands(commands, "raw")
 
         # Update the graphical interface canvas
@@ -100,12 +91,10 @@ def main():
         pygame.display.update()
 
         # Load the last game state to the data handler
-        data_handler.loadIntoBuffer(game.getState("raw sa pairs"))
 
         # At some arbitrary point, store the buffered game states into the
         # destination file. In this case it's after a goal has been scored
         if game.was_point_scored:
-            data_handler.dumpBufferToFile()
             game.was_point_scored = False
 
         game.step()
@@ -116,8 +105,6 @@ def main():
         if game.frames % 1000 == 0:
             print("c_state:")
             print(c_state)
-            print("c_state_norm:")
-            print(c_state_norm)
             game.getFeedback()
 
         disp.getInput()
