@@ -38,16 +38,20 @@ def getData(data_dir, game_number):
     loser_actions = np.concatenate(loser_actions)
     winner_actions = np.concatenate(winner_actions)
 
+    print("Data loaded.")
+
     assert len(loser_frames) == len(loser_actions)
-    p = numpy.random.permutation(len(loser_frames))
+    p = np.random.permutation(len(loser_frames))
     loser_frames = loser_frames[p]
     loser_actions = loser_actions[p]
 
     assert len(winner_frames) == len(winner_actions)
-    p = numpy.random.permutation(len(winner_frames))
+    p = np.random.permutation(len(winner_frames))
     winner_frames = winner_frames[p]
     winner_actions = winner_actions[p]
 
+    print("Data shuffled.")
+    
     loser_actions = np.transpose(loser_actions)
     winner_actions = np.transpose(winner_actions)
 
@@ -61,3 +65,6 @@ def newNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size):
     model = Policy()
     initialize(model, data_tensor, action_data, epochs, learning_rate, batch_size)
     torch.save(model, net_name + ".model")
+
+if __name__ == "__main__":
+    newNet("sebNet", "sebgames", 100, 5, 1e-3, 32)
