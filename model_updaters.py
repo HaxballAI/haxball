@@ -5,7 +5,7 @@ import numpy as np
 import random
 from data_handler import datahandler
 from game_simulator import gameparams as gp
-from network import TwoLayerNet, DIMS
+from network import Policy, DIMS
 from torch.autograd import Variable
 import math
 
