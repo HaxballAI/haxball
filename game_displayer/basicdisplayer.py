@@ -116,15 +116,26 @@ class GameWindow:
         if is_int == False:
             if key == 'UP':
                 return self.pressed_keys[273]
-            if key == 'RIGHT':
+            elif key == 'RIGHT':
                 return self.pressed_keys[275]
-            if key == 'DOWN':
+            elif key == 'DOWN':
                 return self.pressed_keys[274]
-            if key == 'LEFT':
+            elif key == 'LEFT':
                 return self.pressed_keys[276]
-            if key == 'RCTRL':
+			elif key == 'LALT':
+                return self.pressed_keys[308]
+			elif key == 'RALT':
+                return self.pressed_keys[307]
+            elif key == 'LCTRL':
+                return self.pressed_keys[306]
+            elif key == 'RCTRL':
                 return self.pressed_keys[305]
-            return self.pressed_keys[ord(key)]
+			elif key == 'LSHIFT':
+                return self.pressed_keys[304]
+			elif key == 'RSHIFT':
+                return self.pressed_keys[303]
+			else:
+				return self.pressed_keys[ord(key)]
         else:
             return self.pressed_keys[key]
 
