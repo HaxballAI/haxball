@@ -33,12 +33,13 @@ def getData(data_dir, game_number):
 
         else:
             raise ValueError
+    print("Data loaded.")
     loser_frames = np.concatenate(loser_frames)
     winner_frames = np.concatenate(winner_frames)
     loser_actions = np.concatenate(loser_actions)
     winner_actions = np.concatenate(winner_actions)
 
-    print("Data loaded.")
+
 
     assert len(loser_frames) == len(loser_actions)
     p = np.random.permutation(len(loser_frames))
@@ -51,7 +52,7 @@ def getData(data_dir, game_number):
     winner_actions = winner_actions[p]
 
     print("Data shuffled.")
-    
+
     loser_actions = np.transpose(loser_actions)
     winner_actions = np.transpose(winner_actions)
 
