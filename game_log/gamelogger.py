@@ -1,6 +1,6 @@
 import game_simulator.gamesim as gs
 from game_displayer import basicdisplayer
-from human_agent import humanagent
+from agents.human_agent import humanagent
 from game_log import log
 import pygame
 

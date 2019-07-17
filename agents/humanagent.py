@@ -13,9 +13,7 @@ class HumanAgent():
 
         self.gui = gui
 
-        self.is_human = 1
-
-    def getRawAction(self):
+    def getRawAction(self, state = []):
         # Returns raw action of the agent based on the key presses queried from
         # the gui. Returns (dir_idx, kicking_state)
         movements = [self.gui.isKeyPressed(key) for key in self.movement_keys]
@@ -48,5 +46,5 @@ class HumanAgent():
 
         return dir, self.gui.isKeyPressed(self.kick)
 
-    def getAction(self):
-        return playeraction.Action(*self.getRawAction(gui))
+    def getAction(self, state):
+        return playeraction.Action(*self.getRawAction(state))
