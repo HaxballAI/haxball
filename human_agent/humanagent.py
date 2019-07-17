@@ -2,7 +2,7 @@ from game_simulator import playeraction
 
 
 class HumanAgent():
-    def __init__(self, keybindings):
+    def __init__(self, keybindings, gui):
         # Keybindings is a list containing the strings of the keybindings
 
         # Movement keys of the agent in the following order: up, right, down, left
@@ -11,12 +11,14 @@ class HumanAgent():
         # Kicking key for the agent
         self.kick = keybindings[4]
 
+        self.gui = gui
+
         self.is_human = 1
 
-    def getRawAction(self, gui):
+    def getRawAction(self):
         # Returns raw action of the agent based on the key presses queried from
         # the gui. Returns (dir_idx, kicking_state)
-        movements = [gui.isKeyPressed(key) for key in self.movement_keys]
+        movements = [self.gui.isKeyPressed(key) for key in self.movement_keys]
 
         a, b, dir = 0, 0, 0
         if movements[0] + movements[2] == 1:
@@ -36,7 +38,7 @@ class HumanAgent():
             a = 5
         elif a == 5:
             a = 1
-            
+
         if a == 1 and b == 7:
             dir = 8
         elif a != 0 and b != 0:
@@ -44,7 +46,7 @@ class HumanAgent():
         else:
             dir = max(a, b)
 
-        return dir, gui.isKeyPressed(self.kick)
+        return dir, self.gui.isKeyPressed(self.kick)
 
-    def getAction(self, gui):
+    def getAction(self):
         return playeraction.Action(*self.getRawAction(gui))

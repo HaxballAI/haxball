@@ -26,6 +26,10 @@ def main():
     model.load_state_dict(torch.load("initialmodelweights.dat"))
     model.eval()
 
+    # Intialise the graphical interface of the game
+    #disp = basicdisplayer.GameWindow(840, 400)
+    disp = basicdisplayer.GameWindow(1096, 400)
+
     red_player_count = 1
     blue_player_count = 1
     player_count = red_player_count + blue_player_count
@@ -34,17 +38,13 @@ def main():
     # Intialise the agents in the order of all reds sequentially, then blues
     agents = []
     # Red agents
-    agents.append(humanagent.HumanAgent(('w', 'd', 's', 'a', 'x')))
+    agents.append(humanagent.HumanAgent(('w', 'd', 's', 'a', 'x'), disp))
     for i in range(red_player_count - 1):
         agents.append(retardedagent.RetardedAgent())
     # Blue agents
-    agents.append(humanagent.HumanAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'RCTRL')))
+    agents.append(humanagent.HumanAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'RCTRL'), disp))
     for i in range(blue_player_count - 1):
         agents.append(retardedagent.RetardedAgent())
-
-    # Intialise the graphical interface of the game
-    #disp = basicdisplayer.GameWindow(840, 400)
-    disp = basicdisplayer.GameWindow(1096, 400)
 
     # Initialise the game simulator
     game = gamesim.GameSim(red_player_count, blue_player_count, ball_count,
@@ -71,7 +71,7 @@ def main():
         # Need to update what keys are being pressed down for the human agents
         disp.updateKeys()
         # Query each agent on what commands should be sent to the game simulator
-        commands = [agents[i].getRawAction(disp) for i in range(player_count)]
+        commands = [agents[i].getRawAction() for i in range(player_count)]
 
         c_state = flatten( game.getState(   "raw state" ) )
         c_state[4] -= c_state[0]

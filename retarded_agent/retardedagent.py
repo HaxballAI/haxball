@@ -7,10 +7,10 @@ class RetardedAgent():
     def __init__(self):
         self.is_learning = 0
 
-    def getRawAction(self, gui):
+    def getRawAction(self):
         # Returns raw action of the agent based on the key presses queried from
         # the gui. Returns (dir_idx, kicking_state)
         return randrange(9), randrange(2)
 
-    def getAction(self, gui):
+    def getAction(self):
         return playeraction.Action(*self.getRawAction(gui))
