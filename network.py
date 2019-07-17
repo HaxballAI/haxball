@@ -44,8 +44,8 @@ class Policy(torch.nn.Module):
         self.rewards = []
 
     def forward(self, x):
-        x = F.relu(self.affine1(x))
-        moveprobs = F.softmax(self.move_head(x), dim=-1)
-        kickprob = torch.nn.Sigmoid()(self.kick_head(x))
-        winprob = torch.nn.Sigmoid()(self.value_head(x))
+        y = F.relu(self.affine1(x))
+        moveprobs = F.softmax(self.move_head(y), dim=-1)
+        kickprob = torch.nn.Sigmoid()(self.kick_head(y))
+        winprob = torch.nn.Sigmoid()(self.value_head(y))
         return moveprobs, kickprob, winprob

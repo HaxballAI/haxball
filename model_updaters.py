@@ -46,20 +46,26 @@ def initialize(model, data_tensor, action_data, epochs, learning_rate, batch_siz
         movecriterion = torch.nn.CrossEntropyLoss(reduction='mean')
         kickcriterion = torch.nn.BCELoss(size_average=True)
         wincriterion = torch.nn.BCELoss(size_average=True)
-        true_move = [torch.tensor(cuttosize(action_data[0][0])).view(-1,batch_size), torch.tensor(cuttosize(action_data[0][0])).view(-1,batch_size)]
-        true_kick = [torch.FloatTensor(cuttosize(action_data[0][1])).view(-1,batch_size), torch.FloatTensor(cuttosize(action_data[0][1])).view(-1,batch_size)]
-        for i in range(32*((len(data_tensor) * 9) // 320)):
+        loser_moves = cuttosize(action_data[0][0], batch_size)
+        loser_kicks = cuttosize(action_data[0][1], batch_size)
+        winner_moves = cuttosize(action_data[1][0], batch_size)
+        winner_kicks = cuttosize(action_data[1][1], batch_size)
+        true_move = [torch.tensor(loser_moves).view(-1,batch_size), torch.tensor(winner_moves).view(-1,batch_size)]
+        true_kick = [torch.FloatTensor(loser_kicks).view(-1,batch_size), torch.FloatTensor(winner_kicks).view(-1,batch_size)]
 
+        for i in range((len(loser_moves) * 9) // 320):
             for k in range(2):
                 # Forward pass: Compute predicted y by passing x to the model
-                moveprob, kickprob, winprob = model(data_tensor[k][i])
+
+                moveprob, kickprob, winprob = model(data_tensor[k][32 * i : 32 * (i + 1)])
                 # Compute and print loss
+
                 loss = movecriterion(moveprob, true_move[k][i])
                 loss += kickcriterion(kickprob, true_kick[k][i])
                 loss += wincriterion(winprob, torch.FloatTensor(np.repeat(k,batch_size)))
                 runningloss += loss
                 if i % 100 == 0:
-                    print(f"Loss for iteration {t:02}, {i * N:06}/{len(normalizedpositions) * 9 // 10:06}: {float(runningloss) / 100:.5f}")
+                    print(f"Loss for iteration {t:02}, {i * batch_size:06}/{len(winner_moves) * 9 // 10:06}: {float(runningloss) / 100:.5f}")
                     runningloss = 0
                 # Zero gradients, perform a backward pass, and update the weights.
                 optimiser = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -70,14 +76,15 @@ def initialize(model, data_tensor, action_data, epochs, learning_rate, batch_siz
         with torch.no_grad():
             runningloss = 0
             j = 0
-            for i in range(32*(len(data_tensor) * 9 // 320) + 1, len(data_tensor)):
+            for i in range((len(loser_moves) * 9) // 320, len(loser_moves) // 32):
                 for k in range(2):
                     # Forward pass: Compute predicted y by passing x to the model
-                    moveprob, kickprob, winprob = model(data_tensor[k][i])
+                    moveprob, kickprob, winprob = model(data_tensor[k][32 * i : 32 * (i + 1)])
                     # Compute and print loss
                     loss = movecriterion(moveprob, true_move[k][i])
                     loss += kickcriterion(kickprob, true_kick[k][i])
                     loss += wincriterion(winprob, torch.FloatTensor(np.repeat(k,batch_size)))
+                    j += 1
                     runningloss += loss
             print("validation loss: " + str(runningloss / j))
 '''
