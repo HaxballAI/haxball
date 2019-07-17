@@ -32,7 +32,7 @@ class Critic(torch.nn.Module):
         return winprob
 
 class Policy(torch.nn.Module):
-    def __init__(self):
+    def __init__(self, D_in, D_hid, D_out):
         super(Policy, self).__init__()
         self.affine1 = torch.nn.Linear(D_in, D_hid)
         self.move_head = torch.nn.Linear(D_hid, 9)
