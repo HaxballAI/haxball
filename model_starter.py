@@ -67,5 +67,12 @@ def newNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size):
     initialize(model, data_tensor, action_data, epochs, learning_rate, batch_size)
     torch.save(model, net_name + ".model")
 
+def improveNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size):
+    data_tensor, action_data = getData(data_dir, game_number)
+    model = torch.load(net_name + ".model")
+    initialize(model, data_tensor, action_data, epochs, learning_rate, batch_size)
+    torch.save(model, net_name + ".model")
+
+
 if __name__ == "__main__":
-    newNet("sebNet", "sebgames", 100, 5, 1e-3, 32)
+    improveNet("sebNet", "sebgames", 100, 5, 1e-2, 32)
