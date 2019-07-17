@@ -30,7 +30,7 @@ epochs = 5
 learning_rate = .001
 batch_size = 32
 '''
-#data_tensor should be of the form [[loserframes],[winnerframes]]
+#data_tensor should be of the form torch.FloatTensor([[loserframes],[winnerframes]])
 #action_data should be of the form [[[losermoves],[loserkicks]],[[winnermoves],[winnerkicks]]]
 def initialize(model, data_tensor, action_data, epochs, learning_rate, batch_size):
     for t in range(epochs):
