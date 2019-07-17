@@ -1,5 +1,6 @@
 import torch
 from collections import namedtuple
+import torch.nn.functional as F
 
 class Actor(torch.nn.Module):
     def __init__(self, D_in, D_hid, D_out):
@@ -32,7 +33,7 @@ class Critic(torch.nn.Module):
         return winprob
 
 class Policy(torch.nn.Module):
-    def __init__(self, D_in, D_hid, D_out):
+    def __init__(self, D_in = 12, D_hid = 50, D_out = 10):
         super(Policy, self).__init__()
         self.affine1 = torch.nn.Linear(D_in, D_hid)
         self.move_head = torch.nn.Linear(D_hid, 9)
@@ -44,7 +45,7 @@ class Policy(torch.nn.Module):
 
     def forward(self, x):
         x = F.relu(self.affine1(x))
-        moveprobs = F.softmax(self.action_head(x), dim=-1)
+        moveprobs = F.softmax(self.move_head(x), dim=-1)
         kickprob = torch.nn.Sigmoid()(self.kick_head(x))
         winprob = torch.nn.Sigmoid()(self.value_head(x))
         return moveprobs, kickprob, winprob
