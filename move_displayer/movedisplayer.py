@@ -2,6 +2,7 @@ import pygame
 from math import sin, cos, pi
 
 def drawMove(probs, selected):
+    # Gives a surface to show the prob of each move inputted.
     surf = pygame.Surface((256,256))
     surf.fill((0, 0, 0))
     colour = (255, 255, 255) if 0 == selected else (128, 128, 128)
@@ -21,4 +22,3 @@ if __name__ == "__main__":
     pygame.display.set_mode((256,256)).blit(m, (0, 0))
     pygame.display.update()
     input("Press enter:")
-
