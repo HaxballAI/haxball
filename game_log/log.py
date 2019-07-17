@@ -11,10 +11,10 @@ class BallState:
     vy: float
 
     def posToList(self, myTeam):
-        if myTeam == "blue":
+        if myTeam == "red":
             return [x, y, vx, vy]
-        elif myTeam == "red":
-            return [840 - x, y, vx, vy]
+        elif myTeam == "blue":
+            return [840 - x,400 - y, vx, vy]
         else:
             raise ValueError
 
