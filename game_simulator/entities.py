@@ -36,7 +36,7 @@ class Player(Entity):
         Entity.__init__(self, initial_position, initial_velocity, initial_acceleration,
                         gameparams.playerradius, gameparams.playerbouncing)
 
-        # Set the reset position, TODO: Doesn't make any sense, isn't called later
+        # Set the not random reset position
         self.default_position = initial_position
         self.idx = get_idx()
 
@@ -59,10 +59,13 @@ class Player(Entity):
         self.vel *= gameparams.playerdamping
         self.pos += self.vel
 
-    def reset(self):
-        # TODO: Make the positional initialisation better...
-        # positional parameters
-        self.pos = np.array([gameparams.pitchcornerx + (np.random.random_sample())*580, gameparams.pitchcornery + (np.random.random_sample())*200]).astype(float)
+    def reset(self, reset_params):
+        if "random" in reset_params:
+			# positional parameters
+            self.pos = np.array([gameparams.pitchcornerx + (np.random.random_sample())*580, gameparams.pitchcornery + (np.random.random_sample())*200]).astype(float)
+        elif "default" in reset_params:
+            self.pos = self.default_position
+		
         self.vel = np.zeros(2)
         self.acc = np.zeros(2)
 
@@ -87,9 +90,12 @@ class Ball(Entity):
         self.vel *= gameparams.balldamping
         self.pos += self.vel
 
-    def reset(self):
-        # positional parameters
-        self.pos = np.array([gameparams.pitchcornerx + np.random.random_sample() * 580, gameparams.pitchcornery + np.random.random_sample() * 200]).astype(float)
+    def reset(self, reset_params):
+        if "random" in reset_params:
+			# positional parameters
+            self.pos = np.array([gameparams.pitchcornerx + (np.random.random_sample())*580, gameparams.pitchcornery + (np.random.random_sample())*200]).astype(float)
+        elif "default" in reset_params:
+            self.pos = np.array([gameparams.pitchcornerx + gameparams.pitchwidth / 2, gameparams.pitchcornery + gameparams.pitchheight / 2])
         self.vel = np.zeros(2)
         self.acc = np.zeros(2)
 
