@@ -14,7 +14,7 @@ class BallState:
         if myTeam == "red":
             return [self.x, self.y, self.vx, self.vy]
         elif myTeam == "blue":
-            return [840 - self.x,400 - self.y, -self.vx, -self.vy]
+            return [840 - self.x, 400 - self.y, -self.vx, -self.vy]
         else:
             raise ValueError
 
