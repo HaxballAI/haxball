@@ -63,9 +63,9 @@ def initialize(model, data_tensor, action_data, epochs, learning_rate, batch_siz
                 moveprob, kickprob, winprob = model(data_tensor[k][batch_size * i : batch_size * (i + 1)])
                 # Compute and print loss
 
-                loss = movecriterion(moveprob , true_move[k][i])
-                loss += kickcriterion(kickprob, true_kick[k][i])
-                loss += wincriterion(winprob, torch.FloatTensor(np.repeat(k,batch_size)))
+                loss = movecriterion(moveprob , true_move[k][i]) \
+                     + kickcriterion(kickprob, true_kick[k][i]) \
+                     + wincriterion(winprob, torch.FloatTensor(np.repeat(k,batch_size)))
                 runningloss += loss
                 # Zero gradients, perform a backward pass, and update the weights.
 
@@ -74,7 +74,7 @@ def initialize(model, data_tensor, action_data, epochs, learning_rate, batch_siz
                 optimiser.step()
 
             if i % 100 == 99:
-                print(f"Loss for iteration {t:02}, {i * batch_size:06}/{len(winner_moves) * 9 // 10:06}: {float(runningloss) / 100:.5f}")
+                print(f"Loss for iteration {t:02}, {i * batch_size:06}/{len(winner_moves) * 9 // 10:06}: {float(runningloss) / (batch_size *100):.5f}")
                 runningloss = 0
         #Validate
         with torch.no_grad():
