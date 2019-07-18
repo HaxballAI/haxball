@@ -75,7 +75,7 @@ def main():
         # Query each agent on what commands should be sent to the game simulator
         commands = [agents[i].getRawAction() for i in range(player_count)]
 
-        c_state = flatten(game.log().posToNp())
+        c_state = game.log().posToNp().flatten()
 
         commands[0], debug_surf = playerAg.getMaxRawAction(c_state, True)
         f_data = game.log()
