@@ -78,6 +78,13 @@ def main():
         c_state = flatten(game.log().posToNp())
 
         commands[0], debug_surf = playerAg.getMaxRawAction(c_state, True)
+        f_data = game.log()
+        o_action = playerAg.getMaxRawAction(f_data.posToNp("blue" , 0))
+        if o_action[0] != 0:
+            o_move = ((o_action[0] + 3) % 8) + 1
+        else:
+            o_move = 0
+        commands[1] = (o_move , o_action[1])
         game.giveCommands(commands, "raw")
 
         # Update the graphical interface canvas
