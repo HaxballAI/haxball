@@ -75,4 +75,4 @@ def improveNet(net_name, data_dir, game_number, epochs, learning_rate, batch_siz
 
 
 if __name__ == "__main__":
-    improveNet("sebNet", "sebgames", 100, 5, 1e-2, 32)
+    newNet("sebNet2", "sebgames", 100, 5, 1e-2, 32)

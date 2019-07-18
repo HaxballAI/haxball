@@ -19,7 +19,7 @@ class DuelEnviroment:
 
         self.game_sim.giveCommands( [red_action , blue_action ] )
 
-        state_action_pairs = self.game_sim.getState("raw sa pairs")
+        state_action_pairs = self.game_sim.log()
 
         for i in range(self.step_len):
             self.game_sim.step()
@@ -49,4 +49,3 @@ class DuelEnviroment:
             return -1
         else:
             return 0
-
