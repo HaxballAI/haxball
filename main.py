@@ -65,8 +65,8 @@ def main():
         disp.drawFrame(game.log())
 
         # Add the debug thing
-        disp.win.blit(red_debug_surf, (840,0))
-        disp.win.blit(blue_debug_surf, (840 + 256,0))
+        disp.win.blit(red_debug_surf, (840, 0))
+        disp.win.blit(blue_debug_surf, (840 + 256, 0))
 
         # Display
         disp.clock.tick(disp.fps)
@@ -83,9 +83,6 @@ def main():
 
         # Get Debugging data from the game
 
-
-        if game.frames % 1000 == 0:
-            game.getFeedback()
 
         disp.getInput()
         if disp.rip:

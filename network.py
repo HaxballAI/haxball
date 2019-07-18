@@ -1,10 +1,5 @@
 import torch
-from collections import namedtuple
 import torch.nn.functional as F
-
-Dims = namedtuple("Dims",["input", "hidden", "out"])
-# Dimensions: (in, hidden, out)
-DIMS = Dims(12, 50, 10)
 
 class Policy(torch.nn.Module):
     def __init__(self, D_in = 12, D_hid = 50, D_out = 10):

@@ -25,13 +25,9 @@ class PlayerState(BallState):
 
     def actToList(self, myTeam):
         if myTeam == "red":
-            return [self.move, self.kick]
+            return list(self.action.rawAction())
         elif myTeam == "blue":
-            if self.action.dir_idx == 0:
-                conv_move = 0
-            else:
-                conv_move = ((self.action.dir_idx + 3) % 8) + 1
-            return [conv_move, self.action.kicking]
+            return list(self.action.flipped().rawAction())
         else:
             raise ValueError
 
@@ -61,24 +57,6 @@ class Frame:
         else:
             raise ValueError
 
-    def actToNp(self, myTeam, me):
-        if myTeam == "blue":
-            return np.array(
-                    self.blues[me].actToList(myTeam)
-                    + [x for p in self.blues[:me]   for x in p.actToList(myTeam)]
-                    + [x for p in self.blues[me+1:] for x in p.actToList(myTeam)]
-                    + [x for p in self.reds         for x in p.actToList(myTeam)]
-                    )
-        elif myTeam == "red":
-            return np.array(
-                    self.reds[me].actToList(myTeam)
-                    + [x for p in self.reds[:me]   for x in p.actToList(myTeam)]
-                    + [x for p in self.reds[me+1:] for x in p.actToList(myTeam)]
-                    + [x for p in self.blues       for x in p.actToList(myTeam)]
-                    )
-        else:
-            raise ValueError
-
     def singleActToNp(self, myTeam, me):
         if myTeam == "blue":
             return np.array(self.blues[me].actToList(myTeam))
@@ -95,9 +73,6 @@ class Game:
 
     def append(self, frame):
         self.frames.append(frame)
-
-    def toNpAll(self, myTeam, me):
-        return np.array([f.posToNp(myTeam, me) for f in self.frames]), np.array([f.actToNp(myTeam, me) for f in self.frames])
 
     def toNp(self, myTeam, me):
         return np.array([f.posToNp(myTeam, me) for f in self.frames]), np.array([f.singleActToNp(myTeam, me) for f in self.frames])

@@ -5,7 +5,7 @@ import torch.nn.functional as F
 import numpy as np
 import random
 from game_simulator import gameparams as gp
-from network import Policy, DIMS
+from network import Policy
 from torch.autograd import Variable
 import math
 from gym_haxball.onevoneenviroment import DuelEnviroment

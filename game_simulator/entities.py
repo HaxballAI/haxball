@@ -4,20 +4,11 @@ from game_log import log
 
 import numpy as np
 
-# handles player indexing
-curr_idx = -1
-
-def get_idx():
-    global curr_idx
-    curr_idx += 1
-    return curr_idx
-
 # Base class for any entity, stores position, velocity, acceleration.
 class Entity:
     def __init__(self, initial_position, initial_velocity, initial_acceleration, radius, bouncingquotient):
         self.pos = np.array(initial_position)
         self.vel = np.array(initial_velocity)
-        self.acc = np.array(initial_acceleration)
 
         self.radius = radius
         self.bouncingquotient = bouncingquotient
@@ -38,7 +29,6 @@ class Player(Entity):
 
         # Set the not random reset position
         self.default_position = initial_position
-        self.idx = get_idx()
 
         # Initialise current action + can_kick which presents kick-spamming
         self.current_action = playeraction.Action()
@@ -67,13 +57,12 @@ class Player(Entity):
             self.pos = self.default_position
 		
         self.vel = np.zeros(2)
-        self.acc = np.zeros(2)
 
         # Set the action to default action state
         self.current_action = playeraction.Action()
 
     def log(self):
-        return log.PlayerState(self.pos[0], self.pos[1], self.vel[0], self.vel[1], self.current_action)
+        return log.PlayerState(*self.pos, *self.vel, self.current_action)
 
 class Ball(Entity):
     def __init__(self, initial_position, initial_velocity = np.zeros(2), initial_acceleration = np.zeros(2)):
@@ -97,7 +86,6 @@ class Ball(Entity):
         elif "default" in reset_params:
             self.pos = np.array([gameparams.pitchcornerx + gameparams.pitchwidth / 2, gameparams.pitchcornery + gameparams.pitchheight / 2])
         self.vel = np.zeros(2)
-        self.acc = np.zeros(2)
 
     def log(self):
         return log.BallState(self.pos[0], self.pos[1], self.vel[0], self.vel[1])

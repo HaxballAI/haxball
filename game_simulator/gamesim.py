@@ -64,4 +64,8 @@ class GameSim(GameSimEngine):
         # Update the score of the game
         if self.auto_score:
             self.updateScore("random")
+
+        if self.printDebug and self.frames % self.printDebugFreq == 0:
+            self.getFeedback()
+
         return

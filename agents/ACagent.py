@@ -19,15 +19,15 @@ class ACAgent():
             move = int(np.argmax(movepred.detach().numpy()))
         else:
             raise ValueError
+        p_kick = float(kickpred[0])
+        kick = np.random.choice([False, True], p = [1 - p_kick, p_kick])
+        action = playeraction.Action(move, kick)
         if self.team == "red":
             pass
         elif self.team == "blue":
-            if move != 0:
-                move = ((move + 3) % 8) + 1
+            action = action.flipped()
         else:
             raise ValueError
-        p_kick = float(kickpred[0])
-        kick = np.random.choice([False, True], p = [1 - p_kick, p_kick])
         if give_debug_surf:
             if self.team == "red":
                 move_probs = movepred.detach().numpy()
@@ -35,7 +35,7 @@ class ACAgent():
                 move_probs = movepred.detach().numpy()[[0,5,6,7,8,1,2,3,4]]
             else:
                 raise ValueError
-            debug_surf = movedisplayer.drawMove(move_probs, move, self.team) #TODO: Pass win_prob in here
-            return playeraction.Action(move, kick), debug_surf
+            debug_surf = movedisplayer.drawMove(move_probs, action.dir_idx, self.team) #TODO: Pass win_prob in here
+            return action, debug_surf
         else:
-            return playeraction.Action(move, kick)
+            return action

@@ -59,7 +59,7 @@ class GameWindow:
             pygame.gfxdraw.aacircle(self.win, goalpost[0], goalpost[1], gp.goalpostradius-gp.goalpostborderthickness, goalpostcol)
 
         def drawPlayer(p, colour):
-            if p.action.isKicking:
+            if p.action.isKicking():
                 pygame.gfxdraw.filled_circle(self.win, int(p.x), int(p.y),
                     gp.kickingcircleradius, gp.kickingcirclecolour)
                 pygame.gfxdraw.aacircle(self.win, int(p.x), int(p.y),
