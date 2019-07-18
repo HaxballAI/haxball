@@ -14,7 +14,7 @@ class ACAgent():
     def getRawAction(self, frame, method = "random", give_debug_surf = False):
         movepred, kickpred , _ = self.network(torch.FloatTensor(frame.posToNp(self.team)))
         if method == "random":
-            move = np.random.choice(len(movepred), p = torch.nn.Softmax(dim = 0)(movepred).detach().numpy())
+            move = np.random.choice(len(movepred), p = movepred.detach().numpy() )
         elif method == "max":
             move = int(np.argmax(movepred.detach().numpy()))
         else:
@@ -29,7 +29,7 @@ class ACAgent():
         p_kick = float(kickpred[0])
         kick = np.random.choice([False, True], p = [1 - p_kick, p_kick])
         if give_debug_surf:
-            debug_surf = movedisplayer.drawMove(torch.nn.Softmax(dim = 0)(movepred).detach().numpy(), move)
+            debug_surf = movedisplayer.drawMove(movepred.detach().numpy(), move)
             return (move, kick), debug_surf
         else:
             return (move, kick)

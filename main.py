@@ -57,8 +57,8 @@ def main():
 
         f_data = game.log()
 
-        commands[0], debug_surf = redPlayerAg.getRawAction(f_data, "max", True)
-        commands[1] = bluePlayerAg.getRawAction(f_data, "max")
+        commands[0], debug_surf = redPlayerAg.getRawAction(f_data, "random", True)
+        commands[1] = bluePlayerAg.getRawAction(f_data, "random")
         game.giveCommands(commands, "raw")
 
         # Update the graphical interface canvas
