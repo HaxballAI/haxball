@@ -1,8 +1,10 @@
 from game_simulator import playeraction
 from move_displayer import movedisplayer
 from random import randrange
-import torch
+import random
 import numpy as np
+import torch
+
 
 class ACAgent():
     # Agent that works off of a actor-critic model
@@ -19,6 +21,17 @@ class ACAgent():
             return (ran_move, ran_kick), debug_surf
         else:
             return (ran_move, ran_kick)
+
+    def getMaxRawAction(self, state, give_debug_surf = False):
+        movepred, kickpred , _ = self.network(torch.FloatTensor(state))
+        move = int(np.argmax(movepred.detach().numpy()))
+        p_kick = float(kickpred[0])
+        kick = np.random.choice([False, True], p = [1 - p_kick, p_kick])
+        if give_debug_surf:
+            debug_surf = movedisplayer.drawMove(torch.nn.Softmax(dim = 0)(movepred).detach().numpy(), move)
+            return (move, kick), debug_surf
+        else:
+            return (move, kick)
 
     def getAction(self, state = []):
         raise NotImplementedError

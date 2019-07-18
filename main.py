@@ -22,7 +22,7 @@ import torch
 
 def main():
 
-    model = torch.load("sebNet.model")
+    model = torch.load("sebNet2.model")
 
     playerAg = ACagent.ACAgent(model)
 
@@ -77,7 +77,7 @@ def main():
 
         c_state = flatten( game.getState(   "raw state" ) )
 
-        commands[0], debug_surf = playerAg.getRawAction(  c_state, True)
+        commands[0], debug_surf = playerAg.getMaxRawAction(  c_state, True)
         game.giveCommands(commands, "raw")
 
         # Update the graphical interface canvas
