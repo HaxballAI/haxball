@@ -39,7 +39,7 @@ def cuttosize(x,batch):
         return x[:-(len(x) % batch)]
 
 
-def initialize(model, data_tensor, action_data, epochs, learning_rate, batch_size):
+def learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate, batch_size):
 
     movecriterion = torch.nn.CrossEntropyLoss(reduction='mean')
     kickcriterion = torch.nn.BCELoss(size_average=True)
@@ -65,7 +65,7 @@ def initialize(model, data_tensor, action_data, epochs, learning_rate, batch_siz
 
                 loss = movecriterion(moveprob , true_move[k][i]) \
                      + kickcriterion(kickprob, true_kick[k][i]) \
-                     + wincriterion(winprob, torch.FloatTensor(np.repeat(k,batch_size)))
+                     #+ wincriterion(winprob, torch.FloatTensor(np.repeat(k,batch_size)))
                 runningloss += loss
                 # Zero gradients, perform a backward pass, and update the weights.
 
@@ -90,7 +90,7 @@ def initialize(model, data_tensor, action_data, epochs, learning_rate, batch_siz
                     loss += wincriterion(winprob, torch.FloatTensor(np.repeat(k,batch_size)))
                     j += 1
                     runningloss += loss
-            print("validation loss: " + str(runningloss / (j*batch_size)))
+            print("validation loss: " + str(2 * runningloss / (j*batch_size)))
 '''
 def selfplayupdate(model, data_tensor, action_data, epochs, learning_rate, batch_size):
     for t in range(epochs):
