@@ -42,20 +42,15 @@ class GameSim(GameSimEngine):
                 balls = [b.log() for b in self.balls],
                 )
 
-    def giveCommands(self, actions, actionFormat = "raw"):
+    def giveCommands(self, actions):
         # Gives commands to all the controllable entities in the game in the form of a list pf commands.
         # Each command is a tuple of size 2 specifying direction (18 possible states) and then the kick state.
         # The position of the command in the list determines which entity the command is sent to.
         # TODO: Pls complete this function
 
         # NOTE: reds come before blues.
-        if actionFormat == "raw":
-            for i in range(len(self.players)):
-                self.players[i].current_action = playeraction.Action(actions[i][0], actions[i][1])
-        elif actionFormat == "object":
-            for i in range(len(self.players)):
-                self.players[i].current_action = actions[i]
-        return
+        for i in range(len(self.players)):
+            self.players[i].current_action = actions[i]
 
     def step(self):
         self.frames += 1

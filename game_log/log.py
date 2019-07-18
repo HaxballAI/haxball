@@ -1,3 +1,4 @@
+from game_simulator import playeraction
 from dataclasses import dataclass, field
 from typing import List
 import pickle
@@ -20,18 +21,17 @@ class BallState:
 
 @dataclass
 class PlayerState(BallState):
-    move: int
-    kick: int
+    action: playeraction.Action
 
     def actToList(self, myTeam):
         if myTeam == "red":
             return [self.move, self.kick]
         elif myTeam == "blue":
-            if self.move == 0:
+            if self.action.dir_idx == 0:
                 conv_move = 0
             else:
-                conv_move = ((self.move + 3) % 8) + 1
-            return [conv_move, self.kick]
+                conv_move = ((self.action.dir_idx + 3) % 8) + 1
+            return [conv_move, self.action.kicking]
         else:
             raise ValueError
 

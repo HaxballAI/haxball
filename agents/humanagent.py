@@ -12,9 +12,9 @@ class HumanAgent():
 
         self.gui = gui
 
-    def getRawAction(self, state = []):
-        # Ignore state
-        _ = state
+    def getAction(self, frame = None):
+        # Ignore frame
+        _ = frame
         # Returns raw action of the agent based on the key presses queried from
         # the gui. Returns (dir_idx, kicking_state)
         movements = [self.gui.isKeyPressed(key) for key in self.movement_keys]
@@ -45,4 +45,4 @@ class HumanAgent():
         else:
             dir = max(a, b)
 
-        return dir, self.gui.isKeyPressed(self.kick)
+        return playeraction.Action(dir, self.gui.isKeyPressed(self.kick))

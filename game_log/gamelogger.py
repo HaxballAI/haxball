@@ -1,6 +1,6 @@
 import game_simulator.gamesim as gs
 from game_displayer import basicdisplayer
-from agents.human_agent import humanagent
+from agents import humanagent
 from game_log import log
 import pygame
 
@@ -16,10 +16,10 @@ def recordPlayerGames(dest, games_to_play = 10):
         game_log = log.Game()
         while not game_done:
             disp.updateKeys()
-            red_move = red_agent.getRawAction()
-            blue_move = blue_agent.getRawAction()
+            red_move = red_agent.getAction()
+            blue_move = blue_agent.getAction()
 
-            sim.giveCommands([red_move, blue_move], "raw")
+            sim.giveCommands([red_move, blue_move])
             sim.step()
 
             game_log.append(sim.log())

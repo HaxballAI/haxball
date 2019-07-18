@@ -1,3 +1,5 @@
+#! /usr/bin/python
+
 import game_log.log as l
 import numpy as np
 import torch

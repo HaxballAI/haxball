@@ -11,7 +11,7 @@ class ACAgent():
         self.network = network
         self.team = team
 
-    def getRawAction(self, frame, method = "random", give_debug_surf = False):
+    def getAction(self, frame, method = "random", give_debug_surf = False):
         movepred, kickpred , _ = self.network(torch.FloatTensor(frame.posToNp(self.team)))
         if method == "random":
             move = np.random.choice(len(movepred), p = movepred.detach().numpy() )
@@ -36,6 +36,6 @@ class ACAgent():
             else:
                 raise ValueError
             debug_surf = movedisplayer.drawMove(move_probs, move, self.team) #TODO: Pass win_prob in here
-            return (move, kick), debug_surf
+            return playeraction.Action(move, kick), debug_surf
         else:
-            return (move, kick)
+            return playeraction.Action(move, kick)

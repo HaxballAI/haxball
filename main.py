@@ -53,13 +53,13 @@ def main():
         # Need to update what keys are being pressed down for the human agents
         disp.updateKeys()
         # Query each agent on what commands should be sent to the game simulator
-        commands = [agents[i].getRawAction() for i in range(player_count)]
+        commands = [agents[i].getAction() for i in range(player_count)]
 
         f_data = game.log()
 
-        commands[0], red_debug_surf = redPlayerAg.getRawAction(f_data, "random", True)
-        commands[1], blue_debug_surf = bluePlayerAg.getRawAction(f_data, "random", True)
-        game.giveCommands(commands, "raw")
+        commands[0], red_debug_surf = redPlayerAg.getAction(f_data, "random", True)
+        commands[1], blue_debug_surf = bluePlayerAg.getAction(f_data, "random", True)
+        game.giveCommands(commands)
 
         # Update the graphical interface canvas
         disp.drawFrame(game.log())

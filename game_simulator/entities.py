@@ -73,7 +73,7 @@ class Player(Entity):
         self.current_action = playeraction.Action()
 
     def log(self):
-        return log.PlayerState(self.pos[0], self.pos[1], self.vel[0], self.vel[1], self.current_action.dir_idx, self.current_action.kicking)
+        return log.PlayerState(self.pos[0], self.pos[1], self.vel[0], self.vel[1], self.current_action)
 
 class Ball(Entity):
     def __init__(self, initial_position, initial_velocity = np.zeros(2), initial_acceleration = np.zeros(2)):

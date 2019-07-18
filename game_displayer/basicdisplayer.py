@@ -58,39 +58,27 @@ class GameWindow:
             pygame.gfxdraw.filled_circle(self.win, goalpost[0], goalpost[1], gp.goalpostradius-gp.goalpostborderthickness, goalpostcol)
             pygame.gfxdraw.aacircle(self.win, goalpost[0], goalpost[1], gp.goalpostradius-gp.goalpostborderthickness, goalpostcol)
 
+        def drawPlayer(p, colour):
+            if p.action.isKicking:
+                pygame.gfxdraw.filled_circle(self.win, int(p.x), int(p.y),
+                    gp.kickingcircleradius, gp.kickingcirclecolour)
+                pygame.gfxdraw.aacircle(self.win, int(p.x), int(p.y),
+                    gp.kickingcircleradius, gp.kickingcirclecolour)
+            else:
+                pygame.gfxdraw.filled_circle(self.win, int(p.x), int(p.y),
+                    gp.kickingcircleradius, (0,0,0))
+                pygame.gfxdraw.aacircle(self.win, int(p.x), int(p.y),
+                    gp.kickingcircleradius, (0,0,0))
+
+            pygame.gfxdraw.filled_circle(self.win, int(p.x), int(p.y),
+                gp.playerradius-gp.kickingcirclethickness, colour)
+            pygame.gfxdraw.aacircle(self.win, int(p.x), int(p.y),
+                gp.playerradius-gp.kickingcirclethickness, colour)
+
         for p in frame.reds:
-            if p.kick:
-                pygame.gfxdraw.filled_circle(self.win, int(p.x), int(p.y),
-                    gp.kickingcircleradius, gp.kickingcirclecolour)
-                pygame.gfxdraw.aacircle(self.win, int(p.x), int(p.y),
-                    gp.kickingcircleradius, gp.kickingcirclecolour)
-            else:
-                pygame.gfxdraw.filled_circle(self.win, int(p.x), int(p.y),
-                    gp.kickingcircleradius, (0,0,0))
-                pygame.gfxdraw.aacircle(self.win, int(p.x), int(p.y),
-                    gp.kickingcircleradius, (0,0,0))
-
-            pygame.gfxdraw.filled_circle(self.win, int(p.x), int(p.y),
-                gp.playerradius-gp.kickingcirclethickness, gp.redcolour)
-            pygame.gfxdraw.aacircle(self.win, int(p.x), int(p.y),
-                gp.playerradius-gp.kickingcirclethickness, gp.redcolour)
-
+            drawPlayer(p, gp.redcolour)
         for p in frame.blues:
-            if p.kick:
-                pygame.gfxdraw.filled_circle(self.win, int(p.x), int(p.y),
-                    gp.kickingcircleradius, gp.kickingcirclecolour)
-                pygame.gfxdraw.aacircle(self.win, int(p.x), int(p.y),
-                    gp.kickingcircleradius, gp.kickingcirclecolour)
-            else:
-                pygame.gfxdraw.filled_circle(self.win, int(p.x), int(p.y),
-                    gp.kickingcircleradius, (0,0,0))
-                pygame.gfxdraw.aacircle(self.win, int(p.x), int(p.y),
-                    gp.kickingcircleradius, (0,0,0))
-
-            pygame.gfxdraw.filled_circle(self.win, int(p.x), int(p.y),
-                gp.playerradius-gp.kickingcirclethickness, gp.bluecolour)
-            pygame.gfxdraw.aacircle(self.win, int(p.x), int(p.y),
-                gp.playerradius-gp.kickingcirclethickness, gp.bluecolour)
+            drawPlayer(p, gp.bluecolour)
 
         for b in frame.balls:
             pygame.gfxdraw.filled_circle(self.win, int(b.x), int(b.y), gp.ballradius+2, (0, 0, 0))
