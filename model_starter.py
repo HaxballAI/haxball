@@ -39,8 +39,6 @@ def getData(data_dir, game_number):
     loser_actions = np.concatenate(loser_actions)
     winner_actions = np.concatenate(winner_actions)
 
-
-
     assert len(loser_frames) == len(loser_actions)
     p = np.random.permutation(len(loser_frames))
     loser_frames = loser_frames[p]
@@ -60,13 +58,15 @@ def getData(data_dir, game_number):
 
 
 
-
+# MAKE AND TRAINS A NEW NETWORK BASED ON DATA GIVEN BY DATA_DIR WHICH HAS TO
+# BE IN FORMAT OF A FILE OF GAME LOGS INDEXED BY NUMBER
 def newNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size):
     data_tensor, action_data = getData(data_dir, game_number)
     model = Policy()
     initialize(model, data_tensor, action_data, epochs, learning_rate, batch_size)
     torch.save(model, net_name + ".model")
 
+# IMPROVED THE NETWORK GIVEN BY NET_NAME
 def improveNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size):
     data_tensor, action_data = getData(data_dir, game_number)
     model = torch.load(net_name + ".model")
