@@ -35,7 +35,7 @@ class ACAgent():
                 move_probs = movepred.detach().numpy()[[0,5,6,7,8,1,2,3,4]]
             else:
                 raise ValueError
-            debug_surf = movedisplayer.drawMove(move_probs, move, self.team)
+            debug_surf = movedisplayer.drawMove(move_probs, move, self.team) #TODO: Pass win_prob in here
             return (move, kick), debug_surf
         else:
             return (move, kick)
