@@ -48,10 +48,6 @@ def initialize(model, data_tensor, action_data, epochs, learning_rate, batch_siz
     loser_kicks = cuttosize(action_data[0][1], batch_size)
     winner_moves = cuttosize(action_data[1][0], batch_size)
     winner_kicks = cuttosize(action_data[1][1], batch_size)
-    loser_moves = cuttosize(action_data[0][0], batch_size)
-    loser_kicks = cuttosize(action_data[0][1], batch_size)
-    winner_moves = cuttosize(action_data[1][0], batch_size)
-    winner_kicks = cuttosize(action_data[1][1], batch_size)
     true_move =[torch.LongTensor(loser_moves).view(-1,batch_size), torch.LongTensor(winner_moves).view(-1,batch_size)]
     true_kick = [torch.FloatTensor(loser_kicks).view(-1,batch_size), torch.FloatTensor(winner_kicks).view(-1,batch_size)]
     optimiser = torch.optim.Adam(model.parameters(), lr=learning_rate)
