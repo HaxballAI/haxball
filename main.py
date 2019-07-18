@@ -2,26 +2,18 @@
 
 from game_simulator import gamesim
 from game_displayer import basicdisplayer
-from data_handler import datahandler
 from move_displayer import movedisplayer
-from network import Policy, DIMS
-#from model_tuner import tuner
 from game_simulator import gameparams as gp
 from agents import ACagent
 from agents import humanagent
-from utils import flatten
 
 import pygame
 
-import random
-
 import numpy as np
-from random import randrange
 
 import torch
 
 def main():
-
     model = torch.load("sebNet2.model")
 
     redPlayerAg = ACagent.ACAgent(model,"red")
@@ -55,20 +47,7 @@ def main():
 
     # Initialise the data handler (saving data, loading it, etc)
 
-
     running = True
-
-    #tuner.tuner()
-
-    # FUNCTION THAT DEFINES OPPONENT REPLACE RHS WITH THIS
-
-    def opponent(x):
-        movepred, kickpred = model(x)
-        ran_move = np.random.choice(len(movepred), p = torch.nn.Softmax(dim = 0)(movepred).detach().numpy())
-        p_kick = float(kickpred[0])
-        ran_kick = np.random.choice([False, True], p = [1 - p_kick, p_kick])
-        debug_surf = movedisplayer.drawMove(torch.nn.Softmax(dim = 0)(movepred).detach().numpy(), ran_move)
-        return [ran_move, ran_kick], debug_surf
 
     while(running):
         # Need to update what keys are being pressed down for the human agents

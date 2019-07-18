@@ -1,6 +1,5 @@
 from game_simulator import playeraction
 
-
 class HumanAgent():
     def __init__(self, keybindings, gui):
         # Keybindings is a list containing the strings of the keybindings
@@ -14,6 +13,8 @@ class HumanAgent():
         self.gui = gui
 
     def getRawAction(self, state = []):
+        # Ignore state
+        _ = state
         # Returns raw action of the agent based on the key presses queried from
         # the gui. Returns (dir_idx, kicking_state)
         movements = [self.gui.isKeyPressed(key) for key in self.movement_keys]
@@ -45,6 +46,3 @@ class HumanAgent():
             dir = max(a, b)
 
         return dir, self.gui.isKeyPressed(self.kick)
-
-    def getAction(self, state):
-        return playeraction.Action(*self.getRawAction(state))

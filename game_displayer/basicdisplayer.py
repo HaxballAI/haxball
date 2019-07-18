@@ -1,7 +1,6 @@
 import pygame
 from pygame import gfxdraw
 from game_simulator import gameparams as gp
-from game_simulator import playeraction as pa
 
 class GameWindow:
     def __init__(self, winWidth, winHeight, fps = 60):

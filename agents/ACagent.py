@@ -5,7 +5,6 @@ import random
 import numpy as np
 import torch
 
-
 class ACAgent():
     # Agent that works off of a actor-critic model
     def __init__(self, network, team):
@@ -34,6 +33,3 @@ class ACAgent():
             return (move, kick), debug_surf
         else:
             return (move, kick)
-
-    def getAction(self, state = []):
-        raise NotImplementedError
