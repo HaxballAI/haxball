@@ -50,7 +50,7 @@ def initialize(model, data_tensor, action_data, epochs, learning_rate, batch_siz
         loser_kicks = cuttosize(action_data[0][1], batch_size)
         winner_moves = cuttosize(action_data[1][0], batch_size)
         winner_kicks = cuttosize(action_data[1][1], batch_size)
-        true_move = [torch.tensor(loser_moves).view(-1,batch_size), torch.tensor(winner_moves).view(-1,batch_size)]
+        true_move =[torch.LongTensor(loser_moves).view(-1,batch_size), torch.LongTensor(winner_moves).view(-1,batch_size)]
         true_kick = [torch.FloatTensor(loser_kicks).view(-1,batch_size), torch.FloatTensor(winner_kicks).view(-1,batch_size)]
 
         for i in range((len(loser_moves) * 9) // 320):
@@ -60,7 +60,7 @@ def initialize(model, data_tensor, action_data, epochs, learning_rate, batch_siz
                 moveprob, kickprob, winprob = model(data_tensor[k][32 * i : 32 * (i + 1)])
                 # Compute and print loss
 
-                loss = movecriterion(moveprob, true_move[k][i])
+                loss = movecriterion(moveprob , true_move[k][i])
                 loss += kickcriterion(kickprob, true_kick[k][i])
                 loss += wincriterion(winprob, torch.FloatTensor(np.repeat(k,batch_size)))
                 runningloss += loss
@@ -81,7 +81,7 @@ def initialize(model, data_tensor, action_data, epochs, learning_rate, batch_siz
                     # Forward pass: Compute predicted y by passing x to the model
                     moveprob, kickprob, winprob = model(data_tensor[k][32 * i : 32 * (i + 1)])
                     # Compute and print loss
-                    loss = movecriterion(moveprob, true_move[k][i])
+                    loss = movecriterion(moveprob, torch.LongTensor(true_move[k][i]))
                     loss += kickcriterion(kickprob, true_kick[k][i])
                     loss += wincriterion(winprob, torch.FloatTensor(np.repeat(k,batch_size)))
                     j += 1
