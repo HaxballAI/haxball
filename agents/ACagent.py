@@ -20,6 +20,13 @@ class ACAgent():
             move = int(np.argmax(movepred.detach().numpy()))
         else:
             raise ValueError
+        if self.team == "red":
+            pass
+        elif self.team == "blue":
+            if move != 0:
+                move = ((move + 3) % 8) + 1
+        else:
+            raise ValueError
         p_kick = float(kickpred[0])
         kick = np.random.choice([False, True], p = [1 - p_kick, p_kick])
         if give_debug_surf:
