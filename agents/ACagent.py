@@ -8,23 +8,18 @@ import torch
 
 class ACAgent():
     # Agent that works off of a actor-critic model
-    def __init__(self, network):
+    def __init__(self, network, team):
         self.network = network
+        self.team = team
 
-    def getRawAction(self, state, give_debug_surf = False):
-        movepred, kickpred , _ = self.network(torch.FloatTensor(state))
-        ran_move = np.random.choice(len(movepred), p = torch.nn.Softmax(dim = 0)(movepred).detach().numpy())
-        p_kick = float(kickpred[0])
-        ran_kick = np.random.choice([False, True], p = [1 - p_kick, p_kick])
-        if give_debug_surf:
-            debug_surf = movedisplayer.drawMove(torch.nn.Softmax(dim = 0)(movepred).detach().numpy(), ran_move)
-            return (ran_move, ran_kick), debug_surf
+    def getRawAction(self, frame, method = "random", give_debug_surf = False):
+        movepred, kickpred , _ = self.network(torch.FloatTensor(frame.posToNp(self.team)))
+        if method == "random":
+            move = np.random.choice(len(movepred), p = torch.nn.Softmax(dim = 0)(movepred).detach().numpy())
+        elif method == "max":
+            move = int(np.argmax(movepred.detach().numpy()))
         else:
-            return (ran_move, ran_kick)
-
-    def getMaxRawAction(self, state, give_debug_surf = False):
-        movepred, kickpred , _ = self.network(torch.FloatTensor(state))
-        move = int(np.argmax(movepred.detach().numpy()))
+            raise ValueError
         p_kick = float(kickpred[0])
         kick = np.random.choice([False, True], p = [1 - p_kick, p_kick])
         if give_debug_surf:

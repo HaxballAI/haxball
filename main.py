@@ -24,7 +24,8 @@ def main():
 
     model = torch.load("sebNet2.model")
 
-    playerAg = ACagent.ACAgent(model)
+    redPlayerAg = ACagent.ACAgent(model,"red")
+    bluePlayerAg = ACagent.ACAgent(model,"blue")
 
     # Intialise the graphical interface of the game
     #disp = basicdisplayer.GameWindow(840, 400)
@@ -75,11 +76,10 @@ def main():
         # Query each agent on what commands should be sent to the game simulator
         commands = [agents[i].getRawAction() for i in range(player_count)]
 
-        c_state = game.log().posToNp().flatten()
-
-        commands[0], debug_surf = playerAg.getMaxRawAction(c_state, True)
         f_data = game.log()
-        o_action = playerAg.getMaxRawAction(f_data.posToNp("blue" , 0))
+
+        commands[0], debug_surf = redPlayerAg.getRawAction(f_data, "max", True)
+        o_action = bluePlayerAg.getRawAction(f_data, "max")
         if o_action[0] != 0:
             o_move = ((o_action[0] + 3) % 8) + 1
         else:
@@ -110,8 +110,6 @@ def main():
 
 
         if game.frames % 1000 == 0:
-            print("c_state:")
-            print(c_state)
             game.getFeedback()
 
         disp.getInput()
