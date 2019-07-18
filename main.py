@@ -21,7 +21,7 @@ def main():
 
     # Intialise the graphical interface of the game
     #disp = basicdisplayer.GameWindow(840, 400)
-    disp = basicdisplayer.GameWindow(1096, 400)
+    disp = basicdisplayer.GameWindow(840 + 2 * 256, 400)
 
     red_player_count = 1
     blue_player_count = 1
@@ -57,15 +57,16 @@ def main():
 
         f_data = game.log()
 
-        commands[0], debug_surf = redPlayerAg.getRawAction(f_data, "random", True)
-        commands[1] = bluePlayerAg.getRawAction(f_data, "random")
+        commands[0], red_debug_surf = redPlayerAg.getRawAction(f_data, "random", True)
+        commands[1], blue_debug_surf = bluePlayerAg.getRawAction(f_data, "random", True)
         game.giveCommands(commands, "raw")
 
         # Update the graphical interface canvas
         disp.drawFrame(game.log())
 
         # Add the debug thing
-        disp.win.blit(debug_surf, (840,0))
+        disp.win.blit(red_debug_surf, (840,0))
+        disp.win.blit(blue_debug_surf, (840 + 256,0))
 
         # Display
         disp.clock.tick(disp.fps)
