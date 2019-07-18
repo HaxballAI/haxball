@@ -28,13 +28,13 @@ def main():
     agents = []
     # Red agents
     #agents.append(humanagent.HumanAgent(('w', 'd', 's', 'a', 'x'), disp))
-    red_debug_surf  = [pygame.Surface((0, 0))]
+    red_debug_surf = movedisplayer.DebugSurf()
     agents.append(ACagent.ACAgent(model, "red",  "random", red_debug_surf))
     for i in range(red_player_count - 1):
         agents.append(retardedagent.RetardedAgent())
     # Blue agents
     #agents.append(humanagent.HumanAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'RCTRL'), disp))
-    blue_debug_surf = [pygame.Surface((0, 0))]
+    blue_debug_surf = movedisplayer.DebugSurf()
     agents.append(ACagent.ACAgent(model, "blue", "random", blue_debug_surf))
     for i in range(blue_player_count - 1):
         agents.append(retardedagent.RetardedAgent())
@@ -59,8 +59,8 @@ def main():
         disp.drawFrame(game.log())
 
         # Add the debug thing
-        disp.win.blit(red_debug_surf[0],  (840, 0))
-        disp.win.blit(blue_debug_surf[0], (840 + 256, 0))
+        disp.win.blit(red_debug_surf.surf,  (840, 0))
+        disp.win.blit(blue_debug_surf.surf, (840 + 256, 0))
 
         # Display
         disp.clock.tick(disp.fps)
