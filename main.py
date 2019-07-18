@@ -16,27 +16,26 @@ import torch
 def main():
     model = torch.load("newSebNet.model")
 
-    redPlayerAg = ACagent.ACAgent(model,"red")
-    bluePlayerAg = ACagent.ACAgent(model,"blue")
-
     # Intialise the graphical interface of the game
     #disp = basicdisplayer.GameWindow(840, 400)
     disp = basicdisplayer.GameWindow(840 + 2 * 256, 400)
 
     red_player_count = 1
     blue_player_count = 1
-    player_count = red_player_count + blue_player_count
     ball_count = 1 # Doesn't work with >1 yet as balls reset in the exact center
 
     # Intialise the agents in the order of all reds sequentially, then blues
     agents = []
     # Red agents
-
-    agents.append(humanagent.HumanAgent(('w', 'd', 's', 'a', 'x'), disp))
+    #agents.append(humanagent.HumanAgent(('w', 'd', 's', 'a', 'x'), disp))
+    red_debug_surf  = [pygame.Surface((0, 0))]
+    agents.append(ACagent.ACAgent(model, "red",  "random", red_debug_surf))
     for i in range(red_player_count - 1):
         agents.append(retardedagent.RetardedAgent())
     # Blue agents
-    agents.append(humanagent.HumanAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'RCTRL'), disp))
+    #agents.append(humanagent.HumanAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'RCTRL'), disp))
+    blue_debug_surf = [pygame.Surface((0, 0))]
+    agents.append(ACagent.ACAgent(model, "blue", "random", blue_debug_surf))
     for i in range(blue_player_count - 1):
         agents.append(retardedagent.RetardedAgent())
 
@@ -45,28 +44,23 @@ def main():
     game = gamesim.GameSim(red_player_count, blue_player_count, ball_count,
                            {"printDebug" : True, "auto score" : True})
 
-    # Initialise the data handler (saving data, loading it, etc)
-
     running = True
 
     while(running):
         # Need to update what keys are being pressed down for the human agents
         disp.updateKeys()
-        # Query each agent on what commands should be sent to the game simulator
-        commands = [agents[i].getAction() for i in range(player_count)]
 
         f_data = game.log()
 
-        commands[0], red_debug_surf = redPlayerAg.getAction(f_data, "random", True)
-        commands[1], blue_debug_surf = bluePlayerAg.getAction(f_data, "random", True)
-        game.giveCommands(commands)
+        # Query each agent on what commands should be sent to the game simulator
+        game.giveCommands([a.getAction(f_data) for a in agents])
 
         # Update the graphical interface canvas
         disp.drawFrame(game.log())
 
         # Add the debug thing
-        disp.win.blit(red_debug_surf, (840, 0))
-        disp.win.blit(blue_debug_surf, (840 + 256, 0))
+        disp.win.blit(red_debug_surf[0],  (840, 0))
+        disp.win.blit(blue_debug_surf[0], (840 + 256, 0))
 
         # Display
         disp.clock.tick(disp.fps)

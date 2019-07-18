@@ -7,15 +7,17 @@ import torch
 
 class ACAgent():
     # Agent that works off of a actor-critic model
-    def __init__(self, network, team):
+    def __init__(self, network, team, method = "random", debug_surf_container = None):
         self.network = network
         self.team = team
+        self.method = method
+        self.debug_surf_container = debug_surf_container
 
-    def getAction(self, frame, method = "random", give_debug_surf = False):
+    def getAction(self, frame):
         movepred, kickpred , _ = self.network(torch.FloatTensor(frame.posToNp(self.team)))
-        if method == "random":
+        if self.method == "random":
             move = np.random.choice(len(movepred), p = movepred.detach().numpy() )
-        elif method == "max":
+        elif self.method == "max":
             move = int(np.argmax(movepred.detach().numpy()))
         else:
             raise ValueError
@@ -28,14 +30,12 @@ class ACAgent():
             action = action.flipped()
         else:
             raise ValueError
-        if give_debug_surf:
+        if self.debug_surf_container:
             if self.team == "red":
                 move_probs = movepred.detach().numpy()
             elif self.team == "blue":
                 move_probs = movepred.detach().numpy()[[0,5,6,7,8,1,2,3,4]]
             else:
                 raise ValueError
-            debug_surf = movedisplayer.drawMove(move_probs, action.dir_idx, self.team) #TODO: Pass win_prob in here
-            return action, debug_surf
-        else:
-            return action
+            self.debug_surf_container[0] = movedisplayer.drawMove(move_probs, action.dir_idx, self.team) #TODO: Pass win_prob in here
+        return action
