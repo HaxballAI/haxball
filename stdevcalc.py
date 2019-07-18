@@ -39,14 +39,9 @@ positions = np.array(positions)
 print("Red Positions:")
 print(redpositions[10000])
 print("Blue Positions:")
-<<<<<<< HEAD
 print(bluepositions[10000])
 print(np.std(positions,axis=0))
 print(np.mean(positions,axis=0))
-=======
-print(bluepositions[0])
-print(np.std(positions, axis = 0))
->>>>>>> 5680bd16684a7f8cedabec1af90fe1d799e2681a
 
 '''
 class TwoLayerNet(torch.nn.Module):
