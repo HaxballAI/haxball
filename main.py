@@ -14,7 +14,7 @@ import numpy as np
 import torch
 
 def main():
-    model = torch.load("sebNet2.model")
+    model = torch.load("newSebNet.model")
 
     redPlayerAg = ACagent.ACAgent(model,"red")
     bluePlayerAg = ACagent.ACAgent(model,"blue")

@@ -1,7 +1,8 @@
 import game_log.log as l
 import numpy as np
 import torch
-from model_updaters import initialize
+from model_updaters import learnFromPlayedGames
+import model_updaters
 from network import Policy
 
 def getData(data_dir, game_number):
@@ -75,4 +76,8 @@ def improveNet(net_name, data_dir, game_number, epochs, learning_rate, batch_siz
 
 
 if __name__ == "__main__":
-    improveNet("sebNet", "sebgames", 100, 100, 1e-3, 32)
+    mod = torch.load("sebNet.model")
+    model_updaters.actorCriticTrain(mod, 15, 500)
+    print("By some miricle, done!")
+    input("I will save now!")
+    torch.save(mod,"newSebNet.model")
