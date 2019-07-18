@@ -24,7 +24,7 @@ def recordPlayerGames(dest, games_to_play = 10):
 
             game_log.append(sim.log())
 
-            disp.drawThings(sim.getState("full info"))
+            disp.drawFrame(sim.log())
             pygame.display.update()
             disp.clock.tick(disp.fps)
 

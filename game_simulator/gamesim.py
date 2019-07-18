@@ -35,41 +35,6 @@ class GameSim(GameSimEngine):
                 print("    ball at: {:.3f}; {:.3f} with velocity {:.3f}; {:.3f}\n".format(obj.pos[0], obj.pos[1], obj.vel[0], obj.vel[1]))
         return
 
-    def getState(self, format = "positions"):
-        # Returns data based off of format specified
-        # TODO: come up with better name than format
-
-        # Positions give list of player positions, then ball positions
-        # All positions are just tuples (x,y)
-        # First element is list of red player positions
-        # Second element is list of blue player positions
-        # Thirst is list of ball positions
-        if format == "positions":
-            redsPos = [ rPlayer.pos for rPlayer in self.reds ]
-            bluesPos = [ bPlayer.pos for bPlayer in self.blues ]
-            ballsPos = [ ball.pos for ball in self.balls ]
-
-            return (redsPos, bluesPos, ballsPos )
-        elif format == "full info":
-            redsInfo = [ [rPlayer.pos, rPlayer.vel, rPlayer.current_action.isKicking() and rPlayer.can_kick] for rPlayer in self.reds ]
-            bluesInfo = [ [bPlayer.pos, bPlayer.vel, bPlayer.current_action.isKicking() and bPlayer.can_kick] for bPlayer in self.blues ]
-            ballsInfo = [ [ball.pos, ball.vel ] for ball in self.balls ]
-
-            return (redsInfo, bluesInfo, ballsInfo )
-
-        elif format == "state-action pairs":
-            state = [ [object.pos, object.vel ] for object in self.moving_objects]
-            action = [ [player.current_action] for player in self.players]
-            return (state, action)
-
-        elif format == "raw sa pairs":
-            state = [ [object.pos, object.vel ] for object in self.moving_objects]
-            action = [ player.current_action.rawAction() for player in self.players]
-            return [state, action]
-
-        elif format == "raw state":
-            return [ [object.pos, object.vel ] for object in self.moving_objects]
-
     def log(self):
         return log.Frame(
                 blues = [p.log() for p in self.blues],

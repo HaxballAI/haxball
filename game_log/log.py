@@ -41,7 +41,7 @@ class Frame:
     reds: List[PlayerState]
     balls: List[BallState]
 
-    def posToNp(self, myTeam, me):
+    def posToNp(self, myTeam = "red", me = 0):
         if myTeam == "blue":
             return np.array(
                     self.blues[me].posToList(myTeam)

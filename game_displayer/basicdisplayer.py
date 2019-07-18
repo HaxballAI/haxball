@@ -21,8 +21,7 @@ class GameWindow:
         self.win = pygame.display.set_mode( (self.width, self.height ) )
         pygame.display.set_caption( "TEST DISPLAY" )
 
-    def drawThings(self, things):
-        # Things is of a very specific format that should not be violated
+    def drawFrame(self, frame):
         self.win.fill( (0, 0, 0 ) )
         # draws background
         pygame.draw.rect(self.win, gp.bordercolour, (0, 0, gp.windowwidth, gp.windowheight))
@@ -60,53 +59,45 @@ class GameWindow:
             pygame.gfxdraw.filled_circle(self.win, goalpost[0], goalpost[1], gp.goalpostradius-gp.goalpostborderthickness, goalpostcol)
             pygame.gfxdraw.aacircle(self.win, goalpost[0], goalpost[1], gp.goalpostradius-gp.goalpostborderthickness, goalpostcol)
 
-        for redInfo in things[0]:
-            intP = tuple( map( int, redInfo[0] ) )
-
-            if redInfo[2]:
-                pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1],
+        for p in frame.reds:
+            if p.kick:
+                pygame.gfxdraw.filled_circle(self.win, p.x, p.y,
                     gp.kickingcircleradius, gp.kickingcirclecolour)
-                pygame.gfxdraw.aacircle(self.win, intP[0], intP[1],
+                pygame.gfxdraw.aacircle(self.win, p.x, p.y,
                     gp.kickingcircleradius, gp.kickingcirclecolour)
-
             else:
-                pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1],
+                pygame.gfxdraw.filled_circle(self.win, p.x, p.y,
                     gp.kickingcircleradius, (0,0,0))
-                pygame.gfxdraw.aacircle(self.win, intP[0], intP[1],
+                pygame.gfxdraw.aacircle(self.win, p.x, p.y,
                     gp.kickingcircleradius, (0,0,0))
 
-
-            pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1],
+            pygame.gfxdraw.filled_circle(self.win, p.x, p.y,
                 gp.playerradius-gp.kickingcirclethickness, gp.redcolour)
-            pygame.gfxdraw.aacircle(self.win, intP[0], intP[1],
+            pygame.gfxdraw.aacircle(self.win, p.x, p.y,
                 gp.playerradius-gp.kickingcirclethickness, gp.redcolour)
 
-        for blueInfo in things[1]:
-            intP = tuple( map( int, blueInfo[0] ) )
-            if blueInfo[2]:
-                pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1],
+        for p in frame.blues:
+            if p.kick:
+                pygame.gfxdraw.filled_circle(self.win, p.x, p.y,
                     gp.kickingcircleradius, gp.kickingcirclecolour)
-                pygame.gfxdraw.aacircle(self.win, intP[0], intP[1],
+                pygame.gfxdraw.aacircle(self.win, p.x, p.y,
                     gp.kickingcircleradius, gp.kickingcirclecolour)
-
             else:
-                pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1],
+                pygame.gfxdraw.filled_circle(self.win, p.x, p.y,
                     gp.kickingcircleradius, (0,0,0))
-                pygame.gfxdraw.aacircle(self.win, intP[0], intP[1],
+                pygame.gfxdraw.aacircle(self.win, p.x, p.y,
                     gp.kickingcircleradius, (0,0,0))
 
-
-            pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1],
+            pygame.gfxdraw.filled_circle(self.win, p.x, p.y,
                 gp.playerradius-gp.kickingcirclethickness, gp.bluecolour)
-            pygame.gfxdraw.aacircle(self.win, intP[0], intP[1],
+            pygame.gfxdraw.aacircle(self.win, p.x, p.y,
                 gp.playerradius-gp.kickingcirclethickness, gp.bluecolour)
 
-        for ballInfo in things[2]:
-            intP = tuple( map( int, ballInfo[0] ) )
-            pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1], gp.ballradius+2, (0, 0, 0))
-            pygame.gfxdraw.aacircle(self.win, intP[0], intP[1], gp.ballradius+2, (0, 0, 0))
-            pygame.gfxdraw.filled_circle(self.win, intP[0], intP[1], gp.ballradius, (255, 255, 255))
-            pygame.gfxdraw.aacircle(self.win, intP[0], intP[1], gp.ballradius, (255, 255, 255))
+        for b in frame.balls:
+            pygame.gfxdraw.filled_circle(self.win, b.x, b.y, gp.ballradius+2, (0, 0, 0))
+            pygame.gfxdraw.aacircle(self.win, b.x, b.y, gp.ballradius+2, (0, 0, 0))
+            pygame.gfxdraw.filled_circle(self.win, b.x, b.y, gp.ballradius, (255, 255, 255))
+            pygame.gfxdraw.aacircle(self.win, b.x, b.y, gp.ballradius, (255, 255, 255))
 
     def getInput(self):
         for event in pygame.event.get():

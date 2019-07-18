@@ -75,13 +75,13 @@ def main():
         # Query each agent on what commands should be sent to the game simulator
         commands = [agents[i].getRawAction() for i in range(player_count)]
 
-        c_state = flatten( game.getState(   "raw state" ) )
+        c_state = flatten(game.log().posToNp())
 
-        commands[0], debug_surf = playerAg.getMaxRawAction(  c_state, True)
+        commands[0], debug_surf = playerAg.getMaxRawAction(c_state, True)
         game.giveCommands(commands, "raw")
 
         # Update the graphical interface canvas
-        disp.drawThings(game.getState("full info"))
+        disp.drawFrame(game.log())
 
         # Add the debug thing
         disp.win.blit(debug_surf, (840,0))
