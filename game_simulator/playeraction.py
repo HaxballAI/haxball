@@ -50,6 +50,8 @@ class Action:
     def __init__(self, *action):
         if len(action) == 0:
             action = (0, 0)
+        if len(action) == 1:
+            action = (action[0] >> 1, action[0] & 1)
         if len(action) == 2:
             # Handle the case of (kicking_state, movement_direction)
             self.dir_idx = action[0]
@@ -78,6 +80,9 @@ class Action:
 
     def binaryAction(self):
         return rawToBinary(self.dir_idx, self.kicking)
+
+    def singleAction(self):
+        return (self.dir_idx << 1) & self.kicking
 
     def flipped(self):
         if self.dir_idx == 0:
