@@ -40,7 +40,7 @@ def binaryToRaw(*x):
         dir = (a + b) // 2
     else:
         dir = max(a, b)
-    return (dir, x[1])
+    return (dir, x[4])
 
 class Action:
     # Action stores all the useful info about an action that the player can have

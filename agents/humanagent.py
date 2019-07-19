@@ -18,31 +18,9 @@ class HumanAgent():
         # Returns raw action of the agent based on the key presses queried from
         # the gui. Returns (dir_idx, kicking_state)
         movements = [self.gui.isKeyPressed(key) for key in self.movement_keys]
+        movements[0], movements[2] = movements[2], movements[0]
 
-        a, b, dir = 0, 0, 0
-        if movements[0] + movements[2] == 1:
-            a = 1 * movements[0] + 5 * movements[2]
-        if movements[1] + movements[3] == 1:
-            b = 3 * movements[1] + 7 * movements[3]
+        raw_action = playeraction.binaryToRaw(*movements, self.gui.isKeyPressed(self.kick))
+        action = playeraction.Action(*raw_action)
 
-        if a == 1 and b == 7:
-            dir = 8
-        elif a != 0 and b != 0:
-            dir = (a + b) // 2
-        else:
-            dir = max(a, b)
-
-        # Temporary for direction flipping in z
-        if a == 1:
-            a = 5
-        elif a == 5:
-            a = 1
-
-        if a == 1 and b == 7:
-            dir = 8
-        elif a != 0 and b != 0:
-            dir = (a + b) // 2
-        else:
-            dir = max(a, b)
-
-        return playeraction.Action(dir, self.gui.isKeyPressed(self.kick))
+        return action

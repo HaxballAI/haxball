@@ -15,7 +15,8 @@ import numpy as np
 import torch
 
 def main():
-    model = torch.load("sebNet2.model")
+    model = torch.load("models/train2.model")
+    model0 = torch.load("models/sebNet.model")
 
     # Intialise the graphical interface of the game
     #disp = basicdisplayer.GameWindow(gp.windowwidth, gp.windowheight)
@@ -28,15 +29,15 @@ def main():
     # Intialise the agents in the order of all reds sequentially, then blues
     agents = []
     # Red agents
-    agents.append(humanagent.HumanAgent(('w', 'd', 's', 'a', 'LSHIFT'), disp))
+    #agents.append(humanagent.HumanAgent(('w', 'd', 's', 'a', 'LSHIFT'), disp))
     red_debug_surf = movedisplayer.DebugSurf()
-    #agents.append(ACagent.ACAgent(model, "red",  "random", red_debug_surf))
+    agents.append(ACagent.ACAgent(model, "red",  "random", red_debug_surf))
     for i in range(red_player_count - 1):
         agents.append(randomagent.RandomAgent())
     # Blue agents
-    #agents.append(humanagent.HumanAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'RCTRL'), disp))
+    agents.append(humanagent.HumanAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'u'), disp))
     blue_debug_surf = movedisplayer.DebugSurf()
-    agents.append(ACagent.ACAgent(model, "blue", "random", blue_debug_surf))
+    #agents.append(ACagent.ACAgent(model0, "blue", "random", blue_debug_surf))
     for i in range(blue_player_count - 1):
         agents.append(randomagent.RandomAgent())
 
