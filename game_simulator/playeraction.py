@@ -50,9 +50,11 @@ class Action:
     def __init__(self, *action):
         if len(action) == 0:
             action = (0, 0)
+
         if len(action) == 1:
-            action = (action[0] >> 1, action[0] & 1)
-        if len(action) == 2:
+            self.dir_idx = action[0] >> 1
+            self.kicking = action[0] & 1
+        elif len(action) == 2:
             # Handle the case of (kicking_state, movement_direction)
             self.dir_idx = action[0]
             self.kicking = action[1]
