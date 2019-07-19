@@ -20,7 +20,7 @@ class GameWindow:
         self.win = pygame.display.set_mode( (self.width, self.height ) )
         pygame.display.set_caption( "TEST DISPLAY" )
 
-    def drawFrame(self, frame):
+    def drawFrame(self, frame, debug_surfs = []):
         self.win.fill( (0, 0, 0 ) )
         # draws background
         pygame.draw.rect(self.win, gp.bordercolour, (0, 0, gp.windowwidth, gp.windowheight))
@@ -85,6 +85,17 @@ class GameWindow:
             pygame.gfxdraw.aacircle(self.win, int(b.x), int(b.y), gp.ballradius+2, (0, 0, 0))
             pygame.gfxdraw.filled_circle(self.win, int(b.x), int(b.y), gp.ballradius, (255, 255, 255))
             pygame.gfxdraw.aacircle(self.win, int(b.x), int(b.y), gp.ballradius, (255, 255, 255))
+
+        debug_pos = 840
+        for s in debug_surfs:
+            # Add the debug thing
+            self.win.blit(s, (debug_pos, 0))
+            debug_pos += s.get_width()
+
+        # Display
+        self.clock.tick(self.fps)
+        pygame.display.update()
+
 
     def getInput(self):
         for event in pygame.event.get():

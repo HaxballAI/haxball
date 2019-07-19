@@ -27,9 +27,9 @@ def main():
     # Intialise the agents in the order of all reds sequentially, then blues
     agents = []
     # Red agents
-    #agents.append(humanagent.HumanAgent(('w', 'd', 's', 'a', 'x'), disp))
+    agents.append(humanagent.HumanAgent(('w', 'd', 's', 'a', 'x'), disp))
     red_debug_surf = movedisplayer.DebugSurf()
-    agents.append(ACagent.ACAgent(model, "red",  "random", red_debug_surf))
+    #agents.append(ACagent.ACAgent(model, "red",  "random", red_debug_surf))
     for i in range(red_player_count - 1):
         agents.append(retardedagent.RetardedAgent())
     # Blue agents
@@ -44,9 +44,7 @@ def main():
     game = gamesim.GameSim(red_player_count, blue_player_count, ball_count,
                            {"printDebug" : True, "auto score" : True})
 
-    running = True
-
-    while(running):
+    while True:
         # Need to update what keys are being pressed down for the human agents
         disp.updateKeys()
 
@@ -56,32 +54,15 @@ def main():
         game.giveCommands([a.getAction(f_data) for a in agents])
 
         # Update the graphical interface canvas
-        disp.drawFrame(game.log())
-
-        # Add the debug thing
-        disp.win.blit(red_debug_surf.surf,  (840, 0))
-        disp.win.blit(blue_debug_surf.surf, (840 + 256, 0))
-
-        # Display
-        disp.clock.tick(disp.fps)
-        pygame.display.update()
-
-        # Load the last game state to the data handler
-
-        # At some arbitrary point, store the buffered game states into the
-        # destination file. In this case it's after a goal has been scored
-        if game.was_point_scored:
-            game.was_point_scored = False
+        disp.drawFrame(game.log(), [red_debug_surf.surf, blue_debug_surf.surf])
 
         game.step()
 
-        # Get Debugging data from the game
-
-
         disp.getInput()
+
         if disp.rip:
             disp.shutdown()
-            running = False
+            break
 
 if __name__ == "__main__":
     main()

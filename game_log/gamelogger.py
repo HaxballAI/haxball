@@ -25,15 +25,12 @@ def recordPlayerGames(dest, games_to_play = 10):
             game_log.append(sim.log())
 
             disp.drawFrame(sim.log())
-            pygame.display.update()
-            disp.clock.tick(disp.fps)
 
             goals = sim.checkGoals()
             if sum(goals) > 0:
                 game_done = True
                 game_log.red_goals = goals[0]
                 game_log.blue_goals = goals[1]
-
 
             disp.getInput()
             if disp.rip:
