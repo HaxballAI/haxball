@@ -4,7 +4,7 @@ import random
 dirx = [0, 0, 1, 1, 1, 0, -1, -1, -1]
 diry = [0, 1, 1, 0, -1, -1 ,-1, 0, 1]
 
-def rawToBinary(x):
+def rawToBinary(*x):
     if len(x) != 2:
         raise TypeError("Raw action should be a tuple of length 2")
     if x[0] < 0 or x[0] > 8 or x[1] < 0 or x[1] > 1:
@@ -21,7 +21,7 @@ def rawToBinary(x):
         ret[3] = 1
     return ret
 
-def binaryToRaw(x):
+def binaryToRaw(*x):
     if len(x) != 5:
         raise TypeError("Binary action should be a tuple of length 5")
     for i in range(5):
@@ -56,7 +56,7 @@ class Action:
             self.kicking = action[1]
         elif len(action) == 5:
             # Handle the case of a binary action tuple
-            self.dir_idx, self.kicking = binaryToRaw(action)
+            self.dir_idx, self.kicking = binaryToRaw(*action)
         else:
             raise ValueError
 
@@ -77,7 +77,7 @@ class Action:
         return self.kicking, self.dir_idx
 
     def binaryAction(self):
-        return rawToBinary((self.dir_idx, self.kicking))
+        return rawToBinary(self.dir_idx, self.kicking)
 
     def flipped(self):
         if self.dir_idx == 0:
