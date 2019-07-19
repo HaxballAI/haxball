@@ -45,4 +45,4 @@ class HumanAgent():
         else:
             dir = max(a, b)
 
-        return playeraction.Action(dir, self.gui.isKeyPressed(self.kick))
+        return playeraction.Action((dir, self.gui.isKeyPressed(self.kick)))

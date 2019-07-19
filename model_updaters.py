@@ -107,7 +107,7 @@ def select_action(model, state, red_action_list, blue_action_list):
     return red_action, utils.reverseAction(blue_action)
 
 
-def finish_episode(model, red_reward_list, blue_reward_list, red_action_list, blue_action_list, learning_rate = 3e-2, gamma = 1 - 1e-3):
+def finish_episode(model, red_reward_list, blue_reward_list, red_action_list, blue_action_list, learning_rate = 1e-3, gamma = 1 - 1e-3):
     red_R = 0
     red_policy_losses = []
     red_value_losses = []
@@ -125,10 +125,16 @@ def finish_episode(model, red_reward_list, blue_reward_list, red_action_list, bl
         blue_R = r + gamma * blue_R
         blue_returns.insert(0, blue_R)
     # Makes returns into tensor and normalises
+
     blue_returns = torch.tensor(blue_returns)
-    blue_returns = (blue_returns - blue_returns.mean()) / (blue_returns.std() + eps)
     red_returns = torch.tensor(red_returns)
-    red_returns = (red_returns - red_returns.mean()) / (red_returns.std() + eps)
+    # Makes them corrospond to win chances.
+    blue_returns = (blue_returns + 1) / 2
+    red_returns = (red_returns + 1) / 2
+
+    # blue_returns = (blue_returns - blue_returns.mean()) / (blue_returns.std() + eps)
+    # red_returns = (red_returns - red_returns.mean()) / (red_returns.std() + eps)
+
 
     # Gets losses for red and blue.
     for (log_prob, value), R in zip(red_action_list, red_returns):
@@ -149,12 +155,12 @@ def finish_episode(model, red_reward_list, blue_reward_list, red_action_list, bl
     del model.saved_actions[:]
 
 
-def actorCriticTrain(model, step_len, game_limit):
+def actorCriticTrain(model, epochs, step_len, game_limit, learning_rate = 1e-3, gamma = 1 - 1e-3):
     # Makes enviroment
     env = DuelEnviroment(step_len, game_limit)
     # Initialises lists of rewards and actions
 
-    for i_episode in range(20):
+    for i_episode in range(epochs):
 
         red_running_reward = 10
         blue_running_reward = 10
@@ -179,7 +185,7 @@ def actorCriticTrain(model, step_len, game_limit):
 
         red_running_reward = 0.05 * red_ep_reward + (1 - 0.05) * red_running_reward
         blue_running_reward = 0.05 * blue_ep_reward + (1 - 0.05) * blue_running_reward
-        finish_episode(model, red_reward_list, blue_reward_list, red_action_list, blue_action_list)
+        finish_episode(model, red_reward_list, blue_reward_list, red_action_list, blue_action_list, learning_rate , gamma)
         if i_episode % 1 == 0:
             print('Episode {}\tLast reward: {:.2f}\tAverage reward: {:.2f}'.format(
                   i_episode, red_ep_reward, red_running_reward))

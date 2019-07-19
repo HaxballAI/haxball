@@ -4,13 +4,60 @@ import random
 dirx = [0, 0, 1, 1, 1, 0, -1, -1, -1]
 diry = [0, 1, 1, 0, -1, -1 ,-1, 0, 1]
 
+def rawToBinary(x):
+    if len(x) != 2:
+        raise TypeError("Raw action should be a tuple of length 2")
+    if x[0] < 0 or x[0] > 8 or x[1] < 0 or x[1] > 1:
+        raise ValuError("Raw action is not of the correct format")
+
+    ret = (0, 0, 0, 0, x[1])
+    if x == 8 or x == 1 or x == 2:
+        ret[0] = 1
+    if 2 <= x[0] and x[0] <= 4:
+        ret[1] = 1
+    if 4 <= x[0] and x[0] <= 6:
+        ret[2] = 1
+    if 6 <= x[0] and x[0] <= 8:
+        ret[3] = 1
+    return ret
+
+def binaryToRaw(x):
+    if len(x) != 5:
+        raise TypeError("Binary action should be a tuple of length 5")
+    for i in range(5):
+        if x[i] < 0 or x[i] > 1:
+            raise ValueError("Binary action should only have booleans as its members")
+
+    a, b, dir = 0, 0, 0
+    if x[0] + x[2] == 1:
+        a = 1 * x[0] + 5 * x[2]
+    if x[1] + x[3] == 1:
+        b = 3 * x[1] + 7 * x[3]
+
+    if a == 1 and b == 7:
+        dir = 8
+    elif a != 0 and b != 0:
+        dir = (a + b) // 2
+    else:
+        dir = max(a, b)
+    return (dir, x[1])
+
 class Action:
-    def __init__(self, directionNumber = 0, isKicking = 0):
-        self.kicking = isKicking
-        self.dir_idx = directionNumber
+    # Action stores all the useful info about an action that the player can have
+    # Possibility to convert to the "raw" form of (movement_direction, kicking_state) or
+    # binary form of (UP, RIGHT, DOWN, LEFT, IS_KICKING).
+    # Also supports returning a vector of the movement direction
+    def __init__(self, action = (0, 0)):
+        if len(action) == 2:
+            # Handle the case of (kicking_state, movement_direction)
+            self.dir_idx = action[0]
+            self.kicking = action[1]
+        elif len(action) == 5:
+            # Handle the case of a binary action tuple
+            self.dir_idx, self.kicking = binaryToRaw(action)
 
         self.direction = np.array((dirx[self.dir_idx], diry[self.dir_idx])).astype("float")
-        if directionNumber != 0:
+        if self.dir_idx != 0:
             self.direction /= np.linalg.norm(self.direction)
 
     def isKicking(self):
@@ -25,12 +72,14 @@ class Action:
         # and movement direction (from 0 to 8)
         return self.kicking, self.dir_idx
 
+    def binaryAction(self):
+        return rawToBinary((self.dir_idx, self.kicking))
+
     def flipped(self):
         if self.dir_idx == 0:
-            return Action(self.dir_idx, self.kicking)
+            return Action((self.dir_idx, self.kicking))
         else:
-            return Action(((self.dir_idx + 3) % 8) + 1, self.kicking)
+            return Action((((self.dir_idx + 3) % 8) + 1, self.kicking))
 
 def getRandomAction():
-    return Action(random.randint(8), random.randint(1))
-
+    return Action((random.randint(9), random.randint(1)))
