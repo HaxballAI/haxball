@@ -18,8 +18,8 @@ def main():
     model = torch.load("sebNet2.model")
 
     # Intialise the graphical interface of the game
-    #disp = basicdisplayer.GameWindow(840, 400)
-    disp = basicdisplayer.GameWindow(840 + 2 * 256, 400)
+    #disp = basicdisplayer.GameWindow(gp.windowwidth, gp.windowheight)
+    disp = basicdisplayer.GameWindow(gp.windowwidth + 2 * 256, gp.windowheight)
 
     red_player_count = 1
     blue_player_count = 1

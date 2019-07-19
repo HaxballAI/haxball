@@ -1,11 +1,12 @@
 import game_simulator.gamesim as gs
+from game_simulator import gameparams
 from game_displayer import basicdisplayer
 from agents import humanagent
 from game_log import log
 import pygame
 
 def recordPlayerGames(dest, games_to_play = 10):
-    disp = basicdisplayer.GameWindow(840, 400)
+    disp = basicdisplayer.GameWindow(gameparams.windowwidth, gameparams.windowheight)
     blue_agent = humanagent.HumanAgent(('w', 'd', 's', 'a', 'LSHIFT'), disp)
     red_agent = humanagent.HumanAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'RCTRL'), disp)
     pygame.init()

@@ -86,7 +86,7 @@ class GameWindow:
             pygame.gfxdraw.filled_circle(self.win, int(b.x), int(b.y), gp.ballradius, (255, 255, 255))
             pygame.gfxdraw.aacircle(self.win, int(b.x), int(b.y), gp.ballradius, (255, 255, 255))
 
-        debug_pos = 840
+        debug_pos = gp.windowwidth
         for s in debug_surfs:
             # Add the debug thing
             self.win.blit(s, (debug_pos, 0))

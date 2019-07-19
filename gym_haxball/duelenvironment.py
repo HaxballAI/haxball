@@ -1,4 +1,4 @@
-from game_simulator import gamesim
+from game_simulator import gamesim, gameparams
 from game_displayer import basicdisplayer
 
 import numpy as np
@@ -46,7 +46,7 @@ class DuelEnviroment:
     def render(self):
         # If the display hasn't been created, create it
         if self.display == None:
-            self.display = basicdisplayer.GameWindow(840, 400)
+            self.display = basicdisplayer.GameWindow(gameparams.windowwidth, gameparams.windowheight)
 
         self.display.drawFrame(self.game_sim.log())
 
