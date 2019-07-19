@@ -1,4 +1,5 @@
 from game_simulator import playeraction
+from game_simulator import gameparams as gp
 from dataclasses import dataclass, field
 from typing import List
 import pickle
@@ -11,13 +12,17 @@ class BallState:
     vx: float
     vy: float
 
-    def posToList(self, myTeam):
+    def posToList(self, myTeam, normalise = False):
         if myTeam == "red":
-            return [self.x, self.y, self.vx, self.vy]
+            l = [self.x, self.y, self.vx, self.vy]
         elif myTeam == "blue":
-            return [840 - self.x, 400 - self.y, -self.vx, -self.vy]
+            l = [gp.windowwidth - self.x, gp.windowheight - self.y, -self.vx, -self.vy]
         else:
             raise ValueError
+        if normalise:
+            v_max = gp.accel * gp.playerdamping / (1 - gp.playerdamping)
+            l = [l[0] / gp.windowwidth, l[1] / gp.windowheight, l[2] / v_max, l[3] / v_max]
+        return l
 
 @dataclass
 class PlayerState(BallState):
@@ -37,22 +42,22 @@ class Frame:
     reds: List[PlayerState]
     balls: List[BallState]
 
-    def posToNp(self, myTeam = "red", me = 0):
+    def posToNp(self, myTeam = "red", me = 0, normalise = False):
         if myTeam == "blue":
             return np.array(
-                    self.blues[me].posToList(myTeam)
-                    + [x for p in self.blues[me+1:] for x in p.posToList(myTeam)]
-                    + [x for p in self.blues[:me]   for x in p.posToList(myTeam)]
-                    + [x for p in self.reds         for x in p.posToList(myTeam)]
-                    + [x for b in self.balls        for x in b.posToList(myTeam)]
+                    self.blues[me].posToList(myTeam, normalise)
+                    + [x for p in self.blues[me+1:] for x in p.posToList(myTeam, normalise)]
+                    + [x for p in self.blues[:me]   for x in p.posToList(myTeam, normalise)]
+                    + [x for p in self.reds         for x in p.posToList(myTeam, normalise)]
+                    + [x for b in self.balls        for x in b.posToList(myTeam, normalise)]
                     )
         elif myTeam == "red":
             return np.array(
-                    self.reds[me].posToList(myTeam)
-                    + [x for p in self.reds[:me]   for x in p.posToList(myTeam)]
-                    + [x for p in self.reds[me+1:] for x in p.posToList(myTeam)]
-                    + [x for p in self.blues       for x in p.posToList(myTeam)]
-                    + [x for b in self.balls       for x in b.posToList(myTeam)]
+                    self.reds[me].posToList(myTeam, normalise)
+                    + [x for p in self.reds[:me]   for x in p.posToList(myTeam, normalise)]
+                    + [x for p in self.reds[me+1:] for x in p.posToList(myTeam, normalise)]
+                    + [x for p in self.blues       for x in p.posToList(myTeam, normalise)]
+                    + [x for b in self.balls       for x in b.posToList(myTeam, normalise)]
                     )
         else:
             raise ValueError
@@ -74,8 +79,8 @@ class Game:
     def append(self, frame):
         self.frames.append(frame)
 
-    def toNp(self, myTeam, me):
-        return np.array([f.posToNp(myTeam, me) for f in self.frames]), np.array([f.singleActToNp(myTeam, me) for f in self.frames])
+    def toNp(self, myTeam, me, normalise = False):
+        return np.array([f.posToNp(myTeam, me, normalise) for f in self.frames]), np.array([f.singleActToNp(myTeam, me) for f in self.frames])
 
     @staticmethod
     def load(filename):
