@@ -47,7 +47,9 @@ class Action:
     # Possibility to convert to the "raw" form of (movement_direction, kicking_state) or
     # binary form of (UP, RIGHT, DOWN, LEFT, IS_KICKING).
     # Also supports returning a vector of the movement direction
-    def __init__(self, action = (0, 0)):
+    def __init__(self, *action):
+        if len(action) == 0:
+            action = (0, 0)
         if len(action) == 2:
             # Handle the case of (kicking_state, movement_direction)
             self.dir_idx = action[0]
@@ -55,6 +57,8 @@ class Action:
         elif len(action) == 5:
             # Handle the case of a binary action tuple
             self.dir_idx, self.kicking = binaryToRaw(action)
+        else:
+            raise ValueError
 
         self.direction = np.array((dirx[self.dir_idx], diry[self.dir_idx])).astype("float")
         if self.dir_idx != 0:
@@ -77,9 +81,9 @@ class Action:
 
     def flipped(self):
         if self.dir_idx == 0:
-            return Action((self.dir_idx, self.kicking))
+            return Action(self.dir_idx, self.kicking)
         else:
-            return Action((((self.dir_idx + 3) % 8) + 1, self.kicking))
+            return Action(((self.dir_idx + 3) % 8) + 1, self.kicking)
 
 def getRandomAction():
-    return Action((random.randint(9), random.randint(1)))
+    return Action(random.randint(9), random.randint(1))

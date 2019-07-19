@@ -23,7 +23,7 @@ class ACAgent():
             raise ValueError
         p_kick = float(kickpred[0])
         kick = np.random.choice([False, True], p = [1 - p_kick, p_kick])
-        action = playeraction.Action((move, kick))
+        action = playeraction.Action(move, kick)
         if self.team == "red":
             pass
         elif self.team == "blue":
