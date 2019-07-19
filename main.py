@@ -14,7 +14,7 @@ import numpy as np
 import torch
 
 def main():
-    model = torch.load("newSebNet.model")
+    model = torch.load("sebNet2.model")
 
     # Intialise the graphical interface of the game
     #disp = basicdisplayer.GameWindow(840, 400)
@@ -27,7 +27,7 @@ def main():
     # Intialise the agents in the order of all reds sequentially, then blues
     agents = []
     # Red agents
-    agents.append(humanagent.HumanAgent(('w', 'd', 's', 'a', 'x'), disp))
+    agents.append(humanagent.HumanAgent(('w', 'd', 's', 'a', 'LSHIFT'), disp))
     red_debug_surf = movedisplayer.DebugSurf()
     #agents.append(ACagent.ACAgent(model, "red",  "random", red_debug_surf))
     for i in range(red_player_count - 1):
