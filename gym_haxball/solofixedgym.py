@@ -23,7 +23,7 @@ class DuelFixedGym(core.Env):
             dtype = np.float32
            )
 
-        opponent_model = torch.load("models/sebNet.model")
+        opponent_model = torch.load("models/train2.model")
         self.opponent = ACagent.ACAgent(opponent_model, "blue",  "random")
 
     def getState(self):
