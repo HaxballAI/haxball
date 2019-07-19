@@ -72,9 +72,9 @@ def newNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size):
 # IMPROVED THE NETWORK GIVEN BY NET_NAME
 def improveNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size):
     data_tensor, action_data = getData(data_dir, game_number)
-    model = torch.load("models/" + net_name + ".model")
+    model = torch.load(f"models/{net_name}.model")
     learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate, batch_size)
-    torch.save(model, net_name + ".model")
+    torch.save(model, f"models/{net_name}.model")
 
 
 if __name__ == "__main__":
