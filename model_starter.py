@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from model_updaters import learnFromPlayedGames
 import model_updaters
-from network import Policy
+import network
 
 def getData(data_dir, game_number):
     loser_frames = []
@@ -65,21 +65,17 @@ def getData(data_dir, game_number):
 # BE IN FORMAT OF A FILE OF GAME LOGS INDEXED BY NUMBER
 def newNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size):
     data_tensor, action_data = getData(data_dir, game_number)
-    model = Policy()
+    model = GregPolicy()
     learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate, batch_size)
-    torch.save(model, net_name + ".model")
+    torch.save(model, "models/" + net_name + ".model")
 
 # IMPROVED THE NETWORK GIVEN BY NET_NAME
 def improveNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size):
     data_tensor, action_data = getData(data_dir, game_number)
-    model = torch.load(net_name + ".model")
+    model = torch.load("models/" + net_name + ".model")
     learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate, batch_size)
     torch.save(model, net_name + ".model")
 
 
 if __name__ == "__main__":
-    mod = torch.load("sebNet.model")
-    model_updaters.actorCriticTrain(mod, 15, 500)
-    print("By some miricle, done!")
-    input("I will save now!")
-    torch.save(mod,"newSebNet.model")
+    newNet("gregNet", "sebgames", 100, 3, 1e-3, 32)

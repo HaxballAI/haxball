@@ -6,6 +6,7 @@ from move_displayer import movedisplayer
 from game_simulator import gameparams as gp
 from agents import ACagent
 from agents import humanagent
+from agents import randomagent
 
 import pygame
 
@@ -32,13 +33,13 @@ def main():
     red_debug_surf = movedisplayer.DebugSurf()
     agents.append(ACagent.ACAgent(model, "red",  "random", red_debug_surf))
     for i in range(red_player_count - 1):
-        agents.append(retardedagent.RetardedAgent())
+        agents.append(randomagent.RandomAgent())
     # Blue agents
     agents.append(humanagent.HumanAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'u'), disp))
     blue_debug_surf = movedisplayer.DebugSurf()
     #agents.append(ACagent.ACAgent(model0, "blue", "random", blue_debug_surf))
     for i in range(blue_player_count - 1):
-        agents.append(retardedagent.RetardedAgent())
+        agents.append(randomagent.RandomAgent())
 
 
     # Initialise the game simulator

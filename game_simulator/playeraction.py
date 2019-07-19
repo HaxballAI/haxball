@@ -92,5 +92,6 @@ class Action:
         else:
             return Action(((self.dir_idx + 3) % 8) + 1, self.kicking)
 
-def getRandomAction():
-    return Action(random.randint(9), random.randint(1))
+    @staticmethod
+    def randomAction():
+        return Action(random.randint(9), random.randint(1))

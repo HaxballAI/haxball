@@ -25,16 +25,16 @@ def cuttosize(x,batch):
 
 def learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate, batch_size):
 
-    movecriterion = torch.nn.CrossEntropyLoss(reduction='mean')
-    kickcriterion = torch.nn.BCELoss(size_average=True)
-    wincriterion = torch.nn.BCELoss(size_average=True)
+    movecriterion = torch.nn.CrossEntropyLoss(reduction = 'mean')
+    kickcriterion = torch.nn.BCELoss(size_average = True)
+    wincriterion = torch.nn.MSELoss(size_average = True)
     loser_moves = cuttosize(action_data[0][0], batch_size)
     loser_kicks = cuttosize(action_data[0][1], batch_size)
     winner_moves = cuttosize(action_data[1][0], batch_size)
     winner_kicks = cuttosize(action_data[1][1], batch_size)
     true_move =[torch.LongTensor(loser_moves).view(-1,batch_size), torch.LongTensor(winner_moves).view(-1,batch_size)]
     true_kick = [torch.FloatTensor(loser_kicks).view(-1,batch_size), torch.FloatTensor(winner_kicks).view(-1,batch_size)]
-    optimiser = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    optimiser = torch.optim.Adam(model.parameters(), lr = learning_rate)
 
     for t in range(epochs):
         runningloss = 0
@@ -60,7 +60,7 @@ def learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate,
             if i % 100 == 99:
                 print(f"Loss for iteration {t:02}, {i * batch_size:06}/{len(winner_moves) * 9 // 10:06}: {float(runningloss) / (batch_size *100):.5f}")
                 runningloss = 0
-        #Validate
+        # Validate
         with torch.no_grad():
             runningloss = 0
             j = 0
@@ -71,7 +71,7 @@ def learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate,
                     # Compute and print loss
                     loss = movecriterion(moveprob, torch.LongTensor(true_move[k][i]))
                     loss += kickcriterion(kickprob, true_kick[k][i])
-                    loss += wincriterion(winprob, torch.FloatTensor(np.repeat(k,batch_size)))
+                    loss += wincriterion(winprob, torch.FloatTensor(np.repeat( (k * 2) - 1,batch_size)))
                     j += 1
                     runningloss += loss
             print("validation loss: " + str(2 * runningloss / (j*batch_size)))
