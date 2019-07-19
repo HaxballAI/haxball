@@ -16,7 +16,6 @@ import torch
 
 def main():
     model = torch.load("models/train2.model")
-    model0 = torch.load("models/sebNet.model")
 
     # Intialise the graphical interface of the game
     #disp = basicdisplayer.GameWindow(gp.windowwidth, gp.windowheight)
@@ -35,9 +34,9 @@ def main():
     for i in range(red_player_count - 1):
         agents.append(randomagent.RandomAgent())
     # Blue agents
-    agents.append(humanagent.HumanAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'u'), disp))
+    #agents.append(humanagent.HumanAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'u'), disp))
     blue_debug_surf = movedisplayer.DebugSurf()
-    #agents.append(ACagent.ACAgent(model0, "blue", "random", blue_debug_surf))
+    agents.append(ACagent.ACAgent(model, "blue", "random", blue_debug_surf))
     for i in range(blue_player_count - 1):
         agents.append(randomagent.RandomAgent())
 
