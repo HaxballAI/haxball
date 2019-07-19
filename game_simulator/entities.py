@@ -55,7 +55,7 @@ class Player(Entity):
             self.pos = np.array([gameparams.pitchcornerx + (np.random.random_sample())*580, gameparams.pitchcornery + (np.random.random_sample())*200]).astype(float)
         elif "default" in reset_params:
             self.pos = self.default_position
-		
+
         self.vel = np.zeros(2)
 
         # Set the action to default action state
@@ -99,4 +99,3 @@ class CentreCircleBlock(Entity):
     def __init__(self, initial_position, initial_velocity = np.zeros(2), initial_acceleration = np.zeros(2)):
         # Initialise positional parameters, basic properties of the object
         Entity.__init__(self, initial_position, initial_velocity, initial_acceleration, gameparams.centrecircleradius, 0)
-
