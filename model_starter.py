@@ -65,7 +65,7 @@ def getData(data_dir, game_number):
 # BE IN FORMAT OF A FILE OF GAME LOGS INDEXED BY NUMBER
 def newNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size):
     data_tensor, action_data = getData(data_dir, game_number)
-    model = GregPolicy()
+    model = network.GregPolicy()
     learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate, batch_size)
     torch.save(model, "models/" + net_name + ".model")
 

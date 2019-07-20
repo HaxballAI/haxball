@@ -19,7 +19,7 @@ class Policy(torch.nn.Module):
 
 class GregPolicy(torch.nn.Module):
     def __init__(self, D_hid = 80):
-        super(Policy, self).__init__()
+        super(GregPolicy, self).__init__()
         self.affine_actor = torch.nn.Linear(12, D_hid)
         self.affine_critic = torch.nn.Linear(12, D_hid)
         self.move_head = torch.nn.Linear(D_hid, 9)
