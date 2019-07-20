@@ -14,16 +14,13 @@ class ACAgent():
         self.debug_surf = debug_surf
 
     def getAction(self, frame):
-        movepred, kickpred , win_prob = self.network(torch.FloatTensor(frame.posToNp(self.team)))
+        actionpred, win_prob = self.network(torch.FloatTensor(frame.posToNp(self.team)))
         if self.method == "random":
-            move = np.random.choice(len(movepred), p = movepred.detach().numpy() )
+            action = playeraction.Action(np.random.choice(len(actionpred), p = actionpred.detach().numpy()))
         elif self.method == "max":
-            move = int(np.argmax(movepred.detach().numpy()))
+            action = playeraction.Action(int(np.argmax(actionpred.detach().numpy())))
         else:
             raise ValueError
-        p_kick = float(kickpred[0])
-        kick = np.random.choice([False, True], p = [1 - p_kick, p_kick])
-        action = playeraction.Action(move, kick)
         if self.team == "red":
             pass
         elif self.team == "blue":
@@ -32,10 +29,10 @@ class ACAgent():
             raise ValueError
         if self.debug_surf:
             if self.team == "red":
-                move_probs = movepred.detach().numpy()
+                action_probs = actionpred.detach().numpy()
             elif self.team == "blue":
-                move_probs = movepred.detach().numpy()[[0,5,6,7,8,1,2,3,4]]
+                action_probs = actionpred.detach().numpy()[[0,5,6,7,8,1,2,3,4]]
             else:
                 raise ValueError
-            self.debug_surf.drawMove(move_probs, action.dir_idx, self.team, float(win_prob)) #TODO: Pass win_prob in here
+            self.debug_surf.drawMove([(x + y) / 2 for x, y in zip(*([action_probs] * 2))], action.dir_idx, self.team, float(win_prob))
         return action

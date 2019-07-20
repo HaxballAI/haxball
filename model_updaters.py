@@ -15,7 +15,7 @@ from collections import namedtuple
 
 #data_tensor should be of the form torch.FloatTensor([[loserframes],[winnerframes]])
 #each loserframe, winnerframe should be flattened and [loserframes], [winnerframes]
-#action_data should be of the form [[[losermoves],[loserkicks]],[[winnermoves],[winnerkicks]]]
+#action_data should be of the form [[loseractions],[winneractions]]
 def cuttosize(x,batch):
     if len(x) % batch == 0:
         return x
@@ -25,30 +25,25 @@ def cuttosize(x,batch):
 
 def learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate, batch_size):
 
-    movecriterion = torch.nn.CrossEntropyLoss(reduction = 'mean')
-    kickcriterion = torch.nn.BCELoss(size_average = True)
+    actioncriterion = torch.nn.CrossEntropyLoss(reduction = 'mean')
     wincriterion = torch.nn.MSELoss(size_average = True)
-    loser_moves = cuttosize(action_data[0][0], batch_size)
-    loser_kicks = cuttosize(action_data[0][1], batch_size)
-    winner_moves = cuttosize(action_data[1][0], batch_size)
-    winner_kicks = cuttosize(action_data[1][1], batch_size)
-    true_move =[torch.LongTensor(loser_moves).view(-1,batch_size), torch.LongTensor(winner_moves).view(-1,batch_size)]
-    true_kick = [torch.FloatTensor(loser_kicks).view(-1,batch_size), torch.FloatTensor(winner_kicks).view(-1,batch_size)]
+    loser_actions = cuttosize(action_data[0], batch_size)
+    winner_actions = cuttosize(action_data[1], batch_size)
+    true_action = [torch.LongTensor(loser_actions).view(-1,batch_size), torch.LongTensor(winner_actions).view(-1,batch_size)]
     optimiser = torch.optim.Adam(model.parameters(), lr = learning_rate)
 
     for t in range(epochs):
         runningloss = 0
         # Train
 
-        for i in range((len(loser_moves) * 9) // (batch_size*10)):
+        for i in range((len(loser_actions) * 9) // (batch_size * 10)): # TODO: Figure out why the 9 is needed to stop it crashing not 18
             for k in range(2):
                 # Forward pass: Compute predicted y by passing x to the model
 
-                moveprob, kickprob, winprob = model(data_tensor[k][batch_size * i : batch_size * (i + 1)])
+                actionprob, winprob = model(data_tensor[k][batch_size * i : batch_size * (i + 1)])
                 # Compute and print loss
 
-                loss = movecriterion(moveprob , true_move[k][i]) \
-                     + kickcriterion(kickprob, true_kick[k][i]) \
+                loss = actioncriterion(actionprob , true_action[k][i]) \
                      #+ wincriterion(winprob, torch.FloatTensor(np.repeat(k,batch_size)))
                 runningloss += loss
                 # Zero gradients, perform a backward pass, and update the weights.
@@ -58,19 +53,18 @@ def learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate,
                 optimiser.step()
 
             if i % 100 == 99:
-                print(f"Loss for iteration {t:02}, {i * batch_size:06}/{len(winner_moves) * 9 // 10:06}: {float(runningloss) / (batch_size *100):.5f}")
+                print(f"Loss for iteration {t:02}, {i * batch_size:06}/{len(winner_actions) * 9 // 10:06}: {float(runningloss) / (batch_size *100):.5f}")
                 runningloss = 0
         # Validate
         with torch.no_grad():
             runningloss = 0
             j = 0
-            for i in range((len(loser_moves) * 9) // (batch_size*10), len(loser_moves) // batch_size):
+            for i in range((len(loser_actions) * 9) // (batch_size * 10), len(loser_actions) // batch_size):
                 for k in range(2):
                     # Forward pass: Compute predicted y by passing x to the model
-                    moveprob, kickprob, winprob = model(data_tensor[k][batch_size * i : batch_size * (i + 1)])
+                    actionprob, winprob = model(data_tensor[k][batch_size * i : batch_size * (i + 1)])
                     # Compute and print loss
-                    loss = movecriterion(moveprob, torch.LongTensor(true_move[k][i]))
-                    loss += kickcriterion(kickprob, true_kick[k][i])
+                    loss = actioncriterion(actionprob, torch.LongTensor(true_action[k][i]))
                     loss += wincriterion(winprob, torch.FloatTensor(np.repeat( (k * 2) - 1,batch_size)))
                     j += 1
                     runningloss += loss
@@ -86,23 +80,17 @@ def select_action(model, state, red_action_list, blue_action_list):
     red_state = state.posToNp("red" , 0)
     blue_state = state.posToNp("blue" , 0)
     # Gets the actions
-    red_move_probs, red_kick_prob, red_state_value = model( torch.FloatTensor(red_state) )
-    blue_move_probs, blue_kick_prob, blue_state_value = model( torch.FloatTensor(blue_state) )
-    # Make distributions for kicking and moves
-    blue_m = Categorical(blue_move_probs)
-    red_m = Categorical(red_move_probs)
-    blue_k = Categorical(torch.cat((blue_kick_prob, 1 - blue_kick_prob)))
-    red_k = Categorical(torch.cat((red_kick_prob, 1 - red_kick_prob)))
+    red_action_probs, red_state_value = model( torch.FloatTensor(red_state) )
+    blue_action_probs, blue_state_value = model( torch.FloatTensor(blue_state) )
+    # Make distributions for actions
+    blue_a = Categorical(blue_action_probs)
+    red_a = Categorical(red_action_probs)
     # Samples said distributions for actual actions
-    red_action = (red_m.sample(), red_k.sample())
-    blue_action = (blue_m.sample(), blue_k.sample())
+    red_action = red_a.sample()
+    blue_action = blue_a.sample()
     # Append actions
-    red_action_list.append(SavedAction((red_m.log_prob(red_action[0])
-                                        , red_k.log_prob(red_action[1])),
-                                        red_state_value))
-    blue_action_list.append(SavedAction((blue_m.log_prob(blue_action[0])
-                                        , blue_k.log_prob(blue_action[1])),
-                                        blue_state_value))
+    red_action_list.append(SavedAction(red_a.log_prob(red_action), red_state_value))
+    blue_action_list.append(SavedAction(blue_a.log_prob(blue_action), blue_state_value))
     # Finally, reverse action for blue.
     return red_action, utils.reverseAction(blue_action)
 

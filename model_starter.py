@@ -16,21 +16,21 @@ def getData(data_dir, game_number):
         game = l.Game.load(data_dir + "/" + str(g))
         if game.blue_goals == 0:
             assert game.red_goals == 1
-            winf, wina = game.toNp("red" , 0)
+            winf, wina = game.toNp("red", 0, False)
             winner_frames.append(winf)
             winner_actions.append(wina)
 
-            losf, losa = game.toNp("blue" , 0)
+            losf, losa = game.toNp("blue", 0, False)
             loser_frames.append(losf)
             loser_actions.append(losa)
 
         elif game.red_goals == 0:
             assert game.blue_goals == 1
-            winf, wina = game.toNp("blue" , 0)
+            winf, wina = game.toNp("blue", 0, False)
             winner_frames.append(winf)
             winner_actions.append(wina)
 
-            losf, losa = game.toNp("red" , 0)
+            losf, losa = game.toNp("red", 0, False)
             loser_frames.append(losf)
             loser_actions.append(losa)
 
