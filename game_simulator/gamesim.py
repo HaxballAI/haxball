@@ -3,6 +3,7 @@ from game_simulator.gamesimengine import GameSimEngine
 from game_log import log
 
 import numpy as np
+import time
 
 class GameSim(GameSimEngine):
     def __init__(self, red_player_count, blue_player_count, ball_count, extraParams = {}, seed = -1):
@@ -69,3 +70,19 @@ class GameSim(GameSimEngine):
             self.getFeedback()
 
         return
+
+    def run(self, disp, agents):
+        while True:
+            # Query each agent on what commands should be sent to the game simulator
+            self.giveCommands([a.getAction(self.log()) for a in agents])
+
+            self.step()
+
+            # Update the graphical interface canvas
+            disp.drawFrame(self.log())
+
+            disp.getInput()
+
+            if disp.rip:
+                disp.shutdown()
+                break

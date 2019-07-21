@@ -3,24 +3,23 @@ from pygame import gfxdraw
 from game_simulator import gameparams as gp
 
 class GameWindow:
-    def __init__(self, winWidth, winHeight, fps = 60):
+    def __init__(self, winWidth, winHeight, fps = 60, debug_surfs = []):
         self.height = winHeight
         self.width = winWidth
 
         self.clock = pygame.time.Clock()
         self.fps = fps
 
+        self.debug_surfs = debug_surfs
+
         self.rip = False
 
         pygame.init()
 
-        # Keys that are currently pressed down
-        self.pressed_keys = pygame.key.get_pressed()
-
         self.win = pygame.display.set_mode( (self.width, self.height ) )
         pygame.display.set_caption( "TEST DISPLAY" )
 
-    def drawFrame(self, frame, debug_surfs = []):
+    def drawFrame(self, frame):
         self.win.fill( (0, 0, 0 ) )
         # draws background
         pygame.draw.rect(self.win, gp.bordercolour, (0, 0, gp.windowwidth, gp.windowheight))
@@ -87,7 +86,7 @@ class GameWindow:
             pygame.gfxdraw.aacircle(self.win, int(b.x), int(b.y), gp.ballradius, (255, 255, 255))
 
         debug_pos = gp.windowwidth
-        for s in debug_surfs:
+        for s in self.debug_surfs:
             # Add the debug thing
             self.win.blit(s, (debug_pos, 0))
             debug_pos += s.get_width()
@@ -102,38 +101,34 @@ class GameWindow:
             if event.type == pygame.QUIT:
                 self.rip = True
 
-    def updateKeys(self):
-        # Updates the keys that are being pressed down
-        self.pressed_keys = pygame.key.get_pressed()
-
     def isKeyPressed(self, key, is_int = False):
         # Checks whether a key is being pressed, input is a char or an int.
-        # self.keys needs to be updated beforehand.
+        pressed_keys = pygame.key.get_pressed()
         if is_int == False:
             if key == 'UP':
-                return self.pressed_keys[273]
+                return pressed_keys[273]
             elif key == 'RIGHT':
-                return self.pressed_keys[275]
+                return pressed_keys[275]
             elif key == 'DOWN':
-                return self.pressed_keys[274]
+                return pressed_keys[274]
             elif key == 'LEFT':
-                return self.pressed_keys[276]
+                return pressed_keys[276]
             elif key == 'LALT':
-                return self.pressed_keys[308]
+                return pressed_keys[308]
             elif key == 'RALT':
-                return self.pressed_keys[307]
+                return pressed_keys[307]
             elif key == 'LCTRL':
-                return self.pressed_keys[306]
+                return pressed_keys[306]
             elif key == 'RCTRL':
-                return self.pressed_keys[305]
+                return pressed_keys[305]
             elif key == 'LSHIFT':
-                return self.pressed_keys[304]
+                return pressed_keys[304]
             elif key == 'RSHIFT':
-                return self.pressed_keys[303]
+                return pressed_keys[303]
             else:
-                return self.pressed_keys[ord(key)]
+                return pressed_keys[ord(key)]
         else:
-            return self.pressed_keys[key]
+            return pressed_keys[key]
 
     def shutdown(self):
         pygame.quit()
