@@ -43,7 +43,7 @@ def main():
 
     # Initialise the game simulator
     game = gamesim.GameSim(red_player_count, blue_player_count, ball_count,
-                           {"printDebug" : True, "auto score" : True})
+                           printDebug = True, auto_score = True)
     game.run(disp, agents)
 
 if __name__ == "__main__":

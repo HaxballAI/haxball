@@ -5,7 +5,7 @@ from game_simulator import playeraction
 import numpy as np
 
 class GameSimEngine():
-    def __init__(self, red_player_count, blue_player_count, ball_count, extraParams = {}, seed = -1):
+    def __init__(self, red_player_count, blue_player_count, ball_count, enforce_kickoff = False, seed = -1):
         # Intialise the entities
         self.reds = [entities.Player("red", self.getRandomPositionInThePlayingField()) for i in range(red_player_count)]
         self.blues = [entities.Player("blue", self.getRandomPositionInThePlayingField()) for i in range(blue_player_count)]
@@ -39,15 +39,7 @@ class GameSimEngine():
 
         # Sets extra information to do with. Probably a convention that I am
         # not following here.
-        if "auto score" in extraParams:
-            self.auto_score = extraParams["auto score"]
-        else:
-            self.auto_score = False
-
-        if "enforce kickoff" in extraParams:
-            self.enforce_kickoff = extraParams["enforce kickoff"]
-        else:
-            self.enforce_kickoff = False
+        self.enforce_kickoff = enforce_kickoff
 
     def getRandomPositionInThePlayingField(self):
         return np.array([gameparams.pitchcornerx + np.random.random_sample() * 580, gameparams.pitchcornery + np.random.random_sample() * 200]).astype(float)

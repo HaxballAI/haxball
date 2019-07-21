@@ -6,20 +6,13 @@ import numpy as np
 import time
 
 class GameSim(GameSimEngine):
-    def __init__(self, red_player_count, blue_player_count, ball_count, extraParams = {}, seed = -1):
-        GameSimEngine.__init__(self, red_player_count, blue_player_count, ball_count, extraParams, seed)
+    def __init__(self, red_player_count, blue_player_count, ball_count, printDebug = False, printDebugFreq = 600, auto_score = False, enforce_kickoff = False, seed = -1):
+        GameSimEngine.__init__(self, red_player_count, blue_player_count, ball_count, auto_score, seed)
 
         # Sets extra information to do with. Probably a convention that I am
-        # not following here.
-        if "printDebug" in extraParams:
-            self.printDebug = extraParams["printDebug"]
-        else:
-            self.printDebug = False
-
-        if "printDebugFreq" in extraParams:
-            self.printDebugFreq = extraParams["printDebugFreq"]
-        else:
-            self.printDebugFreq = 600
+        self.printDebug = printDebug
+        self.printDebugFreq = printDebugFreq
+        self.auto_score = auto_score
 
     def getFeedback(self):
         # Gives feedback about the state of the game
