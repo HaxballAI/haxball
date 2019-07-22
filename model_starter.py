@@ -7,8 +7,7 @@ from model_updaters import learnFromPlayedGames
 import model_updaters
 import network
 
-def getData(data_dir, game_number):
-    normalise = False
+def getData(data_dir, game_number, normalise = False):
     loser_frames = []
     winner_frames = []
     loser_actions = []
@@ -43,6 +42,7 @@ def getData(data_dir, game_number):
     loser_actions = np.concatenate(loser_actions)
     winner_actions = np.concatenate(winner_actions)
 
+
     assert len(loser_frames) == len(loser_actions)
     p = np.random.permutation(len(loser_frames))
     loser_frames = loser_frames[p]
@@ -55,6 +55,8 @@ def getData(data_dir, game_number):
 
     print("Data shuffled.")
 
+
+
     loser_actions = np.transpose(loser_actions)
     winner_actions = np.transpose(winner_actions)
 
@@ -64,19 +66,19 @@ def getData(data_dir, game_number):
 
 # MAKE AND TRAINS A NEW NETWORK BASED ON DATA GIVEN BY DATA_DIR WHICH HAS TO
 # BE IN FORMAT OF A FILE OF GAME LOGS INDEXED BY NUMBER
-def newNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size):
-    data_tensor, action_data = getData(data_dir, game_number)
+def newNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size, normalise = True):
+    data_tensor, action_data = getData(data_dir, game_number, normalise)
     model = network.GregPolicy()
     learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate, batch_size)
     torch.save(model, "models/" + net_name + ".model")
 
 # IMPROVED THE NETWORK GIVEN BY NET_NAME
-def improveNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size):
-    data_tensor, action_data = getData(data_dir, game_number)
+def improveNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size, normalise = True):
+    data_tensor, action_data = getData(data_dir, game_number, normalise)
     model = torch.load(f"models/{net_name}.model")
     learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate, batch_size)
     torch.save(model, f"models/{net_name}.model")
 
 
 if __name__ == "__main__":
-    newNet("gregNet", "sebgames", 100, 3, 1e-2, 32)
+    newNet("gregNet", "sebgames", 100, 2, 1e-3, 32, True)
