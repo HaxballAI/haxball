@@ -14,7 +14,7 @@ class ACAgent():
         self.debug_surf = debug_surf
 
     def getAction(self, frame):
-        movepred, kickpred , win_prob = self.network(torch.FloatTensor(frame.posToNp(self.team)))
+        movepred, kickpred , win_prob = self.network(torch.FloatTensor(frame.posToNp(self.team, 0, False)))
         if self.method == "random":
             move = np.random.choice(len(movepred), p = movepred.detach().numpy() )
         elif self.method == "max":
