@@ -7,14 +7,19 @@ import torch
 
 class ACAgent():
     # Agent that works off of a actor-critic model
-    def __init__(self, network, team, method = "random", debug_surf = None):
+    def __init__(self, network, team, method = "random", debug_surf = None, accepts_normalised = False):
         self.network = network
         self.team = team
         self.method = method
         self.debug_surf = debug_surf
+        self.accepts_normalised = accepts_normalised
 
     def getAction(self, frame):
-        movepred, kickpred , win_prob = self.network(torch.FloatTensor(frame.posToNp(self.team, 0, False)))
+        if self.accepts_normalised == True:
+            movepred, kickpred , win_prob = self.network(torch.FloatTensor(frame.posToNp(self.team, 0, True)))
+        else:
+            movepred, kickpred , win_prob = self.network(torch.FloatTensor(frame.posToNp(self.team, 0, False)))
+
         if self.method == "random":
             move = np.random.choice(len(movepred), p = movepred.detach().numpy() )
         elif self.method == "max":
