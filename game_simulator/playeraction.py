@@ -78,8 +78,7 @@ class Action:
     def rawAction(self):
         # Returns raw action for use in networks. A tuple of the kicking state (0 or 1)
         # and movement direction (from 0 to 8)
-        return self.kicking, self.dir_idx
-
+        return  self.dir_idx, self.kicking
     def binaryAction(self):
         return rawToBinary(self.dir_idx, self.kicking)
 

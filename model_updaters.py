@@ -49,7 +49,18 @@ def learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate,
 
                 loss = movecriterion(moveprob , true_move[k][i]) \
                      + kickcriterion(kickprob, true_kick[k][i]) \
-                     #+ wincriterion(winprob, torch.FloatTensor(np.repeat(k,batch_size)))
+                     + wincriterion(winprob, torch.FloatTensor(np.repeat(k,batch_size)))
+                if loss < 0:
+                    print("Negative loss!")
+                    print("Kickprobs:")
+                    print(kickprob)
+                    print("True kick:")
+                    print(true_kick[k][i])
+                    print("Kickcrieterion:")
+                    print(kickcriterion(kickprob, true_kick[k][i]))
+                    print("True move:")
+                    print(true_move[k][i])
+                    raise ValueError
                 runningloss += loss
                 # Zero gradients, perform a backward pass, and update the weights.
 

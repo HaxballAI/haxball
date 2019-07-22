@@ -8,6 +8,7 @@ import model_updaters
 import network
 
 def getData(data_dir, game_number):
+    normalise = False
     loser_frames = []
     winner_frames = []
     loser_actions = []
@@ -16,21 +17,21 @@ def getData(data_dir, game_number):
         game = l.Game.load(data_dir + "/" + str(g))
         if game.blue_goals == 0:
             assert game.red_goals == 1
-            winf, wina = game.toNp("red" , 0)
+            winf, wina = game.toNp("red" , 0, normalise)
             winner_frames.append(winf)
             winner_actions.append(wina)
 
-            losf, losa = game.toNp("blue" , 0)
+            losf, losa = game.toNp("blue" , 0, normalise)
             loser_frames.append(losf)
             loser_actions.append(losa)
 
         elif game.red_goals == 0:
             assert game.blue_goals == 1
-            winf, wina = game.toNp("blue" , 0)
+            winf, wina = game.toNp("blue" , 0, normalise)
             winner_frames.append(winf)
             winner_actions.append(wina)
 
-            losf, losa = game.toNp("red" , 0)
+            losf, losa = game.toNp("red" , 0, normalise)
             loser_frames.append(losf)
             loser_actions.append(losa)
 
@@ -78,4 +79,4 @@ def improveNet(net_name, data_dir, game_number, epochs, learning_rate, batch_siz
 
 
 if __name__ == "__main__":
-    newNet("gregNet", "sebgames", 100, 3, 1e-3, 32)
+    newNet("gregNet", "sebgames", 100, 3, 1e-2, 32)
