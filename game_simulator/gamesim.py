@@ -7,7 +7,7 @@ import time
 
 class GameSim(GameSimEngine):
     def __init__(self, red_player_count, blue_player_count, ball_count, printDebug = False, printDebugFreq = 600, auto_score = False, enforce_kickoff = False, seed = -1):
-        GameSimEngine.__init__(self, red_player_count, blue_player_count, ball_count, auto_score, seed)
+        GameSimEngine.__init__(self, red_player_count, blue_player_count, ball_count, enforce_kickoff, seed)
 
         # Sets extra information to do with. Probably a convention that I am
         self.printDebug = printDebug
