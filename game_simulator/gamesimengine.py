@@ -158,23 +158,24 @@ class GameSimEngine():
         # Handle ALL the collision in the sim, including borders, entities etc.
 
         # blocks the players that aren't kicking off from entering the centre/other half
-        if self.has_the_game_been_kicked_off == False:
-            if self.red_last_goal == True:
-                for i in range(len(self.reds)):
-                    player = self.reds[i]
-                    if player.pos[0] >= gameparams.windowwidth // 2 - player.radius:
-                        player.vel[0] = 0
-                        player.pos[0] = gameparams.windowwidth // 2 - player.radius
+        if self.enforce_kickoff:
+            if self.has_the_game_been_kicked_off == False:
+                if self.red_last_goal == True:
+                    for i in range(len(self.reds)):
+                        player = self.reds[i]
+                        if player.pos[0] >= gameparams.windowwidth // 2 - player.radius:
+                            player.vel[0] = 0
+                            player.pos[0] = gameparams.windowwidth // 2 - player.radius
 
-                    self.keepOutOfCentre(self.reds[i])
-            else:
-                for i in range(len(self.blues)):
-                    player = self.blues[i]
-                    if player.pos[0] <= gameparams.windowwidth // 2 + player.radius:
-                        player.vel[0] = 0
-                        player.pos[0] = gameparams.windowwidth // 2 + player.radius
+                        self.keepOutOfCentre(self.reds[i])
+                else:
+                    for i in range(len(self.blues)):
+                        player = self.blues[i]
+                        if player.pos[0] <= gameparams.windowwidth // 2 + player.radius:
+                            player.vel[0] = 0
+                            player.pos[0] = gameparams.windowwidth // 2 + player.radius
 
-                    self.keepOutOfCentre(self.blues[i])
+                        self.keepOutOfCentre(self.blues[i])
 
         # Keep all the players within the playing field
         for player in self.players:
