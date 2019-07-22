@@ -84,7 +84,7 @@ class Action:
         return rawToBinary(self.dir_idx, self.kicking)
 
     def singleAction(self):
-        return (self.dir_idx << 1) & self.kicking
+        return (self.dir_idx << 1) | self.kicking
 
     def flipped(self):
         if self.dir_idx == 0:
