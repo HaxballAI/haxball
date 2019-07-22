@@ -15,7 +15,7 @@ import numpy as np
 import torch
 
 def main():
-    model = torch.load("models/sebNet2.model")
+    model = torch.load("models/gregNet2.model")
 
     # Intialise the graphical interface of the game
     red_debug_surf = movedisplayer.DebugSurf()
@@ -31,12 +31,12 @@ def main():
     agents = []
     # Red agents
     #agents.append(humanagent.HumanAgent(('w', 'd', 's', 'a', 'LSHIFT'), disp))
-    agents.append(ACagent.ACAgent(model, "red",  "random", red_debug_surf))
+    agents.append(ACagent.ACAgent(model, "red",  "random", red_debug_surf, True))
     for i in range(red_player_count - 1):
         agents.append(randomagent.RandomAgent())
     # Blue agents
     #agents.append(humanagent.HumanAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'u'), disp))
-    agents.append(ACagent.ACAgent(model, "blue", "random", blue_debug_surf))
+    agents.append(ACagent.ACAgent(model, "blue", "random", blue_debug_surf, True))
     for i in range(blue_player_count - 1):
         agents.append(randomagent.RandomAgent())
 

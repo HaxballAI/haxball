@@ -6,6 +6,8 @@ import torch
 from model_updaters import learnFromPlayedGames
 import model_updaters
 import network
+import gym_haxball.onevoneenviroment
+import basic_trainers.actor_critic as ac_t
 
 def getData(data_dir, game_number, normalise = False):
     loser_frames = []
@@ -79,6 +81,15 @@ def improveNet(net_name, data_dir, game_number, epochs, learning_rate, batch_siz
     learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate, batch_size)
     torch.save(model, f"models/{net_name}.model")
 
+def envMaker():
+    return gym_haxball.onevoneenviroment.DuelEnviroment()
 
 if __name__ == "__main__":
-    newNet("gregNet", "sebgames", 100, 2, 1e-3, 32, True)
+    newNet("gregNet","sebgames",100,3,1e-3,32)
+    if False:
+        mod = torch.load("models/gregNet.model")
+        trainer = ac_t.TrainSession(mod, envMaker, 5, 100, 1e-3, 1- 1e-2)
+        for i in range(10):
+            print("Step " + str(i))
+            trainer.runStep()
+        torch.save(mod, "models/gregNet2.model")

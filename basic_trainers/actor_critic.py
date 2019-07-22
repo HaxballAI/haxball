@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from torch.distributions import Categoricals
+from torch.distributions import Categorical
 import utils
 
 
@@ -30,9 +30,9 @@ class Game:
         # Gets the action based off the state, updates the value and
         # action lists accordingly.
         if is_red:
-            move_probs, kick_prob, value = self.model( state.posToNp("red", 0, self.is_norming) )
+            move_probs, kick_prob, value = self.model( torch.FloatTensor(state.posToNp("red", 0, self.is_norming) ))
         else:
-            move_probs, kick_prob, value = self.model( state.posToNp("blue", 0, self.is_norming) )
+            move_probs, kick_prob, value = self.model( torch.FloatTensor(state.posToNp("blue", 0, self.is_norming) ))
         move_dist = Categorical(move_probs)
         kick_dist = Categorical(torch.cat((kick_prob, 1 - kick_prob)))
         action = (move_dist.sample(),  kick_dist.sample())
@@ -59,10 +59,10 @@ class Game:
 
         for t in range(self.batch_size):
             # Gets actions
-            r_act = self.getAction(self, state, True)
-            b_act = self.getAction(self, state, False)
+            r_act = self.getAction(self.state, True)
+            b_act = self.getAction(self.state, False)
             # Completes a step
-            self.state , rewards, self.done, _ = env.step(r_act, b_act)
+            self.state , rewards, self.done, _ = self.env.step(r_act, b_act)
             # Updates rewards
             self.r_rewards.append(rewards[0])
             self.b_rewards.append(rewards[1])
@@ -93,37 +93,82 @@ class Game:
             return (r_run, b_run)
         else:
             # Otherwise, bootstraps using the predicted value of last frame.
-            r_run = self.makeDecayingReward(self.r_rewards[:-1], self.r_values[-1])
-            b_run = self.makeDecayingReward(self.b_rewards[:-1], self.b_values[-1])
+            print(self.r_values[-1])
+            r_final = torch.Tensor.detach(self.r_values[-1])
+            b_final = torch.Tensor.detach(self.b_values[-1])
+            print(r_final)
+            r_run = self.makeDecayingReward(self.r_rewards[:-1], r_final)
+            b_run = self.makeDecayingReward(self.b_rewards[:-1], b_final)
             return (r_run, b_run)
 
     def collectData(self):
         # gives the data for the current session
         r_run, b_run = self.getRunningRewards()
         if self.done:
-            return ((r_action_list, r_values, r_run) , (b_action_list, b_values, b_run))
+            return ((self.r_action_list, self.r_values, r_run) , \
+                    (self.b_action_list, self.b_values, b_run))
         else:
             # If not done, omit the last elements.
-            ((r_action_list[:-1], r_values[:-1], r_run) , (b_action_list[:-1], b_values[:-1], b_run))
+            return ((self.r_action_list[:-1], self.r_values[:-1], r_run) , \
+                    (self.b_action_list[:-1], self.b_values[:-1], b_run))
 
     def cleanData(self):
         # Cleans the data, getting ready for a new session of collection.
         if self.done:
             # Delets all rewards, actions, and values.
-            del r_action_list[:]
-            del r_values[:]
-            del r_rewards[:]
-            del b_action_list[:]
-            del b_values[:]
-            del b_rewards[:]
+            del self.r_action_list[:]
+            del self.r_values[:]
+            del self.r_rewards[:]
+            del self.b_action_list[:]
+            del self.b_values[:]
+            del self.b_rewards[:]
             # Resets the enviroment.
-            self.state = env.reset()
+            self.state = self.env.reset()
             self.done = False
         else:
             # Otherwise, keep the last element to work off of.
-            del r_action_list[:-1]
-            del r_values[:-1]
-            del r_rewards[:-1]
-            del b_action_list[:-1]
-            del b_values[:-1]
-            del b_rewards[:-1]
+            del self.r_action_list[:-1]
+            del self.r_values[:-1]
+            del self.r_rewards[:-1]
+            del self.b_action_list[:-1]
+            del self.b_values[:-1]
+            del self.b_rewards[:-1]
+
+class TrainSession:
+    def __init__(self, model, env, worker_number, batch_size, learning_rate, gamma):
+        self.model = model
+        self.env = env
+        self.batch_size = batch_size
+        self.lr = learning_rate
+        self.gamma = gamma
+        self.workers = [Game(model, env(), batch_size, gamma) for k in range(worker_number)]
+        self.opt = torch.optim.Adam(self.model.parameters(), lr = self.lr )
+
+    def getData(self):
+        for w in self.workers:
+            w.runSession()
+
+    def cleanWorkers(self):
+        for w in self.workers:
+            w.cleanData()
+
+    def trainFromData(self, actions, values, rewards):
+        losses = []
+        for i in range(len(actions)):
+            advantage = rewards[i] - values[i]
+            losses.append( actions[i] * advantage )
+        self.opt.zero_grad()
+        loss = torch.stack(losses).sum() + torch.nn.functional.smooth_l1_loss(torch.tensor(values) , torch.tensor( rewards) )
+        loss.backward()
+        self.opt.step()
+
+    def trainFromWorkerData(self, worker):
+        r_data, b_data = worker.collectData()
+        self.trainFromData(*r_data)
+        self.trainFromData(*b_data)
+
+    def runStep(self):
+        self.getData()
+        for w in self.workers:
+            self.trainFromWorkerData(w)
+        self.cleanWorkers()
