@@ -1,4 +1,4 @@
-from game_simulator import gamesim, gameparams
+from game_simulator import gamesim, gameparams, playeraction
 from game_displayer import basicdisplayer
 
 import numpy as np
@@ -24,9 +24,10 @@ class DuelEnviroment:
     def step(self, red_action, blue_action):
         # advances the simulator by step_len number of steps. Returns a list of
         # [observation (object), reward (float), done (bool), info (dict)]
+        # Actions must be integeres in the range [0, 18)
         self.steps_since_reset += 1
 
-        self.game_sim.giveCommands( [red_action , blue_action ] )
+        self.game_sim.giveCommands( [playeraction.Action(red_action), playeraction.Action(blue_action) ] )
 
         for i in range(self.step_len):
             self.game_sim.step()
