@@ -34,17 +34,17 @@ class DuelEnviroment:
             goal = self.goalScored()
             # If a goal is scored return instantly
             if goal == 1:
-                return [self.getState(), 1.0, True, -1]
+                return [self.getState(), 1.0, True, {}]
             elif goal == -1:
-                return [self.getState(), -1.0, True, 1]
+                return [self.getState(), -1.0, True, {}]
 
         # If no goal consider it a tie.
         if self.steps_since_reset >= self.max_steps:
-            return [self.getState(), 0.0, True, 0]
+            return [self.getState(), 0.0, True, {}]
         else:
-            return [self.getState(), 0.0, False, 0]
+            return [self.getState(), 0.0, False, {}]
 
-    def render(self):
+    def render(self, mode):
         # If the display hasn't been created, create it
         if self.display == None:
             self.display = basicdisplayer.GameWindow(gameparams.windowwidth, gameparams.windowheight)
