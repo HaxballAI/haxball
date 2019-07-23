@@ -21,7 +21,8 @@ def main():
     red_debug_surf = movedisplayer.DebugSurf()
     blue_debug_surf = movedisplayer.DebugSurf()
     #disp = basicdisplayer.GameWindow(gp.windowwidth, gp.windowheight)
-    disp = basicdisplayer.GameWindow(gp.windowwidth + 2 * 256, gp.windowheight, debug_surfs = [red_debug_surf.surf, blue_debug_surf.surf])
+    disp = basicdisplayer.GameWindow(gp.windowwidth + 2 * 256, gp.windowheight,\
+                                     debug_surfs = [red_debug_surf.surf, blue_debug_surf.surf])
 
     red_player_count = 1
     blue_player_count = 1
