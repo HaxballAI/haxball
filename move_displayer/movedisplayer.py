@@ -31,6 +31,9 @@ class DebugSurf():
             else:
                 raise ValueError
             pygame.draw.rect(self.surf, colour, pygame.Rect(32, 256, (256 - 64) * win_prob, 16))
+            # Draw halfway line in dark colour 
+            if win_prob > 0.5:
+                pygame.draw.line(self.surf, colour, (128, 256 - 16), (128, 256), 3 )
             if team == "red":
                 colour = (255, 128, 128)
             elif team == "blue":
@@ -38,3 +41,6 @@ class DebugSurf():
             else:
                 raise ValueError
             pygame.draw.rect(self.surf, colour, pygame.Rect((256 - 64) * win_prob + 32, 256, (256 - 64) * (1 - win_prob), 16))
+            # Draws a halfway line of lighter colour if winprob is low
+            if win_prob <= 0.5:
+                pygame.draw.line(self.surf, colour, (128, 256 - 16), (128, 256), 3 )
