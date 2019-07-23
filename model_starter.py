@@ -104,21 +104,15 @@ def improveNet(net_name, data_dir, game_number, epochs, learning_rate, batch_siz
     learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate, batch_size)
     torch.save(model, f"models/{net_name}.model")
 
-def envMaker():
-    return gym_haxball.onevoneenviroment.DuelEnviroment()
+def envMaker(step_len):
+    return lambda :gym_haxball.onevoneenviroment.DuelEnviroment(step_len, 3000 / step_len)
 
 if __name__ == "__main__":
-    newNet("test_classifier_norm_noise","sebgames",100,3,1e-3,32, True, True)
-    if False:
-        mod = torch.load("models/init_nonoise.model")
-        trainer = ac_t.TrainSession(mod, envMaker, 5, 32, 1e-3, 1- 1e-1)
-        for i in range(100000):
+    # newNet("test_classifier","sebgames",100,3,1e-3,32, False, False)
+    if True:
+        mod = torch.load("models/trained_nonorm_v8.model")
+        trainer = ac_t.TrainSession(mod, envMaker(5), 15, 64, 1e-4, 1- 1e-2, False)
+        for i in range(30):
             print("Step " + str(i))
-            if i%100 == 0 and i > 100:
-                torch.save(mod, "models/trained_nonoise"+ str(i//10) + ".model")
-                print("Model saved!")
-            if i%10 == 0 and i < 100:
-                torch.save(mod, "models/trained_nonoise"+ str(i//10) + ".model")
-                print("Model saved!")
             trainer.runStep()
-        torch.save(mod, "models/trained_nonoise.model")
+        torch.save(mod, "models/trained_nonorm_v8_1.model")

@@ -68,7 +68,6 @@ class Game:
             self.b_rewards.append(rewards[1])
             # Breaks if done
             if self.done:
-                print("Game finished")
                 break
 
     def makeDecayingReward(self, l, x):
@@ -94,7 +93,6 @@ class Game:
             return (r_run, b_run)
         else:
             # Otherwise, bootstraps using the predicted value of last frame.
-            print("##Bootstrapping##")
             r_final = torch.Tensor.detach(self.r_values[-1])
             b_final = torch.Tensor.detach(self.b_values[-1])
             r_run = self.makeDecayingReward(self.r_rewards[:-1], r_final)
@@ -156,12 +154,7 @@ class TrainSession:
 
         advantage = [rewards[i] - torch.Tensor.detach(values[i]) for i in range(len(rewards))]
         losses = [actions[i] * advantage[i] for i in range(len(actions))]
-        loss = torch.stack(losses).sum() + torch.nn.functional.smooth_l1_loss(torch.FloatTensor(values) , torch.FloatTensor( rewards) )
-        if random.random() < 0.1:
-            print("Values:")
-            print(torch.FloatTensor(values) )
-            print("Reward:")
-            print(torch.FloatTensor( rewards) )
+        loss = torch.stack(losses).sum() + (10 * torch.nn.functional.smooth_l1_loss(torch.FloatTensor(values) , torch.FloatTensor( rewards) ))
         loss.backward()
 
 

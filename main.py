@@ -5,7 +5,7 @@ from game_displayer import basicdisplayer
 from move_displayer import movedisplayer
 from game_simulator import gameparams as gp
 from agents import ACagent
-from agents import humanagent
+from agents import humanACagent
 from agents import randomagent
 
 import pygame
@@ -15,7 +15,8 @@ import numpy as np
 import torch
 
 def main():
-    model = torch.load("models/gregNet2.model")
+    model_1 = torch.load("models/trained_nonorm_v6.model")
+    model_2 = torch.load("models/trained_nonorm_v8_1.model")
 
     # Intialise the graphical interface of the game
     red_debug_surf = movedisplayer.DebugSurf()
@@ -32,14 +33,15 @@ def main():
     agents = []
     # Red agents
     #agents.append(humanagent.HumanAgent(('w', 'd', 's', 'a', 'LSHIFT'), disp))
-    agents.append(ACagent.ACAgent(model, "red",  "random", red_debug_surf, True))
-    for i in range(red_player_count - 1):
-        agents.append(randomagent.RandomAgent())
+    agents.append(ACagent.ACAgent(model_2, "red",  "random", red_debug_surf, False))
+    # agents.append(randomagent.RandomAgent())
+
     # Blue agents
-    #agents.append(humanagent.HumanAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'u'), disp))
-    agents.append(ACagent.ACAgent(model, "blue", "random", blue_debug_surf, True))
-    for i in range(blue_player_count - 1):
-        agents.append(randomagent.RandomAgent())
+
+    blueA = ACagent.ACAgent(model_1, "blue", "random", blue_debug_surf, False)
+    agents.append(humanACagent.HumanACAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'u'), disp, blueA))
+    #agents.append(blueA)
+    # agents.append(randomagent.RandomAgent())
 
 
     # Initialise the game simulator
