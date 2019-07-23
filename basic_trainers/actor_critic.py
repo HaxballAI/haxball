@@ -2,16 +2,16 @@ import numpy as np
 import torch
 from torch.distributions import Categorical
 import utils
-
+import random
 
 # Class design to run the games, and play out batches of them
 class Game:
-    def __init__(self, model, env, batch_size, gamma):
+    def __init__(self, model, env, batch_size, gamma, is_norming):
         self.model = model
         self.env = env
         self.batch_size = batch_size
         self.gamma = gamma
-        self.is_norming = True
+        self.is_norming = is_norming
         # the action lists
         self.r_action_list = []
         self.b_action_list = []
@@ -68,6 +68,7 @@ class Game:
             self.b_rewards.append(rewards[1])
             # Breaks if done
             if self.done:
+                print("Game finished")
                 break
 
     def makeDecayingReward(self, l, x):
@@ -93,10 +94,9 @@ class Game:
             return (r_run, b_run)
         else:
             # Otherwise, bootstraps using the predicted value of last frame.
-            print(self.r_values[-1])
+            print("##Bootstrapping##")
             r_final = torch.Tensor.detach(self.r_values[-1])
             b_final = torch.Tensor.detach(self.b_values[-1])
-            print(r_final)
             r_run = self.makeDecayingReward(self.r_rewards[:-1], r_final)
             b_run = self.makeDecayingReward(self.b_rewards[:-1], b_final)
             return (r_run, b_run)
@@ -135,13 +135,13 @@ class Game:
             del self.b_rewards[:-1]
 
 class TrainSession:
-    def __init__(self, model, env, worker_number, batch_size, learning_rate, gamma):
+    def __init__(self, model, env, worker_number, batch_size, learning_rate, gamma, is_norming):
         self.model = model
         self.env = env
         self.batch_size = batch_size
         self.lr = learning_rate
         self.gamma = gamma
-        self.workers = [Game(model, env(), batch_size, gamma) for k in range(worker_number)]
+        self.workers = [Game(model, env(), batch_size, gamma, is_norming) for k in range(worker_number)]
         self.opt = torch.optim.Adam(self.model.parameters(), lr = self.lr )
 
     def getData(self):
@@ -153,14 +153,17 @@ class TrainSession:
             w.cleanData()
 
     def trainFromData(self, actions, values, rewards):
-        losses = []
-        for i in range(len(actions)):
-            advantage = rewards[i] - values[i]
-            losses.append( actions[i] * advantage )
-        self.opt.zero_grad()
+
+        advantage = [rewards[i] - torch.Tensor.detach(values[i]) for i in range(len(rewards))]
+        losses = [actions[i] * advantage[i] for i in range(len(actions))]
         loss = torch.stack(losses).sum() + torch.nn.functional.smooth_l1_loss(torch.FloatTensor(values) , torch.FloatTensor( rewards) )
+        if random.random() < 0.1:
+            print("Values:")
+            print(torch.FloatTensor(values) )
+            print("Reward:")
+            print(torch.FloatTensor( rewards) )
         loss.backward()
-        self.opt.step()
+
 
     def trainFromWorkerData(self, worker):
         r_data, b_data = worker.collectData()
@@ -169,6 +172,8 @@ class TrainSession:
 
     def runStep(self):
         self.getData()
+        self.opt.zero_grad()
         for w in self.workers:
             self.trainFromWorkerData(w)
+        self.opt.step()
         self.cleanWorkers()
