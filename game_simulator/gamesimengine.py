@@ -101,8 +101,6 @@ class GameSimEngine():
                     obj.pos[1] = movement_space_y[1] + (movement_space_y[1] - obj.pos[1]) / 2
 
     def makeEntityHitBall(self, obj, ball):
-        if self.printDebug:
-            print("HIT!!")
         # Updates the ball's velocity since a kick call was called from obj to ball
         ball.vel = ball.vel + gameparams.kickstrength * ball.inv_mass * obj.getDirectionTo(ball)
         return
