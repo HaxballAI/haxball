@@ -1,16 +1,36 @@
 from game_simulator import gamesim, gameparams, playeraction
 from game_displayer import basicdisplayer
 
+from gym import core, spaces
 import numpy as np
-import pygame
+import torch
 
-class DuelEnviroment:
-    def __init__(self, step_len = 15, max_steps = 400):
-        self.step_len = step_len
-        self.max_steps = max_steps
+class SingleplayerGym(core.Env):
+    def __init__(self, config):
+        if "step_length" in config:
+            self.step_len = config["step_length"]
+        else:
+            self.step_len = 7
 
-        self.game_sim = gamesim.GameSim(1,1,1)
-        self.game_sim.resetMap()
+        if "max_steps" in config:
+            self.max_steps = config["max_steps"]
+        else:
+            self.max_steps = 400
+
+        self.game_sim = gamesim.GameSim(1, 0, 1)
+        self.game_sim.resetMap("ball center, players random")
+
+        win_w = gameparams.windowwidth
+        win_h = gameparams.windowheight
+
+        self.action_space = spaces.Discrete(18)
+        self.observation_space = spaces.Box(
+           low = np.array([0.0, 0.0, -15.0, -15.0, 0.0, 0.0,
+                          -15.0, -15.0]),
+           high = np.array([win_w, win_h, 15.0, 15.0, win_w, win_h,
+                            15.0, 15.0]),
+            dtype = np.float32
+           )
 
         self.steps_since_reset = 0
 
@@ -21,26 +41,24 @@ class DuelEnviroment:
         # That's desired so the state is in an easier to manipulate form.
         return np.array(self.game_sim.log().posToNp("red"))
 
-    def step(self, red_action, blue_action):
+    def step(self, action_single):
         # advances the simulator by step_len number of steps. Returns a list of
         # [observation (object), reward (float), done (bool), info (dict)]
         # Actions must be integeres in the range [0, 18)
         self.steps_since_reset += 1
 
-        self.game_sim.giveCommands( [playeraction.Action(red_action), playeraction.Action(blue_action) ] )
+        self.game_sim.giveCommands([playeraction.Action(action_single)])
 
         for i in range(self.step_len):
             self.game_sim.step()
             goal = self.goalScored()
             # If a goal is scored return instantly
-            if goal == 1:
-                return [self.getState(), 1.0, True, {}]
-            elif goal == -1:
-                return [self.getState(), -1.0, True, {}]
+            if goal != 0:
+                return [self.getState(), self.game_sim.getSingeplayerReward(), True, {}]
 
         # If no goal consider it a tie.
         if self.steps_since_reset >= self.max_steps:
-            return [self.getState(), 0.0, True, {}]
+            return [self.getState(), self.game_sim.getSingeplayerReward(), True, {}]
         else:
             return [self.getState(), 0.0, False, {}]
 
@@ -58,7 +76,7 @@ class DuelEnviroment:
 
     def reset(self):
         self.steps_since_reset = 0
-        self.game_sim.resetMap("random")
+        self.game_sim.resetMap("ball center, players random")
         return self.getState()
 
     def goalScored(self):

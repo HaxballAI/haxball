@@ -1,4 +1,4 @@
-from game_simulator import playeraction
+from game_simulator import playeraction, gameparams
 from game_simulator.gamesimengine import GameSimEngine
 from game_log import log
 
@@ -13,6 +13,25 @@ class GameSim(GameSimEngine):
         self.printDebug = printDebug
         self.printDebugFreq = printDebugFreq
         self.auto_score = auto_score
+
+    def getSingeplayerReward(self):
+        # Assumes a single red player
+        if len(self.reds) + len(self.blues) > 1:
+            raise ValueError("Too many players in GameSim!")
+
+        player = self.reds[0]
+        ball = self.balls[0]
+
+        goals = self.checkGoals()
+        reward = goals[0] - goals[1]
+
+        if player.kick_count > 0:
+            reward += 0.125
+            if ball.pos[0] > gameparams.pitchcornerx + gameparams.pitchwidth / 2:
+                relative = 2 * (ball.pos[0] - gameparams.pitchcornerx - gameparams.pitchwidth / 2) / gameparams.pitchwidth
+                reward += 0.25 + 0.25 * relative
+
+        return reward
 
     def getFeedback(self):
         # Gives feedback about the state of the game

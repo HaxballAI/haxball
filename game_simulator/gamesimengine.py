@@ -105,6 +105,9 @@ class GameSimEngine():
             print("HIT!!")
         # Updates the ball's velocity since a kick call was called from obj to ball
         ball.vel = ball.vel + gameparams.kickstrength * ball.inv_mass * obj.getDirectionTo(ball)
+        # Update the number of collisions the player has made
+        obj.kick_count += 1
+
         return
 
     def resolveCollision(self, obj1, obj2, is_obj1_static = 0):
@@ -210,10 +213,22 @@ class GameSimEngine():
         for entity in self.moving_objects:
             entity.updatePosition()
 
-    def resetMap(self, reset_params = "random"):
-        # Reset the positions of the entities in the sim
-        for obj in self.moving_objects:
-            obj.reset(reset_params)
+    def resetMap(self, reset_type = "random"):
+        # Reset the positions of the entities in the sim. Possible reset options are:
+        # 1) random reset for all moving entities
+        # 2) ball spawned in center, players randomly
+        # 3) all entities are respawned in default positions TODO: Hasn't been implemented
+        if reset_type == "random":
+            for obj in self.moving_objects:
+                obj.reset("random")
+        elif reset_type == "ball center, players random":
+            for obj in self.players:
+                obj.reset("random")
+            for obj in self.balls:
+                obj.reset("default")
+        else:
+            raise ValueError("Passed a wrong reset type to GameSim")
+
         if self.enforce_kickoff:
             self.has_the_game_been_kicked_off = False
         return

@@ -93,4 +93,4 @@ class Action:
 
     @staticmethod
     def randomAction():
-        return Action(random.randint(9), random.randint(1))
+        return Action(random.randint(0, 9), random.randint(0, 1))

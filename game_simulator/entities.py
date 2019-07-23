@@ -34,6 +34,9 @@ class Player(Entity):
         self.current_action = playeraction.Action()
         self.can_kick = True
 
+        # Records the number of kicks the ball has made, used for reward shaping
+        self.kick_count = 0
+
         # player properties
         self.team = team
         self.mass = 1 / gameparams.playerinvmass
@@ -49,14 +52,18 @@ class Player(Entity):
         self.vel *= gameparams.playerdamping
         self.pos += self.vel
 
-    def reset(self, reset_params):
-        if "random" in reset_params:
+    def reset(self, reset_type):
+        if reset_type == "random":
 			# positional parameters
             self.pos = np.array([gameparams.pitchcornerx + (np.random.random_sample())*580, gameparams.pitchcornery + (np.random.random_sample())*200]).astype(float)
-        elif "default" in reset_params:
+        elif reset_type == "default":
             self.pos = self.default_position
+        else:
+            raise ValueError("Passed a wrong reset type to a player")
 
         self.vel = np.zeros(2)
+
+        self.kick_count = 0
 
         # Set the action to default action state
         self.current_action = playeraction.Action()
@@ -79,12 +86,14 @@ class Ball(Entity):
         self.vel *= gameparams.balldamping
         self.pos += self.vel
 
-    def reset(self, reset_params):
-        if "random" in reset_params:
+    def reset(self, reset_type):
+        if reset_type == "random":
 			# positional parameters
             self.pos = np.array([gameparams.pitchcornerx + (np.random.random_sample())*580, gameparams.pitchcornery + (np.random.random_sample())*200]).astype(float)
-        elif "default" in reset_params:
+        elif reset_type == "default":
             self.pos = np.array([gameparams.pitchcornerx + gameparams.pitchwidth / 2, gameparams.pitchcornery + gameparams.pitchheight / 2])
+        else:
+            raise ValueError("Passed a wrong reset type to a ball")
         self.vel = np.zeros(2)
 
     def log(self):
