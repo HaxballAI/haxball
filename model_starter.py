@@ -20,7 +20,7 @@ def noiseArray():
 
 def makeVelIntoNoise(l):
     for i in [2,3,6,7,10,11]:
-        l[i] = random.normalvariate(0, 1)
+        l[i] = random.normalvariate(0, 0.1)
 
 
 def getData(data_dir, game_number, normalise = False, add_noise = False):
@@ -40,9 +40,7 @@ def getData(data_dir, game_number, normalise = False, add_noise = False):
             loser_frames.append(losf)
             loser_actions.append(losa)
 
-            if add_noise:
-                makeVelIntoNoise(winner_frames[-1])
-                makeVelIntoNoise(loser_frames[-1])
+
 
 
         elif game.red_goals == 0:
@@ -57,6 +55,12 @@ def getData(data_dir, game_number, normalise = False, add_noise = False):
 
         else:
             raise ValueError
+
+        if add_noise:
+            makeVelIntoNoise(winner_frames[-1])
+            makeVelIntoNoise(loser_frames[-1])
+
+
     print("Data loaded.")
     loser_frames = np.concatenate(loser_frames)
     winner_frames = np.concatenate(winner_frames)
@@ -104,8 +108,8 @@ def envMaker():
     return gym_haxball.onevoneenviroment.DuelEnviroment()
 
 if __name__ == "__main__":
-    #newNet("init_nonoise","sebgames",100,40,1e-3,32, True, False)
-    if True:
+    newNet("test_classifier_norm_noise","sebgames",100,3,1e-3,32, True, True)
+    if False:
         mod = torch.load("models/init_nonoise.model")
         trainer = ac_t.TrainSession(mod, envMaker, 5, 32, 1e-3, 1- 1e-1)
         for i in range(100000):
