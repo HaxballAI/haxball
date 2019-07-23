@@ -14,7 +14,7 @@ def runEnv(env):
             env.reset()
 
 if __name__ == "__main__":
-    # env = DuelFixedGym(10, 400)
-    env = SingleplayerGym(15, 50)
+    env = DuelFixedGym({"step_length":10, "max_steps":400})
+    # env = SingleplayerGym({"step_length":15, "max_steps":50})
 
     runEnv(env)
