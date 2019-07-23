@@ -16,6 +16,7 @@ from collections import namedtuple
 #data_tensor should be of the form torch.FloatTensor([[loserframes],[winnerframes]])
 #each loserframe, winnerframe should be flattened and [loserframes], [winnerframes]
 #action_data should be of the form [[[losermoves],[loserkicks]],[[winnermoves],[winnerkicks]]]
+
 def cuttosize(x,batch):
     if len(x) % batch == 0:
         return x
@@ -49,7 +50,7 @@ def learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate,
 
                 loss = movecriterion(moveprob , true_move[k][i]) \
                      + kickcriterion(kickprob, true_kick[k][i]) \
-                     + wincriterion(winprob, torch.FloatTensor(np.repeat(k,batch_size)))
+                     + wincriterion(winprob, torch.FloatTensor(np.repeat( (k * 2) - 1 ,batch_size)))
                 if loss < 0:
                     print("Negative loss!")
                     print("Kickprobs:")
@@ -80,9 +81,9 @@ def learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate,
                     # Forward pass: Compute predicted y by passing x to the model
                     moveprob, kickprob, winprob = model(data_tensor[k][batch_size * i : batch_size * (i + 1)])
                     # Compute and print loss
-                    loss = movecriterion(moveprob, torch.LongTensor(true_move[k][i]))
-                    loss += kickcriterion(kickprob, true_kick[k][i])
-                    loss += wincriterion(winprob, torch.FloatTensor(np.repeat( (k * 2) - 1,batch_size)))
+                    loss = movecriterion(moveprob, torch.LongTensor(true_move[k][i])) \
+                         + kickcriterion(kickprob, true_kick[k][i]) \
+                         + wincriterion(winprob, torch.FloatTensor(np.repeat( (k * 2) - 1 ,batch_size)))
                     j += 1
                     runningloss += loss
             print("validation loss: " + str(2 * runningloss / (j*batch_size)))

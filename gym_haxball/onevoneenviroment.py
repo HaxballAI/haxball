@@ -27,15 +27,15 @@ class DuelEnviroment:
             goal = self.goalScored()
             # If a goal is scored return instantly
             if goal == 1:
-                return [state_action_pairs , True, 1 , -1]
+                return [state_action_pairs ,  (1 , -1) , True, {}]
             elif goal == -1:
-                return [state_action_pairs, True, -1 , 1]
+                return [state_action_pairs,  (-1 , 1), True, {}]
 
         # If no goal consider it a tie.
         if self.steps_since_reset >= self.max_steps:
-            return [state_action_pairs , True, 0 , 0]
+            return [state_action_pairs , (0 , 0), True, {}]
         else:
-            return [state_action_pairs , False, 0 , 0]
+            return [state_action_pairs ,  (0 , 0) , False, {}]
 
     def reset(self):
         self.steps_since_reset = 0

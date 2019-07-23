@@ -6,9 +6,24 @@ import torch
 from model_updaters import learnFromPlayedGames
 import model_updaters
 import network
+import gym_haxball.onevoneenviroment
+import basic_trainers.actor_critic as ac_t
+import random
 
-def getData(data_dir, game_number):
-    normalise = False
+def noiseArray():
+    to_ret = np.zeros(12)
+    for i in [0,1,4,5,8,9]:
+        to_ret[i] = random.normalvariate(0, 0.001)
+    for i in [2,3,6,7,10,11]:
+        to_ret[i] = random.normalvariate(0, 1)
+    return to_ret
+
+def makeVelIntoNoise(l):
+    for i in [2,3,6,7,10,11]:
+        l[i] = random.normalvariate(0, 0.1)
+
+
+def getData(data_dir, game_number, normalise = False, add_noise = False):
     loser_frames = []
     winner_frames = []
     loser_actions = []
@@ -25,6 +40,9 @@ def getData(data_dir, game_number):
             loser_frames.append(losf)
             loser_actions.append(losa)
 
+
+
+
         elif game.red_goals == 0:
             assert game.blue_goals == 1
             winf, wina = game.toNp("blue" , 0, normalise)
@@ -37,11 +55,18 @@ def getData(data_dir, game_number):
 
         else:
             raise ValueError
+
+        if add_noise:
+            makeVelIntoNoise(winner_frames[-1])
+            makeVelIntoNoise(loser_frames[-1])
+
+
     print("Data loaded.")
     loser_frames = np.concatenate(loser_frames)
     winner_frames = np.concatenate(winner_frames)
     loser_actions = np.concatenate(loser_actions)
     winner_actions = np.concatenate(winner_actions)
+
 
     assert len(loser_frames) == len(loser_actions)
     p = np.random.permutation(len(loser_frames))
@@ -55,6 +80,8 @@ def getData(data_dir, game_number):
 
     print("Data shuffled.")
 
+
+
     loser_actions = np.transpose(loser_actions)
     winner_actions = np.transpose(winner_actions)
 
@@ -64,19 +91,34 @@ def getData(data_dir, game_number):
 
 # MAKE AND TRAINS A NEW NETWORK BASED ON DATA GIVEN BY DATA_DIR WHICH HAS TO
 # BE IN FORMAT OF A FILE OF GAME LOGS INDEXED BY NUMBER
-def newNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size):
-    data_tensor, action_data = getData(data_dir, game_number)
+def newNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size, normalise = True, add_noise = False):
+    data_tensor, action_data = getData(data_dir, game_number, normalise, add_noise)
     model = network.GregPolicy()
     learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate, batch_size)
     torch.save(model, "models/" + net_name + ".model")
 
 # IMPROVED THE NETWORK GIVEN BY NET_NAME
-def improveNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size):
-    data_tensor, action_data = getData(data_dir, game_number)
+def improveNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size, normalise = True, add_noise = False):
+    data_tensor, action_data = getData(data_dir, game_number, normalise, add_noise)
     model = torch.load(f"models/{net_name}.model")
     learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate, batch_size)
     torch.save(model, f"models/{net_name}.model")
 
+def envMaker():
+    return gym_haxball.onevoneenviroment.DuelEnviroment()
 
 if __name__ == "__main__":
-    newNet("gregNet", "sebgames", 100, 3, 1e-2, 32)
+    newNet("test_classifier_norm_noise","sebgames",100,3,1e-3,32, True, True)
+    if False:
+        mod = torch.load("models/init_nonoise.model")
+        trainer = ac_t.TrainSession(mod, envMaker, 5, 32, 1e-3, 1- 1e-1)
+        for i in range(100000):
+            print("Step " + str(i))
+            if i%100 == 0 and i > 100:
+                torch.save(mod, "models/trained_nonoise"+ str(i//10) + ".model")
+                print("Model saved!")
+            if i%10 == 0 and i < 100:
+                torch.save(mod, "models/trained_nonoise"+ str(i//10) + ".model")
+                print("Model saved!")
+            trainer.runStep()
+        torch.save(mod, "models/trained_nonoise.model")
