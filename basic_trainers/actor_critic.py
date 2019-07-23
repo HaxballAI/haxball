@@ -158,7 +158,7 @@ class TrainSession:
             advantage = rewards[i] - values[i]
             losses.append( actions[i] * advantage )
         self.opt.zero_grad()
-        loss = torch.stack(losses).sum() + torch.nn.functional.smooth_l1_loss(torch.tensor(values) , torch.tensor( rewards) )
+        loss = torch.stack(losses).sum() + torch.nn.functional.smooth_l1_loss(torch.FloatTensor(values) , torch.FloatTensor( rewards) )
         loss.backward()
         self.opt.step()
 
