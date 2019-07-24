@@ -94,6 +94,9 @@ def getData(data_dir, game_number, normalise = False, add_noise = False):
 def newNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size, normalise = True, add_noise = False):
     data_tensor, action_data = getData(data_dir, game_number, normalise, add_noise)
     model = network.GregPolicy()
+    if torch.cuda.is_available():
+        model.to(torch.device('cuda'))
+        print("Maybe cuda is happening?")
     learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate, batch_size)
     torch.save(model, "models/" + net_name + ".model")
 
@@ -108,8 +111,8 @@ def envMaker(step_len):
     return lambda :gym_haxball.onevoneenviroment.DuelEnviroment(step_len, 3000 / step_len, True)
 
 if __name__ == "__main__":
-    # newNet("test_classifier","sebgames",100,3,1e-3,32, False, False)
-    if True:
+    newNet("cuda_compliant","sebgames",100,3,1e-3,32, False, False)
+    if False:
         mod = torch.load("models/arun_v4.model")
         if torch.cuda.is_available():
             mod.to(torch.device('cuda'))
