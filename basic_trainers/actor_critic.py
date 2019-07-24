@@ -21,6 +21,8 @@ class Game:
         # the running rewards (will be 0 usually, aside from list frame)
         self.r_rewards = []
         self.b_rewards = []
+        # Entropy values
+
         # States if current game is done
         self.done = False
 
@@ -151,10 +153,9 @@ class TrainSession:
             w.cleanData()
 
     def trainFromData(self, actions, values, rewards):
-
         advantage = [rewards[i] - torch.Tensor.detach(values[i]) for i in range(len(rewards))]
         losses = [actions[i] * advantage[i] for i in range(len(actions))]
-        loss = torch.stack(losses).sum() + (10 * torch.nn.functional.smooth_l1_loss(torch.FloatTensor(values) , torch.FloatTensor( rewards) ))
+        loss = torch.stack(losses).sum() + torch.nn.functional.smooth_l1_loss(torch.FloatTensor(values) , torch.FloatTensor( rewards) )
         loss.backward()
 
 
