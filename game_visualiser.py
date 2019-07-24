@@ -10,7 +10,7 @@ from move_displayer import movedisplayer
 
 # Only works with 1v1 so far
 # Example command line code:
-#   python model_tester.py --red-model="arun_v4" --blue-model="arun_v4" --red-human=True
+#   python game_visualiser.py --red-model="arun_v4" --blue-model="arun_v4" --red-human=True
 
 parser = argparse.ArgumentParser(description='Visualise different matchups between agents')
 parser.add_argument(
