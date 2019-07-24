@@ -16,8 +16,8 @@ import numpy as np
 import torch
 
 def main():
-    model_1 = torch.load("models/trained_nonorm_v9.model")
-    model_2 = torch.load("models/trained_nonorm_v11.model")
+    model_1 = torch.load("models/arun_v3.model")
+    model_2 = torch.load("models/arun_v4.model")
 
 
 
@@ -43,11 +43,12 @@ def main():
     # Blue agents
 
     blueA = ACagent.ACAgent(model_1, "blue", "random", blue_debug_surf, False)
-    #agents.append(humanACagent.HumanACAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'u'), disp, blueA))
-    agents.append(blueA)
+
+    agents.append(humanACagent.HumanACAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'u'), disp, blueA))
+    #agents.append(blueA)
     # agents.append(randomagent.RandomAgent())
 
-    model_testers.duel_trials.playGames(redA,blueA, 100)
+    #model_testers.duel_trials.playGames(redA,blueA, 100, randStart = True)
 
 
     # Initialise the game simulator
