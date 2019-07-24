@@ -22,6 +22,8 @@ class Game:
         self.r_rewards = []
         self.b_rewards = []
         # Entropy values
+        self.r_entropy = []
+        self.b_entropy = []
 
         # States if current game is done
         self.done = False
@@ -39,14 +41,21 @@ class Game:
         kick_dist = Categorical(torch.cat((kick_prob, 1 - kick_prob)))
         action = (move_dist.sample(),  kick_dist.sample())
         if is_red:
+            # Appends critic value for the state
             self.r_values.append(value)
+            # Appends log prob of taking that action
             self.r_action_list.append( - move_dist.log_prob(action[0]) \
                                        - kick_dist.log_prob(action[1]) )
+            # Appends entropy of that action
+            self.r_entropy.append( move_dist.entropy() + kick_dist.entropy() )
         else:
+            # Does same for blue.
             self.b_values.append(value)
             self.b_action_list.append( - move_dist.log_prob(action[0]) \
                                        - kick_dist.log_prob(action[1]) )
+            self.b_entropy.append( move_dist.entropy() + kick_dist.entropy() )
             action = utils.reverseAction(action)
+
         return action
 
 
@@ -105,12 +114,12 @@ class Game:
         # gives the data for the current session
         r_run, b_run = self.getRunningRewards()
         if self.done:
-            return ((self.r_action_list, self.r_values, r_run) , \
-                    (self.b_action_list, self.b_values, b_run))
+            return ((self.r_action_list, self.r_values, self.r_entropy, r_run) , \
+                    (self.b_action_list, self.b_values, self.b_entropy, b_run))
         else:
             # If not done, omit the last elements.
-            return ((self.r_action_list[:-1], self.r_values[:-1], r_run) , \
-                    (self.b_action_list[:-1], self.b_values[:-1], b_run))
+            return ((self.r_action_list[:-1], self.r_values[:-1], self.r_entropy[:-1], r_run) , \
+                    (self.b_action_list[:-1], self.b_values[:-1], self.b_entropy[:-1], b_run))
 
     def cleanData(self):
         # Cleans the data, getting ready for a new session of collection.
@@ -122,6 +131,8 @@ class Game:
             del self.b_action_list[:]
             del self.b_values[:]
             del self.b_rewards[:]
+            del self.r_entropy[:]
+            del self.b_entropy[:]
             # Resets the enviroment.
             self.state = self.env.reset()
             self.done = False
@@ -133,11 +144,14 @@ class Game:
             del self.b_action_list[:-1]
             del self.b_values[:-1]
             del self.b_rewards[:-1]
+            del self.r_entropy[:-1]
+            del self.b_entropy[:-1]
 
 class TrainSession:
-    def __init__(self, model, env, worker_number, batch_size, learning_rate, gamma, is_norming):
+    def __init__(self, model, env, worker_number, batch_size, learning_rate, gamma, entropy_rate, is_norming):
         self.model = model
         self.env = env
+        self.entropy_rate = entropy_rate
         self.batch_size = batch_size
         self.lr = learning_rate
         self.gamma = gamma
@@ -152,10 +166,12 @@ class TrainSession:
         for w in self.workers:
             w.cleanData()
 
-    def trainFromData(self, actions, values, rewards):
+    def trainFromData(self, actions, values, entropy, rewards):
         advantage = [rewards[i] - torch.Tensor.detach(values[i]) for i in range(len(rewards))]
         losses = [actions[i] * advantage[i] for i in range(len(actions))]
-        loss = torch.stack(losses).sum() + torch.nn.functional.smooth_l1_loss(torch.FloatTensor(values) , torch.FloatTensor( rewards) )
+        loss = torch.stack(losses).sum() \
+             + torch.nn.functional.smooth_l1_loss(torch.FloatTensor(values) , torch.FloatTensor( rewards) ) \
+             + self.entropy_rate*torch.stack(entropy).sum()
         loss.backward()
 
 
