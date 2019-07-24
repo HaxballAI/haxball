@@ -42,8 +42,8 @@ parser.add_argument(
     action="store_true",
     help='Specify whether debug info should be printed or not')
 parser.add_argument(
-    '--auto-score',
-    action="store_true",
+    '--not-auto-score',
+    action="store_false",
     help='Specify whether the game should autoscore goals')
 parser.add_argument(
     '--rand-reset',
