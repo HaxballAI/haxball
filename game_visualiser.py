@@ -17,13 +17,11 @@ parser.add_argument(
     '--seed', type=int, default=-1, help='random seed (default: -1)')
 parser.add_argument(
     '--red-human',
-    default=False,
-    type=bool,
+    action="store_true",
     help='Does the red team have a human player?')
 parser.add_argument(
     '--blue-human',
-    default=False,
-    type=bool,
+    action="store_true",
     help='Does the blue team have a human player?')
 parser.add_argument(
     '--load-dir',
@@ -39,18 +37,15 @@ parser.add_argument(
     help='Specify the model of the blue team if there is any')
 parser.add_argument(
     '--print-debug',
-    default=True,
-    type=bool,
+    action="store_true",
     help='Specify whether debug info should be printed or not')
 parser.add_argument(
     '--auto-score',
-    default=True,
-    type=bool,
+    action="store_true",
     help='Specify whether the game should autoscore goals')
 parser.add_argument(
     '--rand-reset',
-    default=True,
-    type=bool,
+    action="store_true",
     help='Specify whether gamesim places entities randomly when reseting')
 args = parser.parse_args()
 
@@ -59,6 +54,8 @@ default_red_bindings = ('w', 'd', 's', 'a', 'LSHIFT')
 default_blue_bindings = ('UP', 'RIGHT', 'DOWN', 'LEFT', 'u')
 
 def getAgents(display, red_debug_surf, blue_debug_surf):
+    print(args.blue_human)
+    print(args.blue_human == False)
     if args.red_model != None:
         model_red = torch.load(args.load_dir + args.red_model + ".model")
         agent_red_ = ACagent.ACAgent(model_red, "red", "random", red_debug_surf, False)
