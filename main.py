@@ -7,6 +7,7 @@ from game_simulator import gameparams as gp
 from agents import ACagent
 from agents import humanACagent
 from agents import randomagent
+import model_testers.duel_trials
 
 import pygame
 
@@ -16,7 +17,9 @@ import torch
 
 def main():
     model_1 = torch.load("models/trained_nonorm_v9.model")
-    model_2 = torch.load("models/trained_nonorm_v11_2.model")
+    model_2 = torch.load("models/trained_nonorm_v11.model")
+
+
 
     # Intialise the graphical interface of the game
     red_debug_surf = movedisplayer.DebugSurf()
@@ -32,21 +35,24 @@ def main():
     # Intialise the agents in the order of all reds sequentially, then blues
     agents = []
     # Red agents
+    redA = ACagent.ACAgent(model_2, "red",  "random", red_debug_surf, False)
     #agents.append(humanagent.HumanAgent(('w', 'd', 's', 'a', 'LSHIFT'), disp))
-    agents.append(ACagent.ACAgent(model_2, "red",  "random", red_debug_surf, False))
+    agents.append(redA)
     # agents.append(randomagent.RandomAgent())
 
     # Blue agents
 
     blueA = ACagent.ACAgent(model_1, "blue", "random", blue_debug_surf, False)
-    agents.append(humanACagent.HumanACAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'u'), disp, blueA))
-    #agents.append(blueA)
+    #agents.append(humanACagent.HumanACAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'u'), disp, blueA))
+    agents.append(blueA)
     # agents.append(randomagent.RandomAgent())
+
+    model_testers.duel_trials.playGames(redA,blueA, 100)
 
 
     # Initialise the game simulator
     game = gamesim.GameSim(red_player_count, blue_player_count, ball_count,
-                           printDebug = True, auto_score = True)
+                           printDebug = True, auto_score = True, rand_reset = True)
     game.run(disp, agents)
 
 if __name__ == "__main__":

@@ -6,13 +6,17 @@ import numpy as np
 import time
 
 class GameSim(GameSimEngine):
-    def __init__(self, red_player_count, blue_player_count, ball_count, printDebug = False, printDebugFreq = 600, auto_score = False, enforce_kickoff = False, seed = -1):
-        GameSimEngine.__init__(self, red_player_count, blue_player_count, ball_count, enforce_kickoff, seed)
+    def __init__(self, red_player_count, blue_player_count, ball_count, printDebug = False, printDebugFreq = 600, \
+                       auto_score = False, enforce_kickoff = False, seed = -1, rand_reset = True):
+        GameSimEngine.__init__(self, red_player_count, blue_player_count, ball_count, enforce_kickoff, seed, rand_reset = rand_reset)
 
         # Sets extra information to do with. Probably a convention that I am
+        self.rand_reset = rand_reset
         self.printDebug = printDebug
         self.printDebugFreq = printDebugFreq
         self.auto_score = auto_score
+
+
 
     def getSingeplayerReward(self):
         # Assumes a single red player
@@ -76,7 +80,10 @@ class GameSim(GameSimEngine):
 
         # Update the score of the game
         if self.auto_score:
-            self.updateScore("random")
+            if self.rand_reset:
+                self.updateScore("random")
+            else:
+                self.updateScore("all default")
 
         if self.printDebug and self.frames % self.printDebugFreq == 0:
             self.getFeedback()

@@ -5,16 +5,25 @@ from game_simulator import playeraction
 import numpy as np
 
 class GameSimEngine():
-    def __init__(self, red_player_count, blue_player_count, ball_count, enforce_kickoff = False, seed = -1):
+    def __init__(self, red_player_count, blue_player_count, ball_count, enforce_kickoff = False, seed = -1, rand_reset = True):
         # Intialise the entities
-        self.reds = [entities.Player("red", self.getRandomPositionInThePlayingField()) for i in range(red_player_count)]
-        self.blues = [entities.Player("blue", self.getRandomPositionInThePlayingField()) for i in range(blue_player_count)]
+        if rand_reset:
+            self.reds = [entities.Player("red", self.getRandomPositionInThePlayingField()) for i in range(red_player_count)]
+            self.blues = [entities.Player("blue", self.getRandomPositionInThePlayingField()) for i in range(blue_player_count)]
+            self.balls = [entities.Ball(self.getRandomPositionInThePlayingField()) for i in range(ball_count)]
+        else:
+            red_def_pos = (gameparams.windowwidth / 3, gameparams.windowheight / 2)
+            blue_def_pos = (gameparams.windowwidth * 2 / 3, gameparams.windowheight / 2)
+            ball_def_pos = (gameparams.windowwidth / 2, gameparams.windowheight / 2)
+            self.reds = [entities.Player("red", red_def_pos) for i in range(red_player_count)]
+            self.blues = [entities.Player("blue", blue_def_pos) for i in range(blue_player_count)]
+            self.balls = [entities.Ball(ball_def_pos) for i in range(ball_count)]
         self.goalposts = [entities.GoalPost(np.array((gameparams.pitchcornerx, gameparams.goalcornery))),
                           entities.GoalPost(np.array((gameparams.pitchcornerx, gameparams.goalcornery + gameparams.goalsize))),
                           entities.GoalPost(np.array((gameparams.windowwidth - gameparams.pitchcornerx, gameparams.goalcornery))),
                           entities.GoalPost(np.array((gameparams.windowwidth - gameparams.pitchcornerx, gameparams.goalcornery + gameparams.goalsize)))]
         self.centre_block = entities.CentreCircleBlock(np.array(gameparams.ballstart))
-        self.balls = [entities.Ball(self.getRandomPositionInThePlayingField()) for i in range(ball_count)]
+
 
         # Create useful groupings
         self.players = self.reds + self.blues
@@ -224,6 +233,9 @@ class GameSimEngine():
             for obj in self.players:
                 obj.reset("random")
             for obj in self.balls:
+                obj.reset("default")
+        elif reset_type == "all default":
+            for obj in self.moving_objects:
                 obj.reset("default")
         else:
             raise ValueError("Passed a wrong reset type to GameSim")
