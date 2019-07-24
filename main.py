@@ -15,8 +15,8 @@ import numpy as np
 import torch
 
 def main():
-    model_1 = torch.load("models/trained_nonorm_v6.model")
-    model_2 = torch.load("models/trained_nonorm_v8_1.model")
+    model_1 = torch.load("models/trained_nonorm_v9.model")
+    model_2 = torch.load("models/trained_nonorm_v11_2.model")
 
     # Intialise the graphical interface of the game
     red_debug_surf = movedisplayer.DebugSurf()
