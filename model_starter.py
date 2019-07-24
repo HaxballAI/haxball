@@ -105,14 +105,16 @@ def improveNet(net_name, data_dir, game_number, epochs, learning_rate, batch_siz
     torch.save(model, f"models/{net_name}.model")
 
 def envMaker(step_len):
-    return lambda :gym_haxball.onevoneenviroment.DuelEnviroment(step_len, 3000 / step_len)
+    return lambda :gym_haxball.onevoneenviroment.DuelEnviroment(step_len, 3000 / step_len, True)
 
 if __name__ == "__main__":
     # newNet("test_classifier","sebgames",100,3,1e-3,32, False, False)
     if True:
-        mod = torch.load("models/trained_nonorm_v8.model")
-        trainer = ac_t.TrainSession(mod, envMaker(5), 15, 64, 1e-4, 1- 1e-2, False)
-        for i in range(30):
+        mod = torch.load("models/arun_v4.model")
+        if torch.cuda.is_available():
+            mod.to(torch.device('cuda'))
+        trainer = ac_t.TrainSession(mod, envMaker(10), 15, 1000, 3e-4, 1- 3e-3, 0.001, False)
+        for i in range(200):
             print("Step " + str(i))
             trainer.runStep()
-        torch.save(mod, "models/trained_nonorm_v8_1.model")
+        torch.save(mod, "models/arun_v4_1.model")
