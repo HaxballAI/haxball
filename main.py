@@ -7,7 +7,8 @@ from game_simulator import gameparams as gp
 from agents import ACagent
 from agents import humanACagent
 from agents import randomagent
-import model_testers.duel_trials
+
+from utils import global_timer
 
 import pygame
 
@@ -18,6 +19,7 @@ import torch
 def main():
     model_1 = torch.load("models/trained_nonorm_v9.model")
     model_2 = torch.load("models/trained_nonorm_v11.model")
+    global_timer.logType("Initialising models")
 
 
 
@@ -47,13 +49,15 @@ def main():
     agents.append(blueA)
     # agents.append(randomagent.RandomAgent())
 
-    model_testers.duel_trials.playGames(redA,blueA, 100)
-
 
     # Initialise the game simulator
     game = gamesim.GameSim(red_player_count, blue_player_count, ball_count,
                            printDebug = True, auto_score = True, rand_reset = True)
+
+    global_timer.logType("Initialising game stuff")
+    global_timer.reset()
     game.run(disp, agents)
 
 if __name__ == "__main__":
     main()
+    global_timer.printSummary()

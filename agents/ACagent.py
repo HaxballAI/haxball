@@ -5,6 +5,8 @@ import random
 import numpy as np
 import torch
 
+from utils import global_timer
+
 class ACAgent():
     # Agent that works off of a actor-critic model
     def __init__(self, network, team, method = "random", debug_surf = None, accepts_normalised = False, value_is_prob = False):
@@ -20,6 +22,8 @@ class ACAgent():
             movepred, kickpred , win_prob = self.network(torch.FloatTensor(frame.posToNp(self.team, 0, True)))
         else:
             movepred, kickpred , win_prob = self.network(torch.FloatTensor(frame.posToNp(self.team, 0, False)))
+
+        global_timer.logType("ACagent getting predicitons")
 
         if not self.value_is_prob:
             win_prob = torch.nn.Sigmoid()(win_prob)
@@ -47,4 +51,6 @@ class ACAgent():
             else:
                 raise ValueError
             self.debug_surf.drawMove(move_probs, action.dir_idx, self.team, float(win_prob))
+
+        global_timer.logType("ACagent finalising getting action")
         return action

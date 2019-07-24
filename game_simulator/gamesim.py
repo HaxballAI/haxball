@@ -5,6 +5,8 @@ from game_log import log
 import numpy as np
 import time
 
+from utils import global_timer
+
 class GameSim(GameSimEngine):
     def __init__(self, red_player_count, blue_player_count, ball_count, printDebug = False, printDebugFreq = 600, \
                        auto_score = False, enforce_kickoff = False, seed = -1, rand_reset = True):
@@ -75,8 +77,10 @@ class GameSim(GameSimEngine):
 
         # Update positions
         self.updatePositions()
+        global_timer.logType("Updating entity positions")
         # Handle collisions
         self.detectAndResolveCollisions()
+        global_timer.logType("Resolving collisions")
 
         # Update the score of the game
         if self.auto_score:
@@ -85,8 +89,12 @@ class GameSim(GameSimEngine):
             else:
                 self.updateScore("all default")
 
+        global_timer.logType("Updating game scores")
+
         if self.printDebug and self.frames % self.printDebugFreq == 0:
             self.getFeedback()
+
+        global_timer.logType("Getting game feedback in step")
 
         return
 
