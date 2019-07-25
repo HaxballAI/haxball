@@ -172,7 +172,7 @@ class TrainSession:
                 score = w.r_rewards[-1]
                 if score > 0.5:
                     train_score += 1
-                elif score < 0.5:
+                elif score < -0.5:
                     fix_score += 1
                 else:
                     ties += 1
