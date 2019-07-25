@@ -152,9 +152,28 @@ class TrainSession:
         r_data = worker.collectData()
         self.trainFromData(*r_data)
 
+    def printInfo(self):
+        train_score = 0
+        fix_score = 0
+        ties = 0
+        for w in self.workers:
+            if w.done:
+                score = w.r_rewards[-1]
+                if score > 0.5:
+                    train_score += 1
+                elif score < 0.5:
+                    fix_score += 1
+                else:
+                    ties += 1
+        print(f"Training bot goals: {train_score}")
+        print(f"Fixed bot goals: {fix_score}")
+        print(F"Tied games: {ties}")
+
+
     def runStep(self):
         self.getData()
         self.opt.zero_grad()
+        self.printInfo()
         for w in self.workers:
             self.trainFromWorkerData(w)
         self.opt.step()
