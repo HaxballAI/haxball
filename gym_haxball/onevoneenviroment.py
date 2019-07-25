@@ -32,6 +32,9 @@ class DuelEnviroment:
         else:
             red_bonus = 0
             blue_bonus = 0
+        tie_penalty = 0
+        if self.reward_shape:
+            tie_penalty = 1
 
         state_action_pairs = self.game_sim.log()
 
@@ -46,9 +49,9 @@ class DuelEnviroment:
 
         # If no goal consider it a tie.
         if self.steps_since_reset >= self.max_steps:
-            return [state_action_pairs , (red_bonus , blue_bonus), True, {}]
+            return [state_action_pairs , (red_bonus - tie_penalty , blue_bonus - tie_penalty), True, {}]
         else:
-            return [state_action_pairs ,  (red_bonus , blue_bonus) , False, {}]
+            return [state_action_pairs ,  (red_bonus, blue_bonus) , False, {}]
 
     def reset(self):
         self.steps_since_reset = 0

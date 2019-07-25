@@ -63,7 +63,12 @@ parser.add_argument(
     '--max-steps',
     type=int,
     default = -1,
-    help='Specify the maximum number of steps in gamesim per game') # TODO: NOT IMPLEMENTED YET
+    help='Specify the maximum number of steps in gamesim per game')
+parser.add_argument(
+    '--step-length',
+    type=int,
+    default = 1,
+    help='Specify the number of steps per action received from the models')
 args = parser.parse_args()
 
 
@@ -113,8 +118,25 @@ def main():
         display = None
     agents = getAgents(display, red_debug_surf, blue_debug_surf)
 
-    game = gamesim.GameSim(1, 1, 1, printDebug = args.print_debug, print_score_update = not args.suppress_scorekeeping,auto_score = args.auto_score, rand_reset = args.rand_reset)
-    game.run(display, agents)
+    game = gamesim.GameSim(1, 1, 1, printDebug = args.print_debug, print_score_update = not args.suppress_scorekeeping,auto_score = args.auto_score, rand_reset = args.rand_reset, max_steps = args.max_steps)
+
+    # Run the game
+    while True:
+        # Query each agent on what commands should be sent to the game simulator
+        game.giveCommands([a.getAction(game.log()) for a in agents])
+
+        for i in range(args.step_length):
+            game.step()
+
+        if display != None:
+            # Update the graphical interface canvas
+            display.drawFrame(game.log())
+
+            display.getInput()
+
+            if display.rip:
+                display.shutdown()
+                break
 
 if __name__ == "__main__":
     main()

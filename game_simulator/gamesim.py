@@ -7,7 +7,7 @@ import time
 
 class GameSim(GameSimEngine):
     def __init__(self, red_player_count, blue_player_count, ball_count, printDebug = False, printDebugFreq = 600, print_score_update = False, \
-                       auto_score = False, enforce_kickoff = False, seed = -1, rand_reset = True):
+                       auto_score = False, enforce_kickoff = False, seed = -1, rand_reset = True, max_steps = -1):
         GameSimEngine.__init__(self, red_player_count, blue_player_count, ball_count, enforce_kickoff, seed, rand_reset = rand_reset)
 
         # Sets extra information to do with. Probably a convention that I am
@@ -16,6 +16,7 @@ class GameSim(GameSimEngine):
         self.printDebugFreq = printDebugFreq
         self.print_score_update = print_score_update
         self.auto_score = auto_score
+        self.max_steps = max_steps
 
     def getSingeplayerReward(self):
         # Assumes a single red player
@@ -74,7 +75,7 @@ class GameSim(GameSimEngine):
             print("score R-B: {}-{}".format(self.red_score + scores[0], self.blue_score + scores[1]))
 
     def step(self):
-        self.frames += 1
+        self.steps += 1
         self.was_point_scored = 0
 
         # Update positions
@@ -91,6 +92,8 @@ class GameSim(GameSimEngine):
                 self.updateScore("random")
             else:
                 self.updateScore("all default")
+        if self.max_steps != -1 and self.steps > self.max_steps:
+            self.resetMap()
 
         if self.printDebug and self.frames % self.printDebugFreq == 0:
             self.getFeedback()

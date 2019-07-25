@@ -40,7 +40,7 @@ class GameSimEngine():
         self.blue_score = 0
 
         # Number of elapsed frames
-        self.frames = 0
+        self.steps = 0
 
         # Initialise the random seed iff seed != 1
         if seed != -1:
@@ -226,6 +226,7 @@ class GameSimEngine():
         # 1) random reset for all moving entities
         # 2) ball spawned in center, players randomly
         # 3) all entities are respawned in default positions TODO: Hasn't been implemented
+        self.steps = 0
         if reset_type == "random":
             for obj in self.moving_objects:
                 obj.reset("random")
@@ -252,14 +253,12 @@ class GameSimEngine():
                 self.red_last_goal = False
                 self.was_point_scored = True
 
-                frames = 0
                 self.resetMap(reset_params)
             elif ball.pos[0] >= gameparams.windowwidth - gameparams.pitchcornerx:
                 self.red_score += 1
                 self.red_last_goal = True
                 self.was_point_scored = True
 
-                frames = 0
                 self.resetMap(reset_params)
         return
 
