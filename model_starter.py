@@ -94,9 +94,6 @@ def getData(data_dir, game_number, normalise = False, add_noise = False):
 def newNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size, normalise = True, add_noise = False):
     data_tensor, action_data = getData(data_dir, game_number, normalise, add_noise)
     model = network.GregPolicy()
-    if torch.cuda.is_available():
-        model.to(torch.device('cuda'))
-        print("Maybe cuda is happening?")
     learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate, batch_size)
     torch.save(model, "models/" + net_name + ".model")
 
@@ -111,13 +108,13 @@ def envMaker(step_len):
     return lambda :gym_haxball.onevoneenviroment.DuelEnviroment(step_len, 3000 / step_len, True)
 
 if __name__ == "__main__":
-    newNet("cuda_compliant","sebgames",100,3,1e-3,32, False, False)
-    if False:
+    #newNet("cuda_compliant","sebgames",100,3,1e-3,32, False, False)
+    if True:
         mod = torch.load("models/arun_v4.model")
-        if torch.cuda.is_available():
-            mod.to(torch.device('cuda'))
-        trainer = ac_t.TrainSession(mod, envMaker(10), 15, 1000, 3e-4, 1- 3e-3, 0.001, False)
-        for i in range(200):
+        trainer = ac_t.TrainSession(mod, envMaker(10), 15, 32, 1e-4, 1- 3e-3, 0.001, False)
+
+        for i in range(100):
             print("Step " + str(i))
             trainer.runStep()
+
         torch.save(mod, "models/arun_v4_1.model")
