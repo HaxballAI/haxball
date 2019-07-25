@@ -18,7 +18,7 @@ import torch
 def main():
     model_1 = torch.load("models/arun_v3_2.model")
     model_2 = torch.load("models/overnight/overnight_10.model")
-    
+
     #if torch.cuda.is_available():
     #    model_1 = model_1.cuda()
     #    model_2 = model_2.cuda()

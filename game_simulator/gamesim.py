@@ -6,7 +6,7 @@ import numpy as np
 import time
 
 class GameSim(GameSimEngine):
-    def __init__(self, red_player_count, blue_player_count, ball_count, printDebug = False, printDebugFreq = 600, \
+    def __init__(self, red_player_count, blue_player_count, ball_count, printDebug = False, printDebugFreq = 600, print_score_update = False, \
                        auto_score = False, enforce_kickoff = False, seed = -1, rand_reset = True):
         GameSimEngine.__init__(self, red_player_count, blue_player_count, ball_count, enforce_kickoff, seed, rand_reset = rand_reset)
 
@@ -14,9 +14,8 @@ class GameSim(GameSimEngine):
         self.rand_reset = rand_reset
         self.printDebug = printDebug
         self.printDebugFreq = printDebugFreq
+        self.print_score_update = print_score_update
         self.auto_score = auto_score
-
-
 
     def getSingeplayerReward(self):
         # Assumes a single red player
@@ -69,6 +68,11 @@ class GameSim(GameSimEngine):
         for i in range(len(self.players)):
             self.players[i].current_action = actions[i]
 
+    def printScoreUpdate(self):
+        scores = self.checkGoals()
+        if scores[0] + scores[1] > 0:
+            print("score R-B: {}-{}".format(self.red_score + scores[0], self.blue_score + scores[1]))
+
     def step(self):
         self.frames += 1
         self.was_point_scored = 0
@@ -77,6 +81,9 @@ class GameSim(GameSimEngine):
         self.updatePositions()
         # Handle collisions
         self.detectAndResolveCollisions()
+
+        if self.print_score_update:
+            self.printScoreUpdate()
 
         # Update the score of the game
         if self.auto_score:
@@ -97,11 +104,12 @@ class GameSim(GameSimEngine):
 
             self.step()
 
-            # Update the graphical interface canvas
-            disp.drawFrame(self.log())
+            if disp != None:
+                # Update the graphical interface canvas
+                disp.drawFrame(self.log())
 
-            disp.getInput()
+                disp.getInput()
 
-            if disp.rip:
-                disp.shutdown()
-                break
+                if disp.rip:
+                    disp.shutdown()
+                    break

@@ -7,8 +7,10 @@ from model_updaters import learnFromPlayedGames
 import model_updaters
 import network
 import gym_haxball.onevoneenviroment
-import basic_trainers.actor_critic as ac_t
+import basic_trainers.actor_critic_symmetric as ac_t_s
+import basic_trainers.actor_critic_fixed as ac_t_f
 import random
+from utils import global_timer
 
 def noiseArray():
     to_ret = np.zeros(12)
@@ -111,13 +113,17 @@ def envMaker(step_len):
     return lambda :gym_haxball.onevoneenviroment.DuelEnviroment(step_len, 3000 / step_len, True)
 
 if __name__ == "__main__":
-    newNet("cuda_compliant","sebgames",100,3,1e-3,32, False, False)
-    if False:
-        mod = torch.load("models/arun_v4.model")
-        if torch.cuda.is_available():
-            mod.to(torch.device('cuda'))
-        trainer = ac_t.TrainSession(mod, envMaker(10), 15, 1000, 3e-4, 1- 3e-3, 0.001, False)
+    #newNet("cuda_compliant","sebgames",100,3,1e-3,32, False, False)
+    if True:
+        model = torch.load("models/arun_v4.model")
+        model_fixed_opponent = torch.load("models/arun_v4.model")
+        #if torch.cuda.is_available():
+        #    mod.to(torch.device('cuda'))
+        #trainer = ac_t_s.TrainSession(model=model, env=envMaker(10), worker_number=15,\
+        #                              batch_size=1000, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=0.001, is_norming=False)
+        trainer = ac_t_f.TrainSession(model_training=model, model_fixed=model_fixed_opponent, env=envMaker(10), worker_number=15,\
+                                      batch_size=1000, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=0.001, is_norming=False)
         for i in range(200):
-            print("Step " + str(i))
+            print("Step " + str(i), global_timer.getElapsedTime())
             trainer.runStep()
-        torch.save(mod, "models/arun_v4_1.model")
+        torch.save(model, "models/trained_fixed_v1.model")

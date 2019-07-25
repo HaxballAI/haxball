@@ -12,7 +12,7 @@ from move_displayer import movedisplayer
 
 # Only works with 1v1 so far
 # Example command line code:
-#   python game_visualiser.py --red-model="arun_v4" --blue-model="arun_v4" --red-human=True
+#   python game_visualiser.py --red-model="trained_fixed_v1" --blue-model="arun_v4" --suppress-display
 
 parser = argparse.ArgumentParser(description='Visualise different matchups between agents')
 parser.add_argument(
@@ -51,6 +51,14 @@ parser.add_argument(
     dest="rand_reset",
     action="store_false",
     help='Specify whether gamesim places entities randomly when reseting')
+parser.add_argument(
+    '--suppress-scorekeeping',
+    action="store_true",
+    help='Specify whether gamesim places entities randomly when reseting')
+parser.add_argument(
+    '--suppress-display',
+    action="store_true",
+    help='Specify whether gamesim places entities randomly when reseting')
 args = parser.parse_args()
 
 
@@ -87,14 +95,20 @@ def getAgents(display, red_debug_surf, blue_debug_surf):
     return (agent_red, agent_blue)
 
 def main():
+    if args.suppress_display and (args.red_human or args.blue_human):
+        raise ValueError("Human players need display to function")
+
     red_debug_surf = movedisplayer.DebugSurf()
     blue_debug_surf = movedisplayer.DebugSurf()
 
-    display = basicdisplayer.GameWindow(gp.windowwidth + 2 * 256, gp.windowheight,\
-                                     debug_surfs = [red_debug_surf.surf, blue_debug_surf.surf])
+    if not args.suppress_display:
+        display = basicdisplayer.GameWindow(gp.windowwidth + 2 * 256, gp.windowheight,\
+                                        debug_surfs = [red_debug_surf.surf, blue_debug_surf.surf])
+    else:
+        display = None
     agents = getAgents(display, red_debug_surf, blue_debug_surf)
 
-    game = gamesim.GameSim(1, 1, 1, printDebug = args.print_debug, auto_score = args.auto_score, rand_reset = args.rand_reset)
+    game = gamesim.GameSim(1, 1, 1, printDebug = args.print_debug, print_score_update = not args.suppress_scorekeeping,auto_score = args.auto_score, rand_reset = args.rand_reset)
     game.run(display, agents)
 
 if __name__ == "__main__":
