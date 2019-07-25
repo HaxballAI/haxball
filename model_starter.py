@@ -106,8 +106,8 @@ def improveNet(net_name, data_dir, game_number, epochs, learning_rate, batch_siz
     learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate, batch_size)
     torch.save(model, f"models/{net_name}.model")
 
-def makeEnv(step_len):
-    return gym_haxball.onevoneenviroment.DuelEnviroment(step_len, 3000 / step_len, True)
+def makeEnv(step_len, reward_shape = False):
+    return gym_haxball.onevoneenviroment.DuelEnviroment(step_len, 3000 / step_len, True, reward_shape = reward_shape)
 
 if __name__ == "__main__":
     #newNet("cuda_compliant","sebgames",100,3,1e-3,32, False, False)
@@ -118,8 +118,8 @@ if __name__ == "__main__":
         #    mod.to(torch.device('cuda'))
         #trainer = SymmetricTrainSession(model=model, env=lambda: makeEnv(10), worker_number=15,\
         #                              batch_size=1000, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=0.001, is_norming=False)
-        trainer = FixedTrainSession(model_training=model, model_fixed=model_fixed_opponent, env=lambda: makeEnv(10), worker_number=15,\
-                                      batch_size=100, learning_rate=1e-3, gamma=1-3e-3, entropy_rate=0.001, is_norming=False)
+        trainer = FixedTrainSession(model_training=model, model_fixed=model_fixed_opponent, env=lambda: makeEnv(10, False), worker_number=15,\
+                                      batch_size=64, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=0.001, is_norming=False)
 
     for i in range(200):
             print("Step {}, {:.3f}s".format(str(i), global_timer.getElapsedTime()))

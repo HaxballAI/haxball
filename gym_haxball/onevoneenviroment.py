@@ -3,10 +3,11 @@ from game_simulator.playeraction import Action
 
 class DuelEnviroment:
 
-    def __init__(self, step_len = 15, max_steps = 200, rand_reset = True):
+    def __init__(self, step_len = 15, max_steps = 200, rand_reset = True, reward_shape = False):
         self.step_len = step_len
         self.max_steps = max_steps
         self.rand_rest = rand_reset
+        self.reward_shape = reward_shape
 
         self.game_sim = gamesim.GameSim(1,1,1, rand_reset = rand_reset)
         self.game_sim.resetMap()
@@ -19,10 +20,18 @@ class DuelEnviroment:
     def step(self, red_action, blue_action):
         self.steps_since_reset += 1
 
-        if isinstance(red_action, Action):
-            self.game_sim.giveCommands( [red_action , blue_action ] )
+        if  not isinstance(red_action, Action):
+            red_action = Action(*red_action)
+            blue_action = Action(*blue_action)
+
+        self.game_sim.giveCommands( [red_action , blue_action ] )
+
+        if self.reward_shape:
+            red_bonus = -0.01 * red_action.isKicking()
+            blue_bonus = -0.01 * blue_action.isKicking()
         else:
-            self.game_sim.giveCommands( [Action(*red_action) , Action(*blue_action) ] )
+            red_bonus = 0
+            blue_bonus = 0
 
         state_action_pairs = self.game_sim.log()
 
@@ -31,15 +40,15 @@ class DuelEnviroment:
             goal = self.goalScored()
             # If a goal is scored return instantly
             if goal == 1:
-                return [state_action_pairs ,  (1 , -1) , True, {}]
+                return [state_action_pairs ,  (1 + red_bonus , -1 + blue_bonus) , True, {}]
             elif goal == -1:
-                return [state_action_pairs,  (-1 , 1), True, {}]
+                return [state_action_pairs,  (-1 + red_bonus , 1 + blue_bonus), True, {}]
 
         # If no goal consider it a tie.
         if self.steps_since_reset >= self.max_steps:
-            return [state_action_pairs , (0 , 0), True, {}]
+            return [state_action_pairs , (red_bonus , blue_bonus), True, {}]
         else:
-            return [state_action_pairs ,  (0 , 0) , False, {}]
+            return [state_action_pairs ,  (red_bonus , blue_bonus) , False, {}]
 
     def reset(self):
         self.steps_since_reset = 0
