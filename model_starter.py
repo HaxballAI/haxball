@@ -104,17 +104,17 @@ def improveNet(net_name, data_dir, game_number, epochs, learning_rate, batch_siz
     learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate, batch_size)
     torch.save(model, f"models/{net_name}.model")
 
-def envMaker(step_len):
-    return lambda :gym_haxball.onevoneenviroment.DuelEnviroment(step_len, 3000 / step_len, True)
+def envMaker(step_len, reward_shape = False):
+    return lambda :gym_haxball.onevoneenviroment.DuelEnviroment(step_len, 3000 / step_len, True, reward_shape = reward_shape)
 
 if __name__ == "__main__":
     #newNet("cuda_compliant","sebgames",100,3,1e-3,32, False, False)
     if True:
-        mod = torch.load("models/arun_v4.model")
-        trainer = ac_t.TrainSession(mod, envMaker(10), 15, 32, 1e-4, 1- 3e-3, 0.001, False)
+        mod = torch.load("models/arun_v5.model")
+        trainer = ac_t.TrainSession(mod, envMaker(15,False), 15, 32, 1e-4, 1- 3e-3, 0.001, False)
 
-        for i in range(100):
+        for i in range(200):
             print("Step " + str(i))
             trainer.runStep()
 
-        torch.save(mod, "models/arun_v4_1.model")
+        torch.save(mod, "models/arun_v5_1.model")
