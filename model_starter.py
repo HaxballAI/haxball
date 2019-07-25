@@ -7,8 +7,8 @@ from model_updaters import learnFromPlayedGames
 import model_updaters
 import network
 import gym_haxball.onevoneenviroment
-import basic_trainers.actor_critic_symmetric as ac_t_s
-import basic_trainers.actor_critic_fixed as ac_t_f
+from basic_trainers.actor_critic_symmetric import TrainSession as SymmetricTrainSession
+from basic_trainers.actor_critic_fixed import TrainSession as FixedTrainSession
 import random
 from utils import global_timer
 
@@ -106,8 +106,8 @@ def improveNet(net_name, data_dir, game_number, epochs, learning_rate, batch_siz
     learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate, batch_size)
     torch.save(model, f"models/{net_name}.model")
 
-def envMaker(step_len):
-    return lambda :gym_haxball.onevoneenviroment.DuelEnviroment(step_len, 3000 / step_len, True)
+def makeEnv(step_len):
+    return gym_haxball.onevoneenviroment.DuelEnviroment(step_len, 3000 / step_len, True)
 
 if __name__ == "__main__":
     #newNet("cuda_compliant","sebgames",100,3,1e-3,32, False, False)
@@ -116,9 +116,9 @@ if __name__ == "__main__":
         model_fixed_opponent = torch.load("models/arun_v4.model")
         #if torch.cuda.is_available():
         #    mod.to(torch.device('cuda'))
-        #trainer = ac_t_s.TrainSession(model=model, env=envMaker(10), worker_number=15,\
+        #trainer = SymmetricTrainSession(model=model, env=lambda: makeEnv(10), worker_number=15,\
         #                              batch_size=1000, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=0.001, is_norming=False)
-        trainer = ac_t_f.TrainSession(model_training=model, model_fixed=model_fixed_opponent, env=envMaker(10), worker_number=15,\
+        trainer = FixedTrainSession(model_training=model, model_fixed=model_fixed_opponent, env=lamda: makeEnv(10), worker_number=15,\
                                       batch_size=1000, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=0.001, is_norming=False)
         for i in range(200):
             print("Step " + str(i), global_timer.getElapsedTime())
