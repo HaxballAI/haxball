@@ -113,14 +113,18 @@ if __name__ == "__main__":
     #newNet("cuda_compliant","sebgames",100,3,1e-3,32, False, False)
     if True:
         model = torch.load("models/arun_v4.model")
-        model_fixed_opponent = torch.load("models/arun_v4.model")
+        model_fixed_opponent = torch.load("models/trained_fixed_v3.model")
         #if torch.cuda.is_available():
         #    mod.to(torch.device('cuda'))
         #trainer = SymmetricTrainSession(model=model, env=lambda: makeEnv(10), worker_number=15,\
         #                              batch_size=1000, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=0.001, is_norming=False)
-        trainer = FixedTrainSession(model_training=model, model_fixed=model_fixed_opponent, env=lamda: makeEnv(10), worker_number=15,\
-                                      batch_size=1000, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=0.001, is_norming=False)
-        for i in range(200):
-            print("Step " + str(i), global_timer.getElapsedTime())
+        trainer = FixedTrainSession(model_training=model, model_fixed=model_fixed_opponent, env=lambda: makeEnv(10), worker_number=15,\
+                                      batch_size=100, learning_rate=1e-3, gamma=1-3e-3, entropy_rate=0.001, is_norming=False)
+
+    for i in range(200):
+            print("Step {}, {:.3f}s".format(str(i), global_timer.getElapsedTime()))
+            score = trainer.getScores()
+            if sum(score) != 0:
+                print("R-B-T: {:.3f}% - {:.3f}% - {:.3f}%, # of games = {}".format(score[0]*100/sum(score), score[1]*100/sum(score), score[2]*100/sum(score), sum(score)))
             trainer.runStep()
-        torch.save(model, "models/trained_fixed_v1.model")
+        torch.save(model, "models/trained_fixed_v4.model")
