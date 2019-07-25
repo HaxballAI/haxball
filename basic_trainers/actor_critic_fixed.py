@@ -28,7 +28,10 @@ class Game:
 
         self.state = env.reset()
 
-    def getAction(self,state, is_red):
+        # Stores (red score, blue score, ties)
+        self.score = [0, 0, 0]
+
+    def getAction(self, state, is_red):
         # Gets the action based off the state, updates the value and
         # action lists accordingly.
         if is_red:
@@ -62,11 +65,19 @@ class Game:
             r_act = self.getAction(self.state, True)
             b_act = self.getAction(self.state, False)
             # Completes a step
-            self.state , rewards, self.done, _ = self.env.step(r_act, b_act)
+            self.state, rewards, self.done, _ = self.env.step(r_act, b_act)
+
             # Updates rewards
             self.r_rewards.append(rewards[0])
             # Breaks if done
             if self.done:
+                goals = self.env.goalScored()
+                if goals == 1:
+                    self.score[0] += 1
+                elif goals == -1:
+                    self.score[1] += 1
+                else:
+                    self.score[2] += 1
                 break
 
     def makeDecayingReward(self, l, x):
@@ -152,6 +163,7 @@ class TrainSession:
         r_data = worker.collectData()
         self.trainFromData(*r_data)
 
+<<<<<<< HEAD
     def printInfo(self):
         train_score = 0
         fix_score = 0
@@ -169,6 +181,14 @@ class TrainSession:
         print(f"Fixed bot goals: {fix_score}")
         print(F"Tied games: {ties}")
 
+=======
+    def getScores(self):
+        tot_score = [0, 0, 0]
+        for w in self.workers:
+            for i in range(3):
+                tot_score[i] += w.score[i]
+        return tot_score
+>>>>>>> 6083d597dabeed0739e6e6a1ad566c7b9a5b6b88
 
     def runStep(self):
         self.getData()

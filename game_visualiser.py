@@ -54,11 +54,16 @@ parser.add_argument(
 parser.add_argument(
     '--suppress-scorekeeping',
     action="store_true",
-    help='Specify whether gamesim places entities randomly when reseting')
+    help='Specify whether gamesim should print scores to terminal')
 parser.add_argument(
     '--suppress-display',
     action="store_true",
-    help='Specify whether gamesim places entities randomly when reseting')
+    help='Specify whether the display of the game should be suppressed or not')
+parser.add_argument(
+    '--max-steps',
+    type=int,
+    default = -1,
+    help='Specify the maximum number of steps in gamesim per game') # TODO: NOT IMPLEMENTED YET
 args = parser.parse_args()
 
 
