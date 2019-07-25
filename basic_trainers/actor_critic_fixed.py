@@ -163,7 +163,6 @@ class TrainSession:
         r_data = worker.collectData()
         self.trainFromData(*r_data)
 
-<<<<<<< HEAD
     def printInfo(self):
         train_score = 0
         fix_score = 0
@@ -181,14 +180,6 @@ class TrainSession:
         print(f"Fixed bot goals: {fix_score}")
         print(F"Tied games: {ties}")
 
-=======
-    def getScores(self):
-        tot_score = [0, 0, 0]
-        for w in self.workers:
-            for i in range(3):
-                tot_score[i] += w.score[i]
-        return tot_score
->>>>>>> 6083d597dabeed0739e6e6a1ad566c7b9a5b6b88
 
     def runStep(self):
         self.getData()
