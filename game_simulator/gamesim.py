@@ -95,7 +95,7 @@ class GameSim(GameSimEngine):
         if self.max_steps != -1 and self.steps > self.max_steps:
             self.resetMap()
 
-        if self.printDebug and self.frames % self.printDebugFreq == 0:
+        if self.printDebug and self.steps % self.printDebugFreq == 0:
             self.getFeedback()
 
         return
