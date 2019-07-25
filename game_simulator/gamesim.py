@@ -41,7 +41,7 @@ class GameSim(GameSimEngine):
         # Gives feedback about the state of the game
         if self.printDebug:
             # Print some stuff
-            print("Frame {}, score R-B: {}-{}".format(self.frames, self.red_score, self.blue_score))
+            print("Frame {}, score R-B: {}-{}".format(self.steps, self.red_score, self.blue_score))
             if self.was_point_scored:
                 print("    A point was scored, nice!")
             for obj in self.reds:
