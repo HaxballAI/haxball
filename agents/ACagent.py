@@ -20,8 +20,8 @@ class ACAgent():
 
         frame_tensor = torch.FloatTensor(frame.posToNp(self.team, 0, self.accepts_normalised))
 
-        #if torch.cuda.is_available():
         #    frame_tensor = frame_tensor.cuda()
+        #if torch.cuda.is_available():
 
         movepred, kickpred , win_prob = self.network(frame_tensor)
 

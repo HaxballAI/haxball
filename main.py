@@ -16,8 +16,8 @@ import numpy as np
 import torch
 
 def main():
-    model_1 = torch.load("models/arun_v3_2.model")
-    model_2 = torch.load("models/overnight/overnight_10.model")
+    model_1 = torch.load("models/overnight/overnight_1.model")
+    model_2 = torch.load("models/overnight/overnight_4.model")
 
     #if torch.cuda.is_available():
     #    model_1 = model_1.cuda()
@@ -47,20 +47,21 @@ def main():
 
     blueA = ACagent.ACAgent(model_1, "blue", "random", blue_debug_surf, False)
 
-    agents.append(humanACagent.HumanACAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'u'), disp, blueA))
-    #agents.append(blueA)
+    #agents.append(humanACagent.HumanACAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'u'), disp, blueA))
+    agents.append(blueA)
     # agents.append(randomagent.RandomAgent())
 
-    t1 = time.time()
-    model_testers.duel_trials.playGames(redA,blueA, 100, randStart = True)
-    t2 = time.time()
-    print(f"Took {t2-t1} seconds.")
+    if False:
+        t1 = time.time()
+        model_testers.duel_trials.playGames(redA,blueA, 100, randStart = True)
+        t2 = time.time()
+        print(f"Took {t2-t1} seconds.")
 
 
     # Initialise the game simulator
     game = gamesim.GameSim(red_player_count, blue_player_count, ball_count,
                            printDebug = True, auto_score = True, rand_reset = True)
-    #game.run(disp, agents)
+    game.run(disp, agents)
 
 if __name__ == "__main__":
     main()

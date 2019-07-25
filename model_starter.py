@@ -96,9 +96,6 @@ def getData(data_dir, game_number, normalise = False, add_noise = False):
 def newNet(net_name, data_dir, game_number, epochs, learning_rate, batch_size, normalise = True, add_noise = False):
     data_tensor, action_data = getData(data_dir, game_number, normalise, add_noise)
     model = network.GregPolicy()
-    if torch.cuda.is_available():
-        model.to(torch.device('cuda'))
-        print("Maybe cuda is happening?")
     learnFromPlayedGames(model, data_tensor, action_data, epochs, learning_rate, batch_size)
     torch.save(model, "models/" + net_name + ".model")
 
