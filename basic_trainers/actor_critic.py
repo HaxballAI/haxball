@@ -7,6 +7,8 @@ import random
 # Class design to run the games, and play out batches of them
 class Game:
     def __init__(self, model, env, batch_size, gamma, is_norming):
+
+
         self.model = model
         self.env = env
         self.batch_size = batch_size
@@ -157,6 +159,7 @@ class TrainSession:
         self.gamma = gamma
         self.workers = [Game(model, env(), batch_size, gamma, is_norming) for k in range(worker_number)]
         self.opt = torch.optim.Adam(self.model.parameters(), lr = self.lr )
+        self.critic_loss_bias = 10
 
     def getData(self):
         for w in self.workers:
@@ -170,7 +173,7 @@ class TrainSession:
         advantage = [rewards[i] - torch.Tensor.detach(values[i]) for i in range(len(rewards))]
         losses = [actions[i] * advantage[i] for i in range(len(actions))]
         loss = torch.stack(losses).sum() \
-             + torch.nn.functional.smooth_l1_loss(torch.FloatTensor(values) , torch.FloatTensor( rewards) ) \
+             + self.critic_loss_bias * torch.nn.functional.smooth_l1_loss(torch.FloatTensor(values) , torch.FloatTensor( rewards) ) \
              - (self.entropy_rate * torch.stack(entropy).sum())
         loss.backward()
 
