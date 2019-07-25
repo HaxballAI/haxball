@@ -16,13 +16,21 @@ class ACAgent():
         self.value_is_prob = value_is_prob
 
     def getAction(self, frame):
-        if self.accepts_normalised == True:
-            movepred, kickpred , win_prob = self.network(torch.FloatTensor(frame.posToNp(self.team, 0, True)))
-        else:
-            movepred, kickpred , win_prob = self.network(torch.FloatTensor(frame.posToNp(self.team, 0, False)))
+
+
+        frame_tensor = torch.FloatTensor(frame.posToNp(self.team, 0, self.accepts_normalised))
+
+        #if torch.cuda.is_available():
+        #    frame_tensor = frame_tensor.cuda()
+
+        movepred, kickpred , win_prob = self.network(frame_tensor)
 
         if not self.value_is_prob:
             win_prob = torch.nn.Sigmoid()(win_prob)
+
+        #if torch.cuda.is_available():
+        #    movepred = movepred.cpu()
+
 
         if self.method == "random":
             move = np.random.choice(len(movepred), p = movepred.detach().numpy() )
