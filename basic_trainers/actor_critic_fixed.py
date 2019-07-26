@@ -151,7 +151,7 @@ class TrainSession:
         advantage = [rewards[i] - torch.Tensor.detach(values[i]) for i in range(len(rewards))]
         losses = [actions[i] * advantage[i] for i in range(len(actions))]
         loss = torch.stack(losses).sum() \
-             + torch.nn.functional.smooth_l1_loss(torch.FloatTensor(values) , torch.FloatTensor( rewards) ) \
+             + torch.nn.MSELoss(reduction = "sum")(torch.FloatTensor(values) , torch.FloatTensor( rewards) ) \
              - (self.entropy_rate * torch.stack(entropy).sum())
         loss.backward()
 
