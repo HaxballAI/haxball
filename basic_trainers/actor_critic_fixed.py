@@ -175,7 +175,10 @@ class TrainSession:
                 rolling_score[i] += w.rolling_score[i]
 
         print("Running R-G-T: {}-{}-{}".format(rolling_score[0], rolling_score[1], rolling_score[2]) )
-        print("Overall R-G-T percentage: {:.3f}% - {:.3f}% - {:.3f}%, # of games = {}".format(tot_score[0]*100/sum(tot_score), tot_score[1]*100/sum(tot_score), tot_score[2]*100/sum(tot_score), sum(tot_score)))
+        if sum(tot_score) != 0:
+            print("Overall R-G-T percentage: {:.3f}% - {:.3f}% - {:.3f}%, # of games = {}".format(tot_score[0]*100/sum(tot_score), tot_score[1]*100/sum(tot_score), tot_score[2]*100/sum(tot_score), sum(tot_score)))
+        else:
+            print("# of games = {}".format(sum(tot_score)))
 
     def runStep(self):
         self.getData()
