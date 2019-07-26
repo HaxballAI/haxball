@@ -150,10 +150,16 @@ class TrainSession:
     def trainFromData(self, actions, values, entropy, rewards):
         advantage = [rewards[i] - torch.Tensor.detach(values[i]) for i in range(len(rewards))]
         losses = [actions[i] * advantage[i] for i in range(len(actions))]
-        loss = torch.stack(losses).sum() \
-             + torch.nn.MSELoss(reduction = "sum")(torch.FloatTensor(values) , torch.FloatTensor( rewards) ) \
+        value_tensor = torch.stack(values).reshape(-1)
+        reward_tensor = torch.FloatTensor(rewards).reshape(-1)
+        value_loss = torch.nn.MSELoss(reduction = "sum")( value_tensor , reward_tensor)
+        policy_loss = torch.stack(losses).sum()
+        loss = policy_loss \
+             + value_loss \
              - (self.entropy_rate * torch.stack(entropy).sum())
+
         loss.backward()
+
 
     def trainFromWorkerData(self, worker):
         r_data = worker.collectData()
