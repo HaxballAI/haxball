@@ -3,6 +3,7 @@ import torch
 from torch.distributions import Categorical
 import utils
 import random
+import queue
 
 # Class design to run the games, and play out batches of them
 class Game:
@@ -30,6 +31,8 @@ class Game:
 
         # Stores (red score, blue score, ties)
         self.score = [0, 0, 0]
+        self.rolling_score = [0, 0, 0]
+        self.rolling_score_queue = queue.Queue()
 
     def getAction(self, state, is_red):
         # Gets the action based off the state, updates the value and
@@ -72,12 +75,12 @@ class Game:
             # Breaks if done
             if self.done:
                 goals = self.env.goalScored()
-                if goals == 1:
-                    self.score[0] += 1
-                elif goals == -1:
-                    self.score[1] += 1
-                else:
-                    self.score[2] += 1
+                # Fuck you
+                self.score[(goals + 2) % 3] += 1
+                self.rolling_score_queue.put((goals + 2) % 3)
+                self.rolling_score[(goals + 2) % 3] += 1
+                if self.rolling_score_queue.qsize() > 5:
+                    self.rolling_score[self.rolling_score_queue.get()] -= 1
                 break
 
     def makeDecayingReward(self, l, x):
@@ -164,22 +167,15 @@ class TrainSession:
         self.trainFromData(*r_data)
 
     def printInfo(self):
-        train_score = 0
-        fix_score = 0
-        ties = 0
+        tot_score = [0, 0, 0]
+        rolling_score = [0, 0, 0]
         for w in self.workers:
-            if w.done:
-                score = w.r_rewards[-1]
-                if score > 0.5:
-                    train_score += 1
-                elif score < -0.5:
-                    fix_score += 1
-                else:
-                    ties += 1
-        print(f"Training bot goals: {train_score}")
-        print(f"Fixed bot goals: {fix_score}")
-        print(F"Tied games: {ties}")
+            for i in range(3):
+                tot_score[i] += w.score[i]
+                rolling_score[i] += w.rolling_score[i]
 
+        print("Running R-G-T: {}-{}-{}".format(rolling_score[0], rolling_score[1], rolling_score[2]) )
+        print("Overall R-G-T percentage: {:.3f}% - {:.3f}% - {:.3f}%, # of games = {}".format(tot_score[0]*100/sum(tot_score), tot_score[1]*100/sum(tot_score), tot_score[2]*100/sum(tot_score), sum(tot_score)))
 
     def runStep(self):
         self.getData()
