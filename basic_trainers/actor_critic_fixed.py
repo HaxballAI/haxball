@@ -29,11 +29,6 @@ class Game:
 
         self.state = env.reset()
 
-        # Stores (red score, blue score, ties)
-        self.score = [0, 0, 0]
-        self.rolling_score = [0, 0, 0]
-        self.rolling_score_queue = queue.Queue()
-
     def getAction(self, state, is_red):
         # Gets the action based off the state, updates the value and
         # action lists accordingly.
@@ -74,13 +69,6 @@ class Game:
             self.r_rewards.append(rewards[0])
             # Breaks if done
             if self.done:
-                goals = self.env.goalScored()
-                # Fuck you
-                self.score[(goals + 2) % 3] += 1
-                self.rolling_score_queue.put((goals + 2) % 3)
-                self.rolling_score[(goals + 2) % 3] += 1
-                if self.rolling_score_queue.qsize() > 5:
-                    self.rolling_score[self.rolling_score_queue.get()] -= 1
                 break
 
     def makeDecayingReward(self, l, x):
@@ -146,6 +134,11 @@ class TrainSession:
         self.workers = [Game(model_training, model_fixed, env(), batch_size, gamma, is_norming) for k in range(worker_number)]
         self.opt = torch.optim.Adam(self.model_training.parameters(), lr = self.lr )
 
+        self.seb_rolling_score_queue = queue.Queue()
+        self.seb_last_score = [0, 0, 0]
+        self.seb_rolling_score = [0, 0, 0]
+        self.seb_total_score = [0, 0, 0]
+
     def getData(self):
         for w in self.workers:
             w.runSession()
@@ -167,20 +160,27 @@ class TrainSession:
         self.trainFromData(*r_data)
 
     def printInfo(self):
-        tot_score = [0, 0, 0]
-        rolling_score = [0, 0, 0]
-        last_score = [0, 0, 0]
-        for w in self.workers:
-            for i in range(3):
-                tot_score[i] += w.score[i]
-                rolling_score[i] += w.rolling_score[i]
+        self.seb_last_score = [0, 0, 0]
 
-        print(f"Last L-F-T: {last_score[0]}-{last_score[1]}-{last_score[2]}")
-        print("Running L-F-T: {}-{}-{}".format(rolling_score[0], rolling_score[1], rolling_score[2]) )
-        if sum(tot_score) != 0:
-            print("Overall L-F-T percentage: {:.3f}% - {:.3f}% - {:.3f}%, # of games = {}".format(tot_score[0]*100/sum(tot_score), tot_score[1]*100/sum(tot_score), tot_score[2]*100/sum(tot_score), sum(tot_score)))
+        for w in self.workers:
+            if w.done:
+                goals = w.env.goalScored()
+
+                self.seb_rolling_score[(goals + 2) % 3] += 1
+                self.seb_rolling_score_queue.put((goals + 2) % 3)
+                if self.seb_rolling_score_queue.qsize() > 100:
+                    self.seb_rolling_score[self.seb_rolling_score_queue.get()] -= 1
+
+                self.seb_last_score[(goals + 2) % 3] += 1
+                self.seb_total_score[(goals + 2) % 3] += 1
+
+        print(f"Last L-F-T: {self.seb_last_score[0]}-{self.seb_last_score[1]}-{self.seb_last_score[2]}")
+        print("Running L-F-T: {}-{}-{}".format(self.seb_rolling_score[0], self.seb_rolling_score[1], self.seb_rolling_score[2]) )
+        if sum(self.seb_total_score) != 0:
+            print("Overall L-F-T percentage: {:.3f}% - {:.3f}% - {:.3f}%, # of games = {}".format(self.seb_total_score[0]*100/sum(self.seb_total_score), self.seb_total_score[1]*100/sum(self.seb_total_score), self.seb_total_score[2]*100/sum(self.seb_total_score), sum(self.seb_total_score)))
         else:
-            print("# of games = {}".format(sum(tot_score)))
+            print("# of games = {}".format(sum(self.seb_total_score)))
+        print("\n", end="")
 
     def runStep(self):
         self.getData()
