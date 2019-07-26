@@ -174,9 +174,10 @@ class TrainSession:
                 tot_score[i] += w.score[i]
                 rolling_score[i] += w.rolling_score[i]
 
-        print("Running R-G-T: {}-{}-{}".format(rolling_score[0], rolling_score[1], rolling_score[2]) )
+        print(f"Last L-F-T: {w.score[0]}-{w.score[1]}-{w.score[2]}")
+        print("Running L-F-T: {}-{}-{}".format(rolling_score[0], rolling_score[1], rolling_score[2]) )
         if sum(tot_score) != 0:
-            print("Overall R-G-T percentage: {:.3f}% - {:.3f}% - {:.3f}%, # of games = {}".format(tot_score[0]*100/sum(tot_score), tot_score[1]*100/sum(tot_score), tot_score[2]*100/sum(tot_score), sum(tot_score)))
+            print("Overall L-F-T percentage: {:.3f}% - {:.3f}% - {:.3f}%, # of games = {}".format(tot_score[0]*100/sum(tot_score), tot_score[1]*100/sum(tot_score), tot_score[2]*100/sum(tot_score), sum(tot_score)))
         else:
             print("# of games = {}".format(sum(tot_score)))
 
