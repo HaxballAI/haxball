@@ -173,13 +173,10 @@ def main():
                         game_logger.append(game.log())
 
                 if game_ended:
-                    print("ENDED")
                     # Save the game logger data if enabled
                     if args.save_dir != "None":
-                        print(os.path.exists(f"{args.save_master_dir}/{args.save_dir}"))
                         if not os.path.exists(f"{args.save_master_dir}/{args.save_dir}"):
                             os.makedirs(f"{args.save_master_dir}/{args.save_dir}")
-                        print("SAVED ", game_number)
                         game_logger.save(f"{args.save_master_dir}/{args.save_dir}/{game_number}")
                     break
 
