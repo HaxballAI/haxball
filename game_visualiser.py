@@ -1,6 +1,5 @@
-#! /usr/bin/python
-
 import argparse
+import os
 
 import torch
 
@@ -8,6 +7,7 @@ from agents import ACagent, humanACagent, humanagent, idleagent
 from game_displayer import basicdisplayer
 from game_simulator import gameparams as gp
 from game_simulator import gamesim
+from game_log import log
 from move_displayer import movedisplayer
 
 # Only works with 1v1 so far
@@ -69,6 +69,26 @@ parser.add_argument(
     type=int,
     default = 1,
     help='Specify the number of steps per action received from the models')
+parser.add_argument(
+    '--save-master-dir',
+    type=str,
+    default = "recorded_games",
+    help='Specify the subdirectory where all the recorded games folders are gonna be saved in')
+parser.add_argument(
+    '--save-dir',
+    type=str,
+    default = "None",
+    help='Specify the name of the directory where the current sessions is gonna be saved in')
+parser.add_argument(
+    '--save-step-length',
+    type=int,
+    default = -1,
+    help='Specify the saving step length. Defaults to step length')
+parser.add_argument(
+    '--max-games',
+    type=int,
+    default = 2147483648,
+    help='Specify the number of games to be played. Defaults to infinity')
 args = parser.parse_args()
 
 
@@ -104,6 +124,7 @@ def getAgents(display, red_debug_surf, blue_debug_surf):
 
     return (agent_red, agent_blue)
 
+
 def main():
     if args.suppress_display and (args.red_human or args.blue_human):
         raise ValueError("Human players need display to function")
@@ -121,22 +142,60 @@ def main():
     game = gamesim.GameSim(1, 1, 1, printDebug = args.print_debug, print_score_update = not args.suppress_scorekeeping,auto_score = args.auto_score, rand_reset = args.rand_reset, max_steps = args.max_steps)
 
     # Run the game
-    while True:
-        # Query each agent on what commands should be sent to the game simulator
-        game.giveCommands([a.getAction(game.log()) for a in agents])
+    for game_number in range(args.max_games):
+        exit_loop = False
+        # Initialise the game logger if needed
+        if args.save_dir != "None":
+            game_logger = log.Game()
+            if args.save_step_length == -1:
+                args.save_step_length = args.step_length
+            save_counter = 0
 
-        for i in range(args.step_length):
-            game.step()
+            if not os.path.exists(f"{args.save_master_dir}"):
+                os.makedirs(f"{args.save_master_dir}")
 
-        if display != None:
-            # Update the graphical interface canvas
-            display.drawFrame(game.log())
+        while True:
+            game_ended = False
 
-            display.getInput()
+            # Query each agent on what commands should be sent to the game simulator
+            if display != None:
+                display.getInput()
+            game.giveCommands([a.getAction(game.log()) for a in agents])
 
-            if display.rip:
-                display.shutdown()
+            for i in range(args.step_length):
+                game_ended = game_ended or game.step()
+
+                # Append a frame to the game_logger if enabled
+                if args.save_dir != "None":
+                    save_counter += 1
+                    if save_counter == args.save_step_length:
+                        save_counter = 0
+                        game_logger.append(game.log())
+
+                if game_ended:
+                    print("ENDED")
+                    # Save the game logger data if enabled
+                    if args.save_dir != "None":
+                        print(os.path.exists(f"{args.save_master_dir}/{args.save_dir}"))
+                        if not os.path.exists(f"{args.save_master_dir}/{args.save_dir}"):
+                            os.makedirs(f"{args.save_master_dir}/{args.save_dir}")
+                        print("SAVED ", game_number)
+                        game_logger.save(f"{args.save_master_dir}/{args.save_dir}/{game_number}")
+                    break
+
+            if game_ended:
                 break
+
+            if display != None:
+                # Update the graphical interface canvas
+                display.drawFrame(game.log())
+
+                if display.rip:
+                    display.shutdown()
+                    exit_loop = True
+                    break
+        if exit_loop:
+            break
 
 if __name__ == "__main__":
     main()

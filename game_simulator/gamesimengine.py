@@ -247,20 +247,21 @@ class GameSimEngine():
 
     def updateScore(self, reset_params = "random"):
         # TODO: Fuck this.
+        game_ended = False
         for ball in self.balls:
             if ball.pos[0] <= gameparams.pitchcornerx:
                 self.blue_score += 1
                 self.red_last_goal = False
                 self.was_point_scored = True
-
+                game_ended = True
                 self.resetMap(reset_params)
             elif ball.pos[0] >= gameparams.windowwidth - gameparams.pitchcornerx:
                 self.red_score += 1
                 self.red_last_goal = True
                 self.was_point_scored = True
-
+                game_ended = True
                 self.resetMap(reset_params)
-        return
+        return game_ended
 
     def checkGoals(self):
         #Checks all the balls, returns tuple of (red scores, blue scores)

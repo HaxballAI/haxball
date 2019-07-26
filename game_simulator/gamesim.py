@@ -76,7 +76,8 @@ class GameSim(GameSimEngine):
 
     def step(self):
         self.steps += 1
-        self.was_point_scored = 0
+        self.was_point_scored = False
+        game_ended = False
 
         # Update positions
         self.updatePositions()
@@ -89,16 +90,17 @@ class GameSim(GameSimEngine):
         # Update the score of the game
         if self.auto_score:
             if self.rand_reset:
-                self.updateScore("random")
+                game_ended = self.updateScore("random")
             else:
-                self.updateScore("all default")
+                game_ended = self.updateScore("all default")
         if self.max_steps != -1 and self.steps > self.max_steps:
+            game_ended = True
             self.resetMap()
 
         if self.printDebug and self.steps % self.printDebugFreq == 0:
             self.getFeedback()
 
-        return
+        return game_ended
 
     def run(self, disp, agents):
         while True:
