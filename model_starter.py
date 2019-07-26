@@ -109,34 +109,34 @@ def improveNet(net_name, data_dir, game_number, epochs, learning_rate, batch_siz
 def makeEnv(step_len, reward_shape = False):
     return gym_haxball.onevoneenviroment.DuelEnviroment(step_len, 3000 / step_len, True, reward_shape = reward_shape)
 
+
+def actorTrain(primary_model, env, save_dir, number_of_steps, batch_size, learning_rate, gamma, entropy_rate, is_norming, worker_number, save_frequency=2147483648, secondary_model = None):
+    if secondary_model == None:
+        trainer = SymmetricTrainSession(model=primary_model, env=env, worker_number=worker_number,\
+                                      batch_size=batch_size, learning_rate=learning_rate, gamma=gamma, entropy_rate=entropy_rate, is_norming=is_norming)
+    else:
+        trainer = FixedTrainSession(model_training=primary_model, model_fixed=secondary_model, env=env, worker_number=worker_number,\
+                                      batch_size=batch_size, learning_rate=learning_rate, gamma=gamma, entropy_rate=entropy_rate, is_norming=is_norming)
+
+    cnt = 0
+    for i in range(number_of_steps):
+        print("Step {}, {:.3f}s".format(str(i), global_timer.getElapsedTime()))
+        trainer.runStep()
+
+        if i % save_frequency == 0:
+            torch.save(primary_model, save_dir + "_v" + str(cnt) + ".model")
+            cnt += 1
+    torch.save(primary_model, save_dir + ".model")
+
+
 if __name__ == "__main__":
     #newNet("scum_beater_v0","sebgames",100,3,1e-3,32, False, False)
-    if True:
-<<<<<<< HEAD
-        model = torch.load("models/scum_beater_v0_1.model")
-        model_fixed_opponent = torch.load("models/arun_v5_5.model")
-=======
-        model = torch.load("models/arun_v4.model")
-        model_fixed_opponent = torch.load("models/arun_v4.model")
->>>>>>> 97050db91d156909007658a3d866afff0d2eaa46
-        #if torch.cuda.is_available():
-        #    mod.to(torch.device('cuda'))
-        #trainer = SymmetricTrainSession(model=model, env=lambda: makeEnv(10), worker_number=15,\
-        #                              batch_size=1000, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=0.001, is_norming=False)
-<<<<<<< HEAD
-        trainer = FixedTrainSession(model_training=model, model_fixed=model_fixed_opponent, env = lambda: makeEnv(10, True), worker_number=15,\
-                                      batch_size=20, learning_rate = 1e-4, gamma=1-1e-4, entropy_rate=0.01, is_norming=False)
-        for i in range(100):
-            print("Step " + str(i), global_timer.getElapsedTime())
-            trainer.runStep()
-        torch.save(model, "models/scum_beater_v0_2.model")
-=======
-        trainer = FixedTrainSession(model_training=model, model_fixed=model_fixed_opponent, env = lambda: makeEnv(5, False), worker_number=15,\
-                                      batch_size=256, learning_rate=5e-4, gamma=1-3e-3, entropy_rate=0.004, is_norming=False)
-        for i in range(600):
-            print("Step {}, {:.3f}s".format(str(i), global_timer.getElapsedTime()))
-            trainer.runStep()
-            if i % 100 == 0:
-                torch.save(model, "models/psychic_v4." + str(int(i//100)) + ".model")
-        torch.save(model, "models/psychic_v4.model")
->>>>>>> 97050db91d156909007658a3d866afff0d2eaa46
+
+    model = torch.load("models/arun_v4.model")
+    model_fixed_opponent = torch.load("models/arun_v4.model")
+    #if torch.cuda.is_available():
+    #    mod.to(torch.device('cuda'))
+
+    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(5, False), worker_number=15,\
+                batch_size=256, learning_rate=5e-4, gamma=1-3e-3, entropy_rate=0.004, is_norming=False,\
+                save_dir="models/psychic_v6", save_frequency=10, number_of_steps=600)
