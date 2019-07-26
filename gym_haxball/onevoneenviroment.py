@@ -27,8 +27,8 @@ class DuelEnviroment:
         self.game_sim.giveCommands( [red_action , blue_action ] )
 
         if self.reward_shape:
-            red_bonus = -0.01 * red_action.isKicking()
-            blue_bonus = -0.01 * blue_action.isKicking()
+            red_bonus = -0.01 * bool(red_action.isKicking())
+            blue_bonus = -0.01 * bool(blue_action.isKicking())
         else:
             red_bonus = 0
             blue_bonus = 0

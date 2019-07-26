@@ -26,7 +26,8 @@ class ACAgent():
         movepred, kickpred , win_prob = self.network(frame_tensor)
 
         if not self.value_is_prob:
-            win_prob = torch.nn.Sigmoid()(win_prob)
+            #win_prob = torch.nn.Sigmoid()(win_prob)
+            win_prob = (win_prob + 1.0)/2
 
         #if torch.cuda.is_available():
         #    movepred = movepred.cpu()
