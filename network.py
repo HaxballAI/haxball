@@ -35,3 +35,24 @@ class GregPolicy(torch.nn.Module):
         kickprob = torch.nn.Sigmoid()(self.kick_head(y_actor_2))
         winprob = self.value_head(y_critic)
         return moveprobs, kickprob, winprob
+
+class GregPolicy2(torch.nn.Module):
+    def __init__(self, D_hid = 50):
+        super(GregPolicy2, self).__init__()
+        self.affine_actor_1 = torch.nn.Linear(12, D_hid)
+        self.affine_actor_2 = torch.nn.Linear(D_hid, D_hid)
+        self.affine_critic_1 = torch.nn.Linear(12, D_hid)
+        self.affine_critic_2 = torch.nn.Linear(D_hid, D_hid)
+        self.move_head = torch.nn.Linear(D_hid, 9)
+        self.kick_head = torch.nn.Linear(D_hid, 1)
+        self.value_head = torch.nn.Linear(D_hid, 1)
+
+    def forward(self, x):
+        y_actor_1 = F.relu(self.affine_actor_1(x))
+        y_actor_2 = F.relu(self.affine_actor_2(y_actor_1))
+        y_critic_1 = F.relu(self.affine_critic_1(x))
+        y_critic_2 = F.relu(self.affine_critic_2(y_critic_1))
+        moveprobs = F.softmax(self.move_head(y_actor_2), dim=-1)
+        kickprob = torch.nn.Sigmoid()(self.kick_head(y_actor_2))
+        winprob = self.value_head(y_critic_2)
+        return moveprobs, kickprob, winprob
