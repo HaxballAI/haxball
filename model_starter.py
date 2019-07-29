@@ -123,37 +123,17 @@ def actorTrain(primary_model, env, save_dir, number_of_steps, batch_size, learni
         print("Step {}, {:.3f}s".format(str(i), global_timer.getElapsedTime()))
         trainer.runStep()
 
-        if i % save_frequency == 0:
+        if i % save_frequency == 0 and cnt > 0:
             torch.save(primary_model, save_dir + "_v" + str(cnt) + ".model")
             cnt += 1
     torch.save(primary_model, save_dir + ".model")
 
-
+# v2, 3e-4, v3 1e-3, v4 arun_v6 vs psychov1
 if __name__ == "__main__":
-<<<<<<< HEAD
-    #newNet("new_crit_v0","sebgames",100,3,1e-3,32, False, False)
-    if True:
-        model = torch.load("models/new_crit_v0.model")
-        model_fixed_opponent = torch.load("models/arun_v5_5.model")
-        #if torch.cuda.is_available():
-        #    mod.to(torch.device('cuda'))
-        #trainer = SymmetricTrainSession(model=model, env=lambda: makeEnv(10), worker_number=15,\
-        #                              batch_size=1000, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=0.001, is_norming=False)
-        trainer = FixedTrainSession(model_training=model, model_fixed=model_fixed_opponent, env = lambda: makeEnv(11, True), worker_number=15,\
-                                      batch_size=32, learning_rate = 1e-4, gamma=1-1e-4, entropy_rate=0.1, is_norming=False)
-        for i in range(200):
-            print("Step " + str(i), global_timer.getElapsedTime())
-            trainer.runStep()
-        torch.save(model, "models/new_crit_v0_1.model")
-=======
-    #newNet("scum_beater_v0","sebgames",100,3,1e-3,32, False, False)
 
-    model = torch.load("models/arun_v4.model")
-    model_fixed_opponent = torch.load("models/arun_v4.model")
-    #if torch.cuda.is_available():
-    #    mod.to(torch.device('cuda'))
+    model = torch.load("models/psycho_v5.model")
+    model_fixed_opponent = torch.load("models/psycho_v1.model")
 
-    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(5, False), worker_number=15,\
-                batch_size=256, learning_rate=5e-4, gamma=1-3e-3, entropy_rate=0.004, is_norming=False,\
-                save_dir="models/psychic_v6", save_frequency=10, number_of_steps=600)
->>>>>>> d9c4804f61708f8f0e57d4ad634a21f5e371d7f7
+    actorTrain(primary_model=model, secondary_model=None, env=lambda: makeEnv(5, False), worker_number=15,\
+                batch_size=256, learning_rate=1e-4, gamma=1-3e-3, entropy_rate=0.004, is_norming=False,\
+                save_dir="models/psycho_v5_imp", save_frequency=10, number_of_steps=1000)
