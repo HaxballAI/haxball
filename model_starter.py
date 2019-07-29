@@ -130,30 +130,13 @@ def actorTrain(primary_model, env, save_dir, number_of_steps, batch_size, learni
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
-    #newNet("new_crit_v0","sebgames",100,3,1e-3,32, False, False)
-    if True:
-        model = torch.load("models/new_crit_v0.model")
-        model_fixed_opponent = torch.load("models/arun_v5_5.model")
-        #if torch.cuda.is_available():
-        #    mod.to(torch.device('cuda'))
-        #trainer = SymmetricTrainSession(model=model, env=lambda: makeEnv(10), worker_number=15,\
-        #                              batch_size=1000, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=0.001, is_norming=False)
-        trainer = FixedTrainSession(model_training=model, model_fixed=model_fixed_opponent, env = lambda: makeEnv(11, True), worker_number=15,\
-                                      batch_size=32, learning_rate = 1e-4, gamma=1-1e-4, entropy_rate=0.1, is_norming=False)
-        for i in range(200):
-            print("Step " + str(i), global_timer.getElapsedTime())
-            trainer.runStep()
-        torch.save(model, "models/new_crit_v0_1.model")
-=======
     #newNet("scum_beater_v0","sebgames",100,3,1e-3,32, False, False)
 
-    model = torch.load("models/arun_v4.model")
-    model_fixed_opponent = torch.load("models/arun_v4.model")
+    model = torch.load("models/new_self_v194.model")
+    model_fixed_opponent = torch.load("models/new_self_v194.model")
     #if torch.cuda.is_available():
     #    mod.to(torch.device('cuda'))
 
-    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(5, False), worker_number=15,\
-                batch_size=256, learning_rate=5e-4, gamma=1-3e-3, entropy_rate=0.004, is_norming=False,\
-                save_dir="models/psychic_v6", save_frequency=10, number_of_steps=600)
->>>>>>> d9c4804f61708f8f0e57d4ad634a21f5e371d7f7
+    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(10, False), worker_number=15,\
+                batch_size=32, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=1e-3, is_norming=False,\
+                save_dir="models/learning_test3", save_frequency=2000, number_of_steps=100)
