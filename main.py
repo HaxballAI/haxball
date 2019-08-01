@@ -16,8 +16,8 @@ import numpy as np
 import torch
 
 def main():
-    model_1 = torch.load("models/overnight/overnight_1.model")
-    model_2 = torch.load("models/overnight/overnight_4.model")
+    model_1 = torch.load("models/arun_v4.model")
+    model_2 = torch.load("models/arun_v4.model")
 
     #if torch.cuda.is_available():
     #    model_1 = model_1.cuda()
@@ -47,8 +47,8 @@ def main():
 
     blueA = ACagent.ACAgent(model_1, "blue", "random", blue_debug_surf, False)
 
-    #agents.append(humanACagent.HumanACAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'u'), disp, blueA))
-    agents.append(blueA)
+    agents.append(humanACagent.HumanACAgent(('UP', 'RIGHT', 'DOWN', 'LEFT', 'u'), disp, blueA))
+    #agents.append(blueA)
     # agents.append(randomagent.RandomAgent())
 
     if False:

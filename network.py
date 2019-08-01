@@ -16,6 +16,40 @@ class Policy(torch.nn.Module):
         winprob = torch.nn.Sigmoid()(self.value_head(y))
         return moveprobs, kickprob, winprob
 
+class multiplayer_actor(torch.nn.Module):
+    def __init__(self, num_players = 4, , D_hid = 50):
+        super(GregPolicy2, self).__init__()
+        #inputs are 4 for the ball, 4 for each player.
+        D_in = 4 + 4 * num_players
+
+        self.hidden_1 = torch.nn.Linear(D_in, D_hid)
+        self.hidden_2 = torch.nn.Linear(D_hid, D_hid)
+        self.action_signal = torch.nn.Linear(D_hid, 18)
+
+    def forward(self, x):
+        hidden_1 = F.relu(self.hidden_1(x))
+        hidden_2 = F.relu(self.hidden_2(hidden_1))
+        policy = F.softmax(self.action_signal(hidden_2))
+
+        return policy
+
+class multiplayer_critic(torch.nn.Module):
+    def __init__(self, num_players = 4, , D_hid = 50):
+        super(GregPolicy2, self).__init__()
+        # inputs are 4 for the ball, 4 for each player, and 10 to one-hot encode the action of each player in that frame.
+        D_in = 4 + 4 * num_players + 10 * num_players
+
+        self.critic_hid_1 = torch.nn.Linear(D_in, D_hid)
+        self.critic_hid_2 = torch.nn.Linear(D_in, D_hid)
+        self.critic_Q = torch.nn.Linear(D_hid, 18)
+
+    def forward(self, x):
+        critic_hidden_1 = F.relu(self.critic_hid_1(x))
+        critic_hidden_2 = F.relu(self.critic_hid_2(critic_hidden_1))
+        critic_Q = self.critic_Q(critic_hidden_2)
+        # critic_Q are the estimated Q values for each possible action for first player encoded, given the state and the actions of its teammates
+        return critic_Q
+
 
 class GregPolicy(torch.nn.Module):
     def __init__(self, D_hid = 80):
