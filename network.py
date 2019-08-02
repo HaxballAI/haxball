@@ -17,7 +17,7 @@ class Policy(torch.nn.Module):
         return moveprobs, kickprob, winprob
 
 class multiplayer_actor(torch.nn.Module):
-    def __init__(self, num_players = 4, , D_hid = 50):
+    def __init__(self, num_players = 4, D_hid = 50):
         super(GregPolicy2, self).__init__()
         #inputs are 4 for the ball, 4 for each player.
         D_in = 4 + 4 * num_players
@@ -34,7 +34,7 @@ class multiplayer_actor(torch.nn.Module):
         return policy
 
 class multiplayer_critic(torch.nn.Module):
-    def __init__(self, num_players = 4, , D_hid = 50):
+    def __init__(self, num_players = 4, D_hid = 50):
         super(GregPolicy2, self).__init__()
         # inputs are 4 for the ball, 4 for each player, and 10 to one-hot encode the action of each player in that frame.
         D_in = 4 + 4 * num_players + 10 * num_players
@@ -90,3 +90,29 @@ class GregPolicy2(torch.nn.Module):
         kickprob = torch.nn.Sigmoid()(self.kick_head(y_actor_2))
         winprob = self.value_head(y_critic_2)
         return moveprobs, kickprob, winprob
+
+class SebPolicy(torch.nn.Module):
+    def __init__(self, hidden_size = 50):
+        super(SebPolicy, self).__init__()
+
+        self.critic = torch.nn.Sequential(
+            torch.nn.Linear(12, hidden_size),
+            torch.torch.nn.ReLU(),
+            torch.nn.Linear(hidden_size, hidden_size),
+            torch.torch.nn.ReLU(),
+            torch.nn.Linear(hidden_size, 1)
+        )
+
+        self.actor = torch.nn.Sequential(
+            torch.nn.Linear(12, hidden_size),
+            torch.nn.ReLU(),
+            torch.nn.Linear(hidden_size, hidden_size),
+            torch.nn.ReLU(),
+            torch.nn.Linear(hidden_size, 18)
+        )
+
+
+    def forward(self, x):
+        value = self.critic(x)
+        move  = self.actor(x)
+        return move, value
