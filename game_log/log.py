@@ -30,9 +30,9 @@ class PlayerState(BallState):
 
     def actToList(self, myTeam):
         if myTeam == "red":
-            return list(self.action.binaryAction())
+            return list(self.action.singleAction())
         elif myTeam == "blue":
-            return list(self.action.flipped().binaryAction())
+            return list(self.action.flipped().singleAction())
         else:
             raise ValueError
 
