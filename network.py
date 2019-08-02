@@ -114,5 +114,5 @@ class SebPolicy(torch.nn.Module):
 
     def forward(self, x):
         value = self.critic(x)
-        move  = self.actor(x)
+        move  = F.softmax(self.actor(x),dim = -1)
         return move, value
