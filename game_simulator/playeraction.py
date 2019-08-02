@@ -10,7 +10,7 @@ def rawToBinary(*x):
     if x[0] < 0 or x[0] > 8 or x[1] < 0 or x[1] > 1:
         raise ValuError("Raw action is not of the correct format")
 
-    ret = (0, 0, 0, 0, x[1])
+    ret = [0, 0, 0, 0, x[1]]
     if x == 8 or x == 1 or x == 2:
         ret[0] = 1
     if 2 <= x[0] and x[0] <= 4:
