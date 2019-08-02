@@ -16,14 +16,16 @@ class ACAgent():
         self.value_is_prob = value_is_prob
 
     def getAction(self, frame):
-
-
         frame_tensor = torch.FloatTensor(frame.posToNp(self.team, 0, self.accepts_normalised))
 
         #    frame_tensor = frame_tensor.cuda()
         #if torch.cuda.is_available():
 
-        movepred, kickpred , win_prob = self.network(frame_tensor)
+        output = self.network(frame_tensor)
+        win_prob = output[-1]
+        action_pred_data = output[0:-1]
+
+        print(output, "\n")
 
         if not self.value_is_prob:
             #win_prob = torch.nn.Sigmoid()(win_prob)
@@ -33,27 +35,43 @@ class ACAgent():
         #    movepred = movepred.cpu()
 
 
+        action_data = []
         if self.method == "random":
-            move = np.random.choice(len(movepred), p = movepred.detach().numpy() )
+            for i in range(len(action_pred_data)):
+                if len(action_pred_data[i]) == 1:
+                    p = action_pred_data[i].detach().numpy()[0]
+                    action_data.append(np.random.choice([False, True], p = [1 - p, p]))
+                else:
+                    action_data.append(np.random.choice(len(action_pred_data[i]), p = action_pred_data[i].detach().numpy()))
         elif self.method == "max":
-            move = int(np.argmax(movepred.detach().numpy()))
+            for i in range(len(action_pred_data)):
+                action_data.append(np.argmax(action_pred_data[i].detach().numpy()))
         else:
             raise ValueError
-        p_kick = float(kickpred[0])
-        kick = np.random.choice([False, True], p = [1 - p_kick, p_kick])
-        action = playeraction.Action(move, kick)
+        action = playeraction.Action(*action_data)
         if self.team == "red":
             pass
         elif self.team == "blue":
             action = action.flipped()
         else:
             raise ValueError
+
+
         if self.debug_surf:
-            if self.team == "red":
-                move_probs = movepred.detach().numpy()
-            elif self.team == "blue":
-                move_probs = movepred.detach().numpy()[[0,5,6,7,8,1,2,3,4]]
+            move_probs = []
+            if len(action_pred_data) == 1:
+                temp = action_pred_data[0].detach().numpy()
+                for i in range(len(temp)):
+                    if i % 2 == 0:
+                        move_probs.append(temp[i])
+                    else:
+                        move_probs[i // 2] = (move_probs[i // 2] + temp[i]) / 2
+            elif len(action_pred_data) == 2:
+                move_probs = action_pred_data[0].detach().numpy()
             else:
                 raise ValueError
+
+            if self.team == "blue":
+                move_probs = move_probs[[0,5,6,7,8,1,2,3,4]]
             self.debug_surf.drawMove(move_probs, action.dir_idx, self.team, float(win_prob))
         return action
