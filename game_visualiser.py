@@ -38,6 +38,14 @@ parser.add_argument(
     default=None,
     help='Specify the model of the blue team if there is any')
 parser.add_argument(
+    '--red-normalised',
+    action="store_true",
+    help='Specify whether the model of the red team takes normalised input or not')
+parser.add_argument(
+    '--blue-normalised',
+    action="store_true",
+    help='Specify whether the model of the blue team takes normalised input or not')
+parser.add_argument(
     '--print-debug',
     action="store_true",
     help='Specify whether debug info should be printed or not')
@@ -98,7 +106,7 @@ default_blue_bindings = ('UP', 'RIGHT', 'DOWN', 'LEFT', 'u')
 def getAgents(display, red_debug_surf, blue_debug_surf):
     if args.red_model != None:
         model_red = torch.load(args.load_dir + args.red_model + ".model")
-        agent_red_ = ACagent.ACAgent(model_red, "red", "random", red_debug_surf, False)
+        agent_red_ = ACagent.ACAgent(model_red, "red", "random", red_debug_surf, args.red_normalised)
         if args.red_human == True:
             agent_red = humanACagent.HumanACAgent(default_red_bindings, display, agent_red_)
         else:
@@ -111,7 +119,7 @@ def getAgents(display, red_debug_surf, blue_debug_surf):
 
     if args.blue_model != None:
         model_blue = torch.load(args.load_dir + args.blue_model + ".model")
-        agent_blue_ = ACagent.ACAgent(model_blue, "blue", "random", blue_debug_surf, False)
+        agent_blue_ = ACagent.ACAgent(model_blue, "blue", "random", blue_debug_surf, args.blue_normalised)
         if args.blue_human == True:
             agent_blue = humanACagent.HumanACAgent(default_blue_bindings, display, agent_blue_)
         else:
