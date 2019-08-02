@@ -25,8 +25,6 @@ class ACAgent():
         win_prob = output[-1]
         action_pred_data = output[0:-1]
 
-        print(output, "\n")
-
         if not self.value_is_prob:
             #win_prob = torch.nn.Sigmoid()(win_prob)
             win_prob = (win_prob + 1.0)/2
@@ -66,6 +64,7 @@ class ACAgent():
                         move_probs.append(temp[i])
                     else:
                         move_probs[i // 2] = (move_probs[i // 2] + temp[i]) / 2
+                move_probs = np.array(move_probs)
             elif len(action_pred_data) == 2:
                 move_probs = action_pred_data[0].detach().numpy()
             else:
