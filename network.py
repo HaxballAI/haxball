@@ -92,8 +92,12 @@ class GregPolicy2(torch.nn.Module):
         return moveprobs, kickprob, winprob
 
 class SebPolicy(torch.nn.Module):
-    def __init__(self, hidden_size = 50):
+    def __init__(self, hidden_size = 50, norming = False):
         super(SebPolicy, self).__init__()
+
+        # Just a flag to allow for easily finding if a model is supposed
+        # to use normalised data.
+        self.norming = norming
 
         self.critic = torch.nn.Sequential(
             torch.nn.Linear(12, hidden_size),
