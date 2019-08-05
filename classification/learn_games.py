@@ -54,7 +54,7 @@ def learnFromGames(model, data_dir, game_indicies, epoch_num, learning_rate, bat
         for i, data in enumerate(game_loader):
             act_pred, value_pred = model(data["state"])
             actor_loss = actioncriterion(act_pred, data["action"])
-            critic_loss = wincriterion(value_pred, data["won"])
+            critic_loss = wincriterion(value_pred.squeeze(), data["won"])
             loss = actor_loss + critic_loss
             optimiser.zero_grad()
             loss.backward()
