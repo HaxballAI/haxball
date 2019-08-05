@@ -16,8 +16,8 @@ import numpy as np
 import torch
 
 def main():
-    model_1 = torch.load("models/arun_v4.model")
-    model_2 = torch.load("models/arun_v4.model")
+    model_1 = torch.load("models/arun_v6.model")
+    model_2 = torch.load("models/champion3_v1.model")
 
     #if torch.cuda.is_available():
     #    model_1 = model_1.cuda()
