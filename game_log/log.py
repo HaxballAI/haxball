@@ -30,9 +30,9 @@ class PlayerState(BallState):
 
     def actToList(self, myTeam):
         if myTeam == "red":
-            return list(self.action.rawAction())
+            return self.action.singleAction()
         elif myTeam == "blue":
-            return list(self.action.flipped().rawAction())
+            return self.action.flipped().singleAction()
         else:
             raise ValueError
 
@@ -81,6 +81,8 @@ class Game:
 
     def toNp(self, myTeam, me, normalise = True):
         return np.array([f.posToNp(myTeam, me, normalise) for f in self.frames]), np.array([f.singleActToNp(myTeam, me) for f in self.frames])
+
+
 
     @staticmethod
     def load(filename):

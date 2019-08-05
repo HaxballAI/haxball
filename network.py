@@ -2,8 +2,10 @@ import torch
 import torch.nn.functional as F
 
 class Policy(torch.nn.Module):
-    def __init__(self, D_in = 12, D_hid = 50, D_out = 10):
+    def __init__(self, D_in = 12, D_hid = 50, D_out = 10, norming = False):
         super(Policy, self).__init__()
+        self.norming = norming
+
         self.affine1 = torch.nn.Linear(D_in, D_hid)
         self.move_head = torch.nn.Linear(D_hid, D_out - 1)
         self.kick_head = torch.nn.Linear(D_hid, 1)
@@ -17,7 +19,7 @@ class Policy(torch.nn.Module):
         return moveprobs, kickprob, winprob
 '''
 class multiplayer_actor(torch.nn.Module):
-    def __init__(self, num_players = 4, , D_hid = 50):
+    def __init__(self, num_players = 4, D_hid = 50):
         super(GregPolicy2, self).__init__()
         #inputs are 4 for the ball, 4 for each player.
         D_in = 4 + 4 * num_players
@@ -34,7 +36,7 @@ class multiplayer_actor(torch.nn.Module):
         return policy
 
 class multiplayer_critic(torch.nn.Module):
-    def __init__(self, num_players = 4, , D_hid = 50):
+    def __init__(self, num_players = 4, D_hid = 50):
         super(GregPolicy2, self).__init__()
         # inputs are 4 for the ball, 4 for each player, and 10 to one-hot encode the action of each player in that frame.
         D_in = 4 + 4 * num_players + 10 * num_players
@@ -52,8 +54,10 @@ class multiplayer_critic(torch.nn.Module):
 '''
 
 class GregPolicy(torch.nn.Module):
-    def __init__(self, D_hid = 80):
+    def __init__(self, D_hid = 80, norming = False):
         super(GregPolicy, self).__init__()
+        self.norming = norming
+
         self.affine_actor_1 = torch.nn.Linear(12, D_hid)
         self.affine_actor_2 = torch.nn.Linear(D_hid, D_hid)
         self.affine_critic = torch.nn.Linear(12, D_hid)
@@ -71,8 +75,10 @@ class GregPolicy(torch.nn.Module):
         return moveprobs, kickprob, winprob
 
 class GregPolicy2(torch.nn.Module):
-    def __init__(self, D_hid = 50):
+    def __init__(self, D_hid = 50, norming = False):
         super(GregPolicy2, self).__init__()
+        self.norming = norming
+
         self.affine_actor_1 = torch.nn.Linear(12, D_hid)
         self.affine_actor_2 = torch.nn.Linear(D_hid, D_hid)
         self.affine_critic_1 = torch.nn.Linear(12, D_hid)
@@ -90,3 +96,33 @@ class GregPolicy2(torch.nn.Module):
         kickprob = torch.nn.Sigmoid()(self.kick_head(y_actor_2))
         winprob = self.value_head(y_critic_2)
         return moveprobs, kickprob, winprob
+
+class SebPolicy(torch.nn.Module):
+    def __init__(self, hidden_size = 50, norming = False):
+        super(SebPolicy, self).__init__()
+
+        # Just a flag to allow for easily finding if a model is supposed
+        # to use normalised data.
+        self.norming = norming
+
+        self.critic = torch.nn.Sequential(
+            torch.nn.Linear(12, hidden_size),
+            torch.torch.nn.ReLU(),
+            torch.nn.Linear(hidden_size, hidden_size),
+            torch.torch.nn.ReLU(),
+            torch.nn.Linear(hidden_size, 1)
+        )
+
+        self.actor = torch.nn.Sequential(
+            torch.nn.Linear(12, hidden_size),
+            torch.nn.ReLU(),
+            torch.nn.Linear(hidden_size, hidden_size),
+            torch.nn.ReLU(),
+            torch.nn.Linear(hidden_size, 18)
+        )
+
+
+    def forward(self, x):
+        value = self.critic(x)
+        move  = F.softmax(self.actor(x),dim = -1)
+        return move, value
