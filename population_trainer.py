@@ -76,7 +76,7 @@ class PopulationHandler:
 
         self.game_tester = GameTester(env())
 
-        self.reference_model = torch.load("models/classifier.model")
+        self.reference_model = torch.load("models/arun_v6.model")
 
     def updateNashEquilibrium(self, number_of_games):
         reward_matrix = np.zeros((self.number_of_agents, self.number_of_agents))
@@ -131,6 +131,7 @@ class PopulationHandler:
                 trainer.runStep()
 
         self.agents = new_agents
+        self.agents[torch.argmin(self.nash_distribution).item()] = copy.deepcopy(self.agents[torch.argmax(self.nash_distribution).item()])
 
     def getChampion(self):
         return copy.deepcopy(self.champion)
@@ -141,10 +142,10 @@ class PopulationHandler:
 
 
 def makeEnv(step_len, reward_shape = False):
-    return gym_haxball.onevoneenviroment.DuelEnviroment(step_len, 3000 / step_len, True, reward_shape = reward_shape)
+    return gym_haxball.onevoneenviroment.DuelEnviroment(step_len, 3000 // step_len, True, reward_shape = reward_shape)
 
 def main():
-    starter_agents = [torch.load("models/classifier.model") for i in range(6)]
+    starter_agents = [torch.load("models/arun_v6.model") for i in range(6)]
 
     pop = PopulationHandler(initial_agents=starter_agents, env=lambda: makeEnv(5, False), \
                             batch_size=256, learning_rate=1e-4, gamma=1-3e-3, entropy_rate=0.01, is_norming=False)
@@ -156,7 +157,7 @@ def main():
         pop.referenceTestChampion()
 
         champion = pop.getChampion()
-        torch.save(champion, "models/champion_v" + str(i) + ".model")
+        torch.save(champion, "models/champion3_v" + str(i) + ".model")
         print(f"champion v{i} saved! \t{global_timer.getElapsedTime():.3f}s\n\n")
 
 if __name__ == "__main__":

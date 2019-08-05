@@ -130,23 +130,13 @@ def actorTrain(primary_model, env, save_dir, number_of_steps, batch_size, learni
 
 # v2, 3e-4, v3 1e-3, v4 arun_v6 vs psychov1
 if __name__ == "__main__":
-<<<<<<< HEAD
     #newNet("scum_beater_v0","sebgames",100,3,1e-3,32, False, False)
 
-    model = torch.load("models/new_self_v194.model")
-    model_fixed_opponent = torch.load("models/new_self_v194.model")
+    model = torch.load("models/arun_v6.model")
+    model_fixed_opponent = None
     #if torch.cuda.is_available():
     #    mod.to(torch.device('cuda'))
 
     actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(10, False), worker_number=15,\
                 batch_size=32, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=1e-3, is_norming=False,\
-                save_dir="models/learning_test3", save_frequency=2000, number_of_steps=100)
-=======
-
-    model = torch.load("models/psycho_v5.model")
-    model_fixed_opponent = torch.load("models/psycho_v1.model")
-
-    actorTrain(primary_model=model, secondary_model=None, env=lambda: makeEnv(5, False), worker_number=15,\
-                batch_size=256, learning_rate=1e-4, gamma=1-3e-3, entropy_rate=0.004, is_norming=False,\
-                save_dir="models/psycho_v5_imp", save_frequency=10, number_of_steps=1000)
->>>>>>> 75b87874a903693f7b93063bd336a823969f7d1c
+                save_dir="models/hybridloss_test", save_frequency=2000, number_of_steps=100)

@@ -15,7 +15,7 @@ class Policy(torch.nn.Module):
         kickprob = torch.nn.Sigmoid()(self.kick_head(y))
         winprob = torch.nn.Sigmoid()(self.value_head(y))
         return moveprobs, kickprob, winprob
-
+'''
 class multiplayer_actor(torch.nn.Module):
     def __init__(self, num_players = 4, , D_hid = 50):
         super(GregPolicy2, self).__init__()
@@ -49,7 +49,7 @@ class multiplayer_critic(torch.nn.Module):
         critic_Q = self.critic_Q(critic_hidden_2)
         # critic_Q are the estimated Q values for each possible action for first player encoded, given the state and the actions of its teammates
         return critic_Q
-
+'''
 
 class GregPolicy(torch.nn.Module):
     def __init__(self, D_hid = 80):
