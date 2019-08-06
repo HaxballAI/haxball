@@ -23,6 +23,11 @@ class DuelFixedGym(core.Env):
         else:
             norming = True
 
+        if "model" in config:
+            model = config["model"]
+        else:
+            model = "arun_v6"
+
         self.envo = DuelEnviroment(step_len, max_steps, norming)
 
         win_w = gameparams.windowwidth
@@ -37,7 +42,7 @@ class DuelFixedGym(core.Env):
             dtype = np.float32
            )
 
-        opponent_model = torch.load("models/train2.model")
+        opponent_model = torch.load(f"models/{model}.model").to("cpu")
         self.opponent = ACagent.ACAgent(opponent_model, "blue",  "random")
 
     def getState(self):
