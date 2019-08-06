@@ -139,4 +139,4 @@ if __name__ == "__main__":
 
     actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(10, False), worker_number=15,\
                 batch_size=32, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=1e-3, is_norming=False,\
-                save_dir="models/hybridloss_test", save_frequency=2000, number_of_steps=100)
+                save_dir="models/sanity_test", save_frequency=2, number_of_steps=10)

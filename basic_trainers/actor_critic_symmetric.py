@@ -174,10 +174,10 @@ class TrainSession:
         five_step_advantage = [ (rewards[-1] if i + 4 > len(rewards) - 1 else rewards[i + 4]) - torch.Tensor.detach(values[i]) for i in range(len(rewards))]
         twentyfive_step_advantage = [ (rewards[-1] if i + 24 > len(rewards) - 1 else rewards[i + 24]) - torch.Tensor.detach(values[i]) for i in range(len(rewards))]
         full_episode_advantage = [rewards[-1] - torch.Tensor.detach(values[i]) for i in range(len(rewards))]
-        losses = [actions[i] * (4*one_step_advantage[i] + 0*five_step_advantage[i] + 0*twentyfive_step_advantage[i] + 0*full_episode_advantage[i])/4 for i in range(len(actions))]
+        losses = [actions[i] * (one_step_advantage[i] + five_step_advantage[i] + twentyfive_step_advantage[i] + full_episode_advantage[i])/4 for i in range(len(actions))]
         value_tensor = torch.stack(values).reshape(-1)
         reward_tensor = torch.FloatTensor(rewards).reshape(-1)
-        value_loss = torch.nn.MSELoss(reduction = "sum")( value_tensor , reward_tensor)
+        value_loss = torch.nn.MSELoss(reduction = "mean")( value_tensor , reward_tensor)
         policy_loss = torch.stack(losses).sum()
         loss = policy_loss \
              + value_loss \
