@@ -5,9 +5,11 @@ import numpy as np
 import pygame
 
 class DuelEnviroment:
-    def __init__(self, step_len = 15, max_steps = 400):
+    def __init__(self, step_len = 15, max_steps = 400, norming = True):
         self.step_len = step_len
         self.max_steps = max_steps
+
+        self.norming = norming
 
         self.game_sim = gamesim.GameSim(1,1,1)
         self.game_sim.resetMap()
@@ -19,7 +21,7 @@ class DuelEnviroment:
     def getState(self):
         # Returns the state of the game, posToNp flattens it to a np array.
         # That's desired so the state is in an easier to manipulate form.
-        return np.array(self.game_sim.log().posToNp("red"))
+        return np.array(self.game_sim.log().posToNp("red",0,self.norming))
 
     def step(self, red_action, blue_action):
         # advances the simulator by step_len number of steps. Returns a list of

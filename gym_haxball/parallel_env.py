@@ -79,6 +79,25 @@ class VecEnv(object):
         self.step_async(actions)
         return self.step_wait()
 
+class BadVecEnv(VecEnv):
+    # Do not use this is bad.
+    def __init__(self, env_fns):
+        self.nenvs = len(env_fns)
+        self.envs = [e() for e in env_fns]
+        self.last_ret = self.reset()
+
+    def reset(self):
+        return [e.reset() for e in self.envs]
+
+    def step_async(self,actions):
+        self.last_ret = [e.step(act) for e, act in zip(self.envs, actions)]
+
+    def step_wait(self):
+        obs, rews, dones, infos = zip(*self.last_ret)
+        return np.stack(obs), np.stack(rews), np.stack(dones), infos
+
+
+
 
 class CloudpickleWrapper(object):
     """

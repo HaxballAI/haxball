@@ -10,7 +10,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.distributions import Categorical
 
-from gym_haxball.parallel_env import SubprocVecEnv
+import gym_haxball.parallel_env as vecenv
 
 use_cuda = torch.cuda.is_available()
 device   = torch.device("cuda" if use_cuda else "cpu")
@@ -18,16 +18,22 @@ device   = torch.device("cuda" if use_cuda else "cpu")
 class PPOTrainer:
     def __init__(self, model, env_constructor, worker_num,
                  learning_rate = 0.001, gamma = 0.99, tau = 0.95, critic_param = 0.5,
-                 temperature = 0.001, clip_param = 0.1):
-        self.model = model
+                 temperature = 0.001, clip_param = 0.1, ppo_epochs = 4,
+                 mini_batch_size = 5):
+        self.model = model.to(device)
         self.lr = learning_rate
         self.gamma = gamma
         self.tau = tau
         self.critic_param = critic_param
         self.temperature = temperature
-        self.envs = SubprocVecEnv([env_constructor() for i in range(workers)])
+        self.ppo_epochs = ppo_epochs
+        self.mini_batch_size = mini_batch_size
+        self.clip_param = clip_param
+        self.envs = vecenv.SubprocVecEnv([env_constructor for i in range(worker_num)])
         self.optimiser = optim.Adam(self.model.parameters(), lr=self.lr)
-        self.state = self.envs.reset()
+        self.state = torch.FloatTensor(self.envs.reset()).to(device)
+
+        print("Done.")
 
 
     def train(self, steps):
@@ -43,9 +49,8 @@ class PPOTrainer:
             masks     = []
             entropy = 0
 
-            for _ in range(num_steps):
-                self.state = torch.FloatTensor(self.state).to(device)
-                a_probs, value = model(self.state)
+            for _ in range(steps):
+                a_probs, value = self.model(self.state)
                 dist = Categorical(a_probs)
 
                 action = dist.sample()
@@ -59,10 +64,10 @@ class PPOTrainer:
                 rewards.append(torch.FloatTensor(reward).unsqueeze(1).to(device))
                 masks.append(torch.FloatTensor(1 - done).unsqueeze(1).to(device))
 
-                states.append(state)
+                states.append(self.state)
                 actions.append(action)
 
-                state = next_state
+                state = torch.FloatTensor(next_state).to(device)
                 frame_idx += 1
 
                 # Might be nice to have this sort of visauliser.
@@ -76,8 +81,8 @@ class PPOTrainer:
 
 
             next_state = torch.FloatTensor(next_state).to(device)
-            _, next_value = model(next_state)
-            returns = compute_gae(next_value, rewards, masks, values)
+            _, next_value = self.model(next_state)
+            returns = self.compute_gae(next_value, rewards, masks, values)
 
             returns   = torch.cat(returns).detach()
             log_probs = torch.cat(log_probs).detach()
@@ -86,9 +91,10 @@ class PPOTrainer:
             actions   = torch.cat(actions)
             advantage = returns - values
 
-            self.ppo_update(ppo_epochs, mini_batch_size, states, actions, log_probs, returns, advantage)
+            self.ppo_update(self.ppo_epochs, self.mini_batch_size, states,
+                            actions, log_probs, returns, advantage)
 
-    def compute_gae(next_value, rewards, masks, values):
+    def compute_gae(self,next_value, rewards, masks, values):
         values = values + [next_value]
         gae = 0
         returns = []
@@ -98,17 +104,20 @@ class PPOTrainer:
             returns.insert(0, gae + values[step])
         return returns
 
-    def ppo_iter(mini_batch_size, states, actions, log_probs, returns, advantage):
+    def ppo_iter(self,mini_batch_size, states, actions, log_probs, returns, advantage):
         batch_size = states.size(0)
         for _ in range(batch_size // mini_batch_size):
             rand_ids = np.random.randint(0, batch_size, mini_batch_size)
-            yield states[rand_ids, :], actions[rand_ids, :], log_probs[rand_ids, :], returns[rand_ids, :], advantage[rand_ids, :]
+            # Need to be concerned probably about : only being used on states.
+            yield states[rand_ids, :], actions[rand_ids], log_probs[rand_ids], returns[rand_ids], advantage[rand_ids]
 
-    def ppo_update(ppo_epochs, mini_batch_size, states, actions, log_probs, returns, advantages):
+    def ppo_update(self,ppo_epochs, mini_batch_size, states, actions, log_probs, returns, advantages):
         for _ in range(ppo_epochs):
             # Splits data into minibatches.
-            for state, action, old_log_probs, return_, advantage in ppo_iter(mini_batch_size, states, actions, log_probs, returns, advantages):
-                dist, value = self.model(state)
+            for state, action, old_log_probs, return_, advantage \
+             in self.ppo_iter(mini_batch_size, states, actions, log_probs, returns, advantages):
+                a_prob, value = self.model(state)
+                dist = Categorical(a_prob)
                 entropy = dist.entropy().mean()
                 new_log_probs = dist.log_prob(action)
 

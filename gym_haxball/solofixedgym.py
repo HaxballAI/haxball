@@ -17,7 +17,13 @@ class DuelFixedGym(core.Env):
             max_steps = config["max_steps"]
         else:
             max_steps = 400
-        self.envo = DuelEnviroment(step_len, max_steps)
+
+        if "norming" in config:
+            norming = config["norming"]
+        else:
+            norming = True
+
+        self.envo = DuelEnviroment(step_len, max_steps, norming)
 
         win_w = gameparams.windowwidth
         win_h = gameparams.windowheight
