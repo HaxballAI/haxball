@@ -137,21 +137,7 @@ if __name__ == "__main__":
     #if torch.cuda.is_available():
     #    mod.to(torch.device('cuda'))
 
-    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(9, False), worker_number=15,\
-                batch_size=32, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=1e-3, is_norming=False,\
-                save_dir="models/hybridloss_step_9", save_frequency=200, number_of_steps=1000)
-
-    model = torch.load("models/hybridloss_step_9.model")
-
-    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(8, False), worker_number=15,\
-                batch_size=32, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=1e-3, is_norming=False,\
-                save_dir="models/hybridloss_step_8", save_frequency=200, number_of_steps=1250)
-
-    model = torch.load("models/hybridloss_step_8.model")
-
-    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(7, False), worker_number=15,\
-                batch_size=32, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=1e-3, is_norming=False,\
-                save_dir="models/hybridloss_step_7", save_frequency=200, number_of_steps=1607)
+    
 
     model = torch.load("models/hybridloss_step_7.model")
 
