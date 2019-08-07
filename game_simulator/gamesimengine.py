@@ -10,7 +10,7 @@ class GameSimEngine():
         if rand_reset:
             self.reds = [entities.Player("red", self.getRandomPositionInThePlayingField()) for i in range(red_player_count)]
             self.blues = [entities.Player("blue", self.getRandomPositionInThePlayingField()) for i in range(blue_player_count)]
-            self.balls = [entities.Ball(self.getRandomPositionInThePlayingField()) for i in range(ball_count)]
+            self.balls = [entities.Ball(self.getRandomPositionInThePitch()) for i in range(ball_count)]
         else:
             red_def_pos = (gameparams.windowwidth / 3, gameparams.windowheight / 2)
             blue_def_pos = (gameparams.windowwidth * 2 / 3, gameparams.windowheight / 2)
@@ -51,6 +51,9 @@ class GameSimEngine():
         self.enforce_kickoff = enforce_kickoff
 
     def getRandomPositionInThePlayingField(self):
+        return np.array([np.random.random_sample() * 840,  np.random.random_sample() * 400]).astype(float)
+
+    def getRandomPositionInThePitch(self):
         return np.array([gameparams.pitchcornerx + np.random.random_sample() * 580, gameparams.pitchcornery + np.random.random_sample() * 200]).astype(float)
 
     def keepOutOfCentre(self, obj):
