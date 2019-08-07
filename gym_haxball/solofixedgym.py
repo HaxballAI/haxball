@@ -6,6 +6,12 @@ from gym import core, spaces
 import numpy as np
 import torch
 
+def env_constructor(opponent, step_length = 10, max_steps = 400):
+    def toRet():
+        return DuelFixedGym({"step_length": step_length, "max_steps" : max_steps ,\
+                             "model object": opponent})
+    return toRet
+
 class DuelFixedGym(core.Env):
     def __init__(self, config):
         if "step_length" in config:
@@ -23,6 +29,16 @@ class DuelFixedGym(core.Env):
         else:
             norming = True
 
+        if "model name" in config:
+            model_name = config["model name"]
+        else:
+            model_name = "arun_v6"
+
+        if "model object" in config:
+            model_obj = config["model object"]
+        else:
+            model_obj = None
+
         self.envo = DuelEnviroment(step_len, max_steps, norming)
 
         win_w = gameparams.windowwidth
@@ -37,8 +53,11 @@ class DuelFixedGym(core.Env):
             dtype = np.float32
            )
 
-        opponent_model = torch.load("models/train2.model")
-        self.opponent = ACagent.ACAgent(opponent_model, "blue",  "random")
+        if model_obj = None:
+            opponent_model = torch.load(f"models/{model}.model").to("cpu")
+            self.opponent = ACagent.ACAgent(opponent_model, "blue",  "random")
+        else:
+            self.opponent = ACagent.ACAgent(model_obj, "blue",  "random")
 
     def getState(self):
         return self.envo.getState()
