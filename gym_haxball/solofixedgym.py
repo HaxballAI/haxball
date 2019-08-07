@@ -53,7 +53,7 @@ class DuelFixedGym(core.Env):
             dtype = np.float32
            )
 
-        if model_obj = None:
+        if model_obj == None:
             opponent_model = torch.load(f"models/{model}.model").to("cpu")
             self.opponent = ACagent.ACAgent(opponent_model, "blue",  "random")
         else:

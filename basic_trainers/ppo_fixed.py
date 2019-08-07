@@ -15,11 +15,13 @@ import gym_haxball.parallel_env as vecenv
 use_cuda = torch.cuda.is_available()
 device   = torch.device("cuda" if use_cuda else "cpu")
 
+
+
 class PPOTrainer:
     def __init__(self, model, env_constructor, worker_num,
-                 learning_rate = 0.001, gamma = 0.99, tau = 0.95, critic_param = 0.5,
-                 temperature = 0.001, clip_param = 0.1, ppo_epochs = 4,
-                 mini_batch_size = 5):
+                 learning_rate =3e-4, gamma = 1 - 3e-3, tau = 0.95, critic_param = 0.5,
+                 temperature = 1e-3, clip_param = 0.1, ppo_epochs = 4,
+                 mini_batch_size = 5, parallelise = True):
         self.model = model.to(device)
         self.lr = learning_rate
         self.gamma = gamma
@@ -29,11 +31,16 @@ class PPOTrainer:
         self.ppo_epochs = ppo_epochs
         self.mini_batch_size = mini_batch_size
         self.clip_param = clip_param
-        self.envs = vecenv.SubprocVecEnv([env_constructor for i in range(worker_num)])
+        if parallelise:
+            self.envs = vecenv.SubprocVecEnv([env_constructor for i in range(worker_num)])
+        else:
+            self.envs = vecenv.BadVecEnv([env_constructor for i in range(worker_num)])
         self.optimiser = optim.Adam(self.model.parameters(), lr=self.lr)
         self.state = torch.FloatTensor(self.envs.reset()).to(device)
 
         print("Done.")
+
+
 
 
     def train(self, steps):
@@ -49,7 +56,7 @@ class PPOTrainer:
             masks     = []
             entropy = 0
 
-            for _ in range(steps):
+            for _ in range(32):
                 a_probs, value = self.model(self.state)
                 dist = Categorical(a_probs)
 
@@ -57,7 +64,7 @@ class PPOTrainer:
                 next_state, reward, done, _ = self.envs.step(action.cpu().numpy())
 
                 log_prob = dist.log_prob(action)
-                entropy += dist.entropy().mean()
+                entropy = entropy + dist.entropy().mean()
 
                 log_probs.append(log_prob)
                 values.append(value)
@@ -136,3 +143,6 @@ class PPOTrainer:
                 self.optimiser.zero_grad()
                 loss.backward()
                 self.optimiser.step()
+
+    def __del__():
+        self.envs.close()

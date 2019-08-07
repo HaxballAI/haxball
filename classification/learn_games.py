@@ -43,10 +43,13 @@ class GameDataset(Dataset):
 
 
 
-def learnFromGames(model, data_dir, game_indicies, epoch_num, learning_rate, batch_size, norming = False):
+def learnFromGames(model, data_dir, game_indicies, epoch_num \
+                 , learning_rate, batch_size, temperature = 0.001, norming = False):
     game_data = GameDataset(data_dir, game_indicies, norming)
     game_loader = DataLoader(game_data, batch_size=batch_size, shuffle = True)
-    actioncriterion = torch.nn.CrossEntropyLoss(reduction = 'mean')
+    # Weights the actions, to ensure kicking is actually predicted.
+    action_weight = torch.FloatTensor([1 + 5 * (i % 2) for i in range(18)])
+    actioncriterion = torch.nn.CrossEntropyLoss(reduction = 'mean', weight = action_weight)
     wincriterion = torch.nn.MSELoss(reduction = 'mean')
     optimiser = torch.optim.Adam(model.parameters(), lr = learning_rate)
     for epoch in range(epoch_num):
