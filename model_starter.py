@@ -132,11 +132,45 @@ def actorTrain(primary_model, env, save_dir, number_of_steps, batch_size, learni
 if __name__ == "__main__":
     #newNet("scum_beater_v0","sebgames",100,3,1e-3,32, False, False)
 
-    model = torch.load("models/arun_v6.model")
+    model = torch.load("models/hybridloss_test.model")
     model_fixed_opponent = None
     #if torch.cuda.is_available():
     #    mod.to(torch.device('cuda'))
 
-    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(10, False), worker_number=15,\
+    
+
+    model = torch.load("models/hybridloss_step_7.model")
+
+    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(6, False), worker_number=15,\
                 batch_size=32, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=1e-3, is_norming=False,\
-                save_dir="models/sanity_test", save_frequency=2, number_of_steps=10)
+                save_dir="models/hybridloss_step_6", save_frequency=200, number_of_steps=2143)
+
+    model = torch.load("models/hybridloss_step_6.model")
+
+    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(5, False), worker_number=15,\
+                batch_size=32, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=1e-3, is_norming=False,\
+                save_dir="models/hybridloss_step_5", save_frequency=200, number_of_steps=3000)
+
+    model = torch.load("models/hybridloss_step_5.model")
+
+    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(4, False), worker_number=15,\
+                batch_size=32, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=1e-3, is_norming=False,\
+                save_dir="models/hybridloss_step_4", save_frequency=200, number_of_steps=4500)
+
+    model = torch.load("models/hybridloss_step_4.model")
+
+    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(3, False), worker_number=15,\
+                batch_size=32, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=1e-3, is_norming=False,\
+                save_dir="models/hybridloss_step_3", save_frequency=200, number_of_steps=7500)
+
+    model = torch.load("models/hybridloss_step_3.model")
+
+    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(2, False), worker_number=15,\
+                batch_size=32, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=1e-3, is_norming=False,\
+                save_dir="models/hybridloss_step_2", save_frequency=200, number_of_steps=15000)
+
+    model = torch.load("models/hybridloss_step_2.model")
+
+    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(1, False), worker_number=15,\
+                batch_size=32, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=1e-3, is_norming=False,\
+                save_dir="models/hybridloss_step_1", save_frequency=200, number_of_steps=45000)
