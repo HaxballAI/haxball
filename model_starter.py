@@ -9,6 +9,7 @@ import network
 import gym_haxball.onevoneenviroment
 from basic_trainers.actor_critic_symmetric import TrainSession as SymmetricTrainSession
 from basic_trainers.actor_critic_fixed import TrainSession as FixedTrainSession
+from basic_trainers.ppo_fixed import PPOTrainer
 import random
 from utils import global_timer
 
@@ -137,40 +138,10 @@ if __name__ == "__main__":
     #if torch.cuda.is_available():
     #    mod.to(torch.device('cuda'))
 
-    
+
 
     model = torch.load("models/hybridloss_step_7.model")
 
-    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(6, False), worker_number=15,\
-                batch_size=32, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=1e-3, is_norming=False,\
-                save_dir="models/hybridloss_step_6", save_frequency=200, number_of_steps=2143)
-
-    model = torch.load("models/hybridloss_step_6.model")
-
-    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(5, False), worker_number=15,\
-                batch_size=32, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=1e-3, is_norming=False,\
-                save_dir="models/hybridloss_step_5", save_frequency=200, number_of_steps=3000)
-
-    model = torch.load("models/hybridloss_step_5.model")
-
-    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(4, False), worker_number=15,\
-                batch_size=32, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=1e-3, is_norming=False,\
-                save_dir="models/hybridloss_step_4", save_frequency=200, number_of_steps=4500)
-
-    model = torch.load("models/hybridloss_step_4.model")
-
-    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(3, False), worker_number=15,\
-                batch_size=32, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=1e-3, is_norming=False,\
-                save_dir="models/hybridloss_step_3", save_frequency=200, number_of_steps=7500)
-
-    model = torch.load("models/hybridloss_step_3.model")
-
-    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(2, False), worker_number=15,\
-                batch_size=32, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=1e-3, is_norming=False,\
-                save_dir="models/hybridloss_step_2", save_frequency=200, number_of_steps=15000)
-
-    model = torch.load("models/hybridloss_step_2.model")
-
-    actorTrain(primary_model=model, secondary_model=model_fixed_opponent, env=lambda: makeEnv(1, False), worker_number=15,\
-                batch_size=32, learning_rate=3e-4, gamma=1-3e-3, entropy_rate=1e-3, is_norming=False,\
-                save_dir="models/hybridloss_step_1", save_frequency=200, number_of_steps=45000)
+    PPOTrainer(model, lambda: makeEnv(1, False), worker_num=15, learning_rate =3e-4,\
+    gamma = 1 - 3e-3, tau = 0.95, critic_param = 0.5, temperature = 1e-3,\
+    clip_param = 0.1, ppo_epochs = 4, mini_batch_size = 5, parallelise = False)

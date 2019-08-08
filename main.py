@@ -16,7 +16,7 @@ import numpy as np
 import torch
 
 def main():
-    model_1 = torch.load("models/hybridloss_step_5.model")
+    model_1 = torch.load("models/hybridloss_step_2.model")
     model_2 = torch.load("models/champion3_v1.model")
 
     #if torch.cuda.is_available():

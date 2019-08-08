@@ -144,5 +144,5 @@ class PPOTrainer:
                 loss.backward()
                 self.optimiser.step()
 
-    def __del__(self):
-        self.envs.close()
+#    def __del__():
+        #self.envs.close()
