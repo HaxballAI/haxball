@@ -105,7 +105,7 @@ default_blue_bindings = ('UP', 'RIGHT', 'DOWN', 'LEFT', 'u')
 
 def getAgents(display, red_debug_surf, blue_debug_surf):
     if args.red_model != None:
-        model_red = torch.load(args.load_dir + args.red_model + ".model")
+        model_red = torch.load(args.load_dir + args.red_model + ".model").to("cpu")
         agent_red_ = ACagent.ACAgent(model_red, "red", "random", red_debug_surf, args.red_normalised)
         if args.red_human == True:
             agent_red = humanACagent.HumanACAgent(default_red_bindings, display, agent_red_)
@@ -118,7 +118,7 @@ def getAgents(display, red_debug_surf, blue_debug_surf):
             agent_red = idleagent.IdleAgent()
 
     if args.blue_model != None:
-        model_blue = torch.load(args.load_dir + args.blue_model + ".model")
+        model_blue = torch.load(args.load_dir + args.blue_model + ".model").to("cpu")
         agent_blue_ = ACagent.ACAgent(model_blue, "blue", "random", blue_debug_surf, args.blue_normalised)
         if args.blue_human == True:
             agent_blue = humanACagent.HumanACAgent(default_blue_bindings, display, agent_blue_)
